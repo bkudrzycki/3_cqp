@@ -210,7 +210,7 @@ Second, **competency questions** refer to sets of trade-specific tasks which wer
 
 Finally, **experience questions** were based on the same list of trade-specific tasks, except that trainers and apprentices were asked to tally which tasks the apprentice already had performed at least once in the past. As with apprentice competency, experience was evaluated by master trainers at both baseline and endline and self-evaluated by apprentices at endline.
 
-The final metric used in evaluating apprentice progress was the proportion of knowledge questions answered correctly and the proportion of tasks in which apprentices were deemed competent or experienced, respectively. Each metric is evaluated at baseline and endline for each individual apprentice, with the results shown in Table \@ref(tab:skills) in the Appendix. Changes in scores averaged across wave and trade are shown in Figure \@ref(fig:improvement1) in the Appendix. We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 5% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing. 
+The final metric used as an indicator of apprentice human capital is the proportion of knowledge questions answered correctly and the proportion of tasks in which apprentices were deemed competent or experienced, respectively. Each metric is evaluated at baseline and endline for each individual apprentice, with the results shown in Table \@ref(tab:skills) in the Appendix. Changes in scores averaged across wave and trade are shown in Figure \@ref(fig:improvement1) in the Appendix. We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 10% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing; thus, the marginally significant increase in knowledge scores is driven by improvements in a single trade.
 
 ### Firm Benefits
 Firm owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
@@ -261,7 +261,7 @@ df %>% select(FS1.2, firm_size, FS3.4, FS6.1, contains("FS3.5"), wave) %>%
                            FS3.5_5 ~ "Occasional workers"),
               include = -c(FS1.2, FS3.5_1)) %>% 
   modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Total firm size includes owner."
+    all_stat_cols() ~ "Mean (SD). Firm size refers to no. of total workers including owner."
   ) %>% 
   as_kable_extra(caption = "Firm size", 
                  booktabs = T,
@@ -298,20 +298,36 @@ In this section, we analyze the benefits of apprenticeship training for apprenti
 
 ## Apprentice benefits {#appbenefits}
 
-``` {r improvement2, fig.width=7,fig.height=4, fig.cap = "Change in apprentice human capital scores", fig.pos='H'}
-y <- df %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, FS1.11, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = ifelse(comp_all_trades_0 != 0, (comp_all_trades_1-comp_all_trades_0)/comp_all_trades_0*100, 1), exp_diff = ifelse(exp_all_trades_0 > 0, (exp_all_trades_1-exp_all_trades_0)/exp_all_trades_0*100, 1), skills_diff = ifelse(skills_all_trades_0 != 0, (skills_all_trades_1-skills_all_trades_0)/skills_all_trades_0*100), 1) %>% mutate(trade = FS1.11)
-
-y <- y %>% rbind(y %>% mutate(trade = NA)) %>% mutate(trade = ifelse(is.na(trade), 6, trade)) %>% 
-  select(trade, comp_diff, exp_diff, skills_diff) %>% group_by(trade) %>% summarise_all(mean, na.rm = T) %>% pivot_longer(cols = c(comp_diff, exp_diff, skills_diff))
-
-ggplot(data=y, aes(x=trade, y=value, fill=name)) +
-  geom_bar(stat="identity", color="black", position=position_dodge()) +
-  labs(x = "", y = "Percent change") + scale_fill_viridis_d(name = "", labels = c("Competence", "Experience", "Knowledge")) +
-  theme_minimal() + scale_x_discrete(limits = c("Masonry", "Carpentry", "Plumbing",  "Metalwork", "Electrical Inst.", "Overall"))
-
+```{r skills}
+df %>% select(contains("skills"), wave, IDYouth) %>%
+  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
+  tbl_summary(by=wave,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              include = -IDYouth) %>% 
+      add_stat(
+    fns = everything() ~ add_by_n
+  ) %>% 
+  modify_table_body(
+    ~ .x %>%
+      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
+      dplyr::relocate(add_n_stat_2, .before = stat_2)
+  ) %>%
+  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>% 
+  modify_header(stat_by =  "**{level}**",
+                starts_with("add_n_stat") ~ "**N**",
+                label = "**Trade**") %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Proportion of correctly answered knowledge questions."
+  ) %>% 
+  as_kable_extra(caption = "Change in Apprentice Knowledge", 
+                 booktabs = T,
+                 linesep = "",
+                 position = "H")
 ```
 
-In the above analysis, and in Table \@ref(tab:skills) in the Appendix, scores are pooled at the trade level in each wave. Alternatively, we can observe the change in scores for individuals before taking means. Individual changes in score averaged across trades are shown in Figure \@ref(fig:improvement2). Viewed thus, improvements in competence and experience scores are much more pronounced, with apprentices in masonry doubling their experience and nearly doubling their competence (on the other hand, improvements for electrical installation appear lower compared to the case where data is pooled). However, due to attrition between the two waves, this subgroup analysis suffers from small group size, with $N=34$ for masonry and $N=20$ for carpentry.
+In Table \@ref(tab:skills) above, scores are pooled at the trade level in each wave. Alternatively, we can observe the change in scores for individuals before taking means. Individual changes in score averaged across trades are shown in Figure \@ref(fig:improvement2) in the Appendix. Viewed thus, improvements in competence and experience scores are much more pronounced, with apprentices in masonry doubling their experience and nearly doubling their competence (on the other hand, improvements for electrical installation appear lower compared to the case where data is pooled). However, due to attrition between the two waves, this subgroup analysis suffers from small group size, with $N=34$ for masonry and $N=20$ for carpentry.
 
 Evidence of apprenticeship effectiveness is clearer when regarding the apprentice competency and experience metrics. Table \@ref(tab:compexp1) in the Appendix shows that mean *competency* score among all apprentices improved from 76% of tasks at baseline to 92% at endline, an improvement of .66 standard deviations. Improvements were observed across all trades, and all differences were statistically significant at standard levels (with the exception of carpentry). Similarly, apprentice *experience* improved from having performed 73% of tasks at baseline to 92% at endline, an improvement of .73 standard deviations.
 
@@ -332,11 +348,11 @@ According to survey data, about a quarter of respondents say training does not t
 _@mohrenweiser2009: The German dual apprenticeship system is often regarded as a potential model for other countries because it allows enterprises to provide and pay for training in specific and general human capital (Harhoff and Kane, 1997; Acemoglu and Pischke, 1999b; Steedman 2001)...We show that employing apprentices in trade, commercial, craft, and construction occupations instead of unskilled or semi-skilled employees has a positive impact on contemporary establishment performance. In contrast, apprentices in manufacturing occupations have higher relative training costs in comparison to their benefits — contemporary establishment performance declines when their share of employees increases while those of unskilled or semi-skilled employees decreases...The net costs assumption stems from a series of descriptive cost–benefit-studies conducted by the BIBB (Bardeleben et al., 1997; Beicht et al., 2004; Wenzelmann et al., 2009). These evaluations calculate relevant costs during apprenticeship training for about 50 occupations and compare them with the economic value of the productivity contribution of a typical apprentice. Evaluations are based on surveys of about 2500 (personnel) managers who assessed one occupation each. They consistently find that all occupations and almost all companies face sizeable net costs during the apprenticeship period...Fougère and Schwerdt (2002) find a positive effect of apprentices on value added only in medium-sized German establishments. Askilden and Nilsen (2005) analyse the recruitment of apprentices during the business cycle in Norway. They find that apprentices are substitutes for skilled workers and are primarily recruited in boom phases. Zwick (2007) finds on the basis of panel estimations that an increase in the share of apprentices does not decrease profits on average_
 --> 
 
-In the German and Swiss context, the primary benefit of training for firms is the productive value of apprentices during and after their apprenticeship. This value is generated when the apprentices is working in the firm, performing skilled or unskilled tasks that would otherwise be carried out by the firm owner, paid employees, or unpaid labor. These benefits accumulate after graduation if the apprentice is hired for less than the labor market wage for workers of equal productivity, as well as any savings on recruitment and hiring costs [@acemogluWhyFirmsTrain1998, @acemogluStructureWagesInvestment1999, acemogluTrainingImperfectLabour1999].
+In the German and Swiss context, the primary benefit of training for firms is the productive value of apprentices during and after their apprenticeship. This value is generated when the apprentices is working in the firm, performing skilled or unskilled tasks that would otherwise be carried out by the firm owner, paid employees, or unpaid labor. These benefits accumulate after graduation if the apprentice is hired for less than the labor market wage for workers of equal productivity, as well as any savings on recruitment and hiring costs [@acemogluWhyFirmsTrain1998; @acemogluStructureWagesInvestment1999; @acemogluTrainingImperfectLabour1999].
 
-In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007, @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:firmdesc)).
+In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007; @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:firmdesc)).
 
-If this is the case, why do craftsmen in Bénin train at all? First, apprentices are the cheapest and most abundant source of labor, and can be hired to complete unskilled tasks at little overhead. Second, if trades can be mastered relatively quickly, apprentices will provide skilled labor in the later years of their graduation (and after graduation as well, for as long as they need to work to pay off outstanding training fees or save up for their own workshop). Finally, the apprentices (or, more often, their families) traditionally pay fees to the master craftsmen in return for the provision of training [@velenchikApprenticeshipContractsSmall1995; @frazer2006; @bankole2020]. Aside from the training fee, these include minor fees to cover the provision of equipment and materials, application fees (pertinent for the CQP, as the master trainer must submit paperwork in their apprentices' stead), and initiation and graduation fees. In total, apprentices report paying about 175,000 FCFA (280 \$US) in fees for training, while firm owner report around 160,000 FCFA (255 \$US) in fees per apprentice. This indicates an minor increase in the costs of training in Benin over the past two decades: @walther2007 reports total fees ranging from 50,000 to 150,000 FCFA (96-290 \$US, inflation adjusted). Though generally unregulated, in some cases professional associations and public authorities step in to regulate fees, particularly those levied for initiation and graduation ceremonies.
+If this is the case, why do craftsmen in Bénin train at all? First, apprentices are the cheapest and most abundant source of labor, and can be hired to complete unskilled tasks at little overhead. Second, if trades can be mastered relatively quickly, apprentices will provide skilled labor in the later years of their graduation (and after graduation as well, for as long as they need to work to pay off outstanding training fees or save up for their own workshop). Finally, the apprentices (or, more often, their families) traditionally pay fees to the master craftsmen in return for the provision of training [@velenchikApprenticeshipContractsSmall1995; @frazer2006; @bankole2020].
 
 ```{r fees}
 df <- unlabelled(df)
@@ -387,7 +403,10 @@ tbl_merge(list(baseline, endline), tab_spanner = c("**Baseline**", "**Endline**"
 ```
 
 
-Fees are the simplest set of benefits to quantify, and are summarized in Table \@ref(tab:fees). General training fees account are the largest sum paid to the firms and account for over half of total fees paid. Apprentices report significantly higher fees than firms, for this specific fee in particular. Firms may underreport fees to avoid accusations of gauging, but are at the same time likely to have more direct knowledge of all fees than apprentices, whose parents and relatives usually pay the craftsmen directly. Finally, firms report collecting higher initiation and application fees at the time of the endline survey. This may indicate a shift to fee payments to the beginning of the apprenticeship as graduation ceremonies (and the concomitant graduation fees) are phased out as legislation prohibiting graduation ceremonies is put into practice over time.
+Fees are the simplest set of benefits to quantify, and are summarized in Table \@ref(tab:fees). General training fees account are the largest sum paid to the firms and account for over half of total fees paid. Other minor fees cover the provision of equipment and materials, application fees (pertinent for the CQP, as the master trainer must submit paperwork in their apprentices' stead), and initiation and graduation fees. In total, apprentices report paying about 175,000 FCFA (280 \$US) in fees for training, while firm owner report around 160,000 FCFA (255 \$US) in fees per apprentice. This indicates an minor increase in the costs of training in Benin over the past two decades: @walther2007 reports total fees ranging from 50,000 to 150,000 FCFA (96-290 \$US, inflation adjusted). Though generally unregulated, in some cases professional associations and public authorities step in to regulate fees, particularly those levied for initiation and graduation ceremonies.
+
+
+Apprentices report significantly higher fees than firms, for this specific fee in particular. Firms may underreport fees to avoid accusations of gauging, but are at the same time likely to have more direct knowledge of all fees than apprentices, whose parents and relatives usually pay the craftsmen directly. Finally, firms report collecting higher initiation and application fees at the time of the endline survey. This may indicate a shift to fee payments to the beginning of the apprenticeship as graduation ceremonies (and the concomitant graduation fees) are phased out as legislation prohibiting graduation ceremonies is put into practice over time.
 
 <!---
 Averaging over both survey waves, the largest fees reported by the firms are training fees, totalling `r round(mean(df$fee_formation, na.rm = T), 0)` FCFA (`r round(mean(df$fee_formation/605, na.rm = T), 0)` \$US). The remaining fees total `r round(mean(df$fee_entry, na.rm = T) + mean(df$fee_liberation, na.rm = T) + mean(df$fee_materials, na.rm = T) + mean(df$fee_contract, na.rm = T) + mean(df$fee_application, na.rm = T), 0)` FCFA (`r round((mean(df$fee_entry, na.rm = T) + mean(df$fee_liberation, na.rm = T) + mean(df$fee_materials, na.rm = T) + mean(df$fee_contract, na.rm = T) + mean(df$fee_application, na.rm = T))/605, 0)` \$US).
@@ -771,35 +790,19 @@ _
 
 # Appendix {.unnumbered}
 
+``` {r improvement2, fig.width=7,fig.height=4, fig.cap = "Change in apprentice human capital scores", fig.pos='H'}
+y <- df %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, FS1.11, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = ifelse(comp_all_trades_0 != 0, (comp_all_trades_1-comp_all_trades_0)/comp_all_trades_0*100, 1), exp_diff = ifelse(exp_all_trades_0 > 0, (exp_all_trades_1-exp_all_trades_0)/exp_all_trades_0*100, 1), skills_diff = ifelse(skills_all_trades_0 != 0, (skills_all_trades_1-skills_all_trades_0)/skills_all_trades_0*100), 1) %>% mutate(trade = FS1.11)
 
-```{r skills}
-df %>% select(contains("skills"), wave, IDYouth) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-      add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>% 
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Proportion of correctly answered knowledge questions."
-  ) %>% 
-  as_kable_extra(caption = "Change in Apprentice Knowledge", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
+y <- y %>% rbind(y %>% mutate(trade = NA)) %>% mutate(trade = ifelse(is.na(trade), 6, trade)) %>% 
+  select(trade, comp_diff, exp_diff, skills_diff) %>% group_by(trade) %>% summarise_all(mean, na.rm = T) %>% pivot_longer(cols = c(comp_diff, exp_diff, skills_diff))
+
+ggplot(data=y, aes(x=trade, y=value, fill=name)) +
+  geom_bar(stat="identity", color="black", position=position_dodge()) +
+  labs(x = "", y = "Percent change") + scale_fill_viridis_d(name = "", labels = c("Competence", "Experience", "Knowledge")) +
+  theme_minimal() + scale_x_discrete(limits = c("Masonry", "Carpentry", "Plumbing",  "Metalwork", "Electrical Inst.", "Overall"))
+
 ```
+
 
 ```{r compexp1}
 comp <- df %>% select(contains("comp"), -contains("a_"), wave, IDYouth) %>%
