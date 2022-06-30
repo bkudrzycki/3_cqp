@@ -293,9 +293,9 @@ ggplot(data=x, aes(x=FS1.11, y=value, fill=name)) +
 
 
 # simple net benefits by duration
-df %>% filter(!is.na(duration), duration < 9) %>% select(duration, cb_simple, cb_complex) %>% 
+df %>% filter(!is.na(duration), duration < 9) %>% select(duration, cb_2, cb_3) %>% 
   group_by(duration) %>% summarise_all(mean, na.rm = T) %>% 
-  ggplot(aes(x = duration, y = cb_simple)) +
+  ggplot(aes(x = duration, y = cb_2)) +
   geom_segment(aes(xend = duration, yend="cb_simple")) +
   geom_point( color="orange", size=4) +
   theme_minimal() +
@@ -304,15 +304,23 @@ df %>% filter(!is.na(duration), duration < 9) %>% select(duration, cb_simple, cb
   scale_x_discrete(limits = c(0:8)) %>% suppressWarnings()
 
 # complex net benefits by duration
-df %>% filter(!is.na(duration), duration < 7) %>% select(duration, cb_simple, cb_complex) %>% 
+df %>% filter(!is.na(duration), duration < 7) %>% select(duration, cb_2, cb_3) %>% 
   group_by(duration) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% 
-  ggplot(aes(x = duration, y = cb_complex)) +
+  ggplot(aes(x = duration, y = cb_3)) +
   geom_segment(aes(xend = duration, yend="cb_complex")) +
   geom_point( color="orange", size=4) +
   theme(axis.text.y=element_blank()) +
   xlab("Year of apprenticeship") +
   ylab("Net benefits") +
-  scale_x_discrete(limits = c(0:6)) %>% suppressWarnings()
+  scale_x_continuous(limits = c(0:6)) %>% suppressWarnings()
+
+x <- df %>% filter(!is.na(firm_size_bins), !is.na(FS6.1)) %>% select(FS1.2, cb_1, cb_2, firm_size_bins, wave) %>%
+  group_by(FS1.2, firm_size_bins, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% group_by(firm_size_bins, wave) %>% summarise_all(mean, na.rm = T)
+  
+  
+  ggplot(aes(x=firm_size_bins, y=cb_1)) +
+  geom_bar(stat="identity", color="black", position=position_dodge()) +
+  labs(x = "Firm Size", y = "FCFA per year")
 
 
 rm(list = ls())

@@ -16,3 +16,5 @@ purrr
 dplyr
 stringr
 forcats
+rstatix
+kableExtra

@@ -41,14 +41,14 @@ time_inv_ys <- ys %>% select("IDYouth", "baseline_age", "endline_age", "cqp", "b
 #baseline
 base_ys <- ys %>% select(tidyselect::vars_select(names(ys), -matches(c("baseline_age", "endline_age", "YE", "cqp", "birthdate", "sex", "DEPART", "NOTE_OBTENUE", "SELECTED", "DIPLOME", "YS3.16", "YS4.6")))) %>% mutate(wave = 0)
 #endline
-end_ys <- ys %>% select(tidyselect::vars_select(names(ys), matches(c('IDYouth', 'YE3', 'YE5', 'YE3.22')))) %>% mutate(wave = 1)
+end_ys <- ys %>% select(tidyselect::vars_select(names(ys), matches(c('IDYouth', 'YE3', 'YE5')))) %>% mutate(wave = 1)
 
 # SELECT FIRM (FS) VARIABLES OF INTEREST HERE
 #time-invariant from firm survey
 time_inv_fs <- fs %>% select("FS1.2", "FS1.11", "FS6.16", "dossier_apps", "dossier_reserves", "dossier_selected") %>% left_join(fs_end %>% select("FS1.2", contains("FE5.1")), by = "FS1.2")
 
-df <- rbind(JoinCQP(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS3.5_1','FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS4.1', 'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', 'FS9.3')) %>% rename(status = FS9.3), 
-            JoinTrad(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS4.1', 'FS3.5_1', 'FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS3.5_1',  'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', 'FS7.4')) %>% rename(status = FS7.4)) %>%
+df <- rbind(JoinCQP(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS3.5_1','FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS4.1', 'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', matches('FS6.15'), 'FS6.17', 'FS9.3')) %>% rename(status = FS9.3), 
+            JoinTrad(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS4.1', 'FS3.5_1', 'FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS3.5_1',  'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', matches('FS6.15'), 'FS6.17', 'FS7.4')) %>% rename(status = FS7.4)) %>%
   left_join(base_ys, by = c("IDYouth", "wave")) %>%
   left_join(time_inv_ys, by = "IDYouth") %>%
   left_join(time_inv_fs, by = "FS1.2") %>%
@@ -255,7 +255,7 @@ df <- df %>% left_join(rbind(JoinCQPMatch(c('FS9.6')) %>% rename(allow_food = FS
 df <- df %>% mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), recode,
                        `1` = 150,
                        `2` = 325,
-                       `3` = 475,
+                       `3` = 525,
                        `4` = 875,
                        `5` = 1225,
                        `6` = 1775,

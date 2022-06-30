@@ -30,9 +30,32 @@ knitr::opts_chunk$set(message=FALSE,
                       fig.path='figures/',
                       out.extra = "",
                       floatfoot.envs = c("figure", "table", "longtabu")) 
+knitr::read_chunk('../code/allowances_big_table.R')
 
 options(scipen=2, digits=2)
 ```
+
+<!--  
+```{r installlibraries, include=FALSE, cache = FALSE}
+
+packages <- c("lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "gridExtra", "rstatix", "kableExtra")
+
+# Install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages], silent = TRUE)
+}
+
+# Load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+rm(packages, installed_packages)
+
+suppressMessages(library(stargazer))
+suppressMessages(library(tidyverse))
+
+```
+-->
 
 ```{r loadlibraries, include=FALSE, cache = FALSE}
 library(lfe)
@@ -44,7 +67,7 @@ library(gtsummary)
 library(labelled)
 library(gridExtra)
 suppressMessages(library(tidyverse))
-
+library(rstatix)
 ```
 
 ```{r loaddata, include=FALSE}
@@ -55,11 +78,14 @@ selected <- df %>% filter(SELECTED == 1)
 # load functions
 source("../functions/add_by_n.R")
 ggplot2::theme_set(ggplot2::theme_bw())  ## (sets the ggplot2 theme to theme_bw)
+
 ```
 
 \doublespacing
 
 # Introduction {#intro}
+
+[@davodoun2011]
 
 In sub-Saharan Africa (SSA), interest in apprenticeship is on the rise. According to survey data, informal apprenticeships (also referred to as apprenticeships in the informal economy or traditional apprenticeships) are estimated to provide as much as 95 percent of technical and vocational education and training (TVET) in SSA, and in many cases account for as much as 90 percent of total employment in the crafts sector [@walther2007; @worldbank2017]. Informal sector training is seen by many policy experts as an important tool to tackle the youth employment challenge facing the continent [@filmer2014].
 
@@ -67,23 +93,27 @@ For youth who drop out of school early, informal on-the-job training is often th
 
 While abundant and flexible, training in the informal economy is subject to little oversight, with apprentices often exposed to inexperienced or exploitative trainers. Moreover, since informal apprenticeships are often outside formal accreditation systems, they offer limited labor market mobility relative to formal education and training schemes [@worldbank2017]. Policies introducing competency-based, nationally-accredited certification of informal apprenticeship are a potential solution to this issue, and have been introduced in countries such as Malawi and Tanzania.
 
-In this paper, we employ a two-period panel of matched firm-apprentice data from the West African country of Bénin to investigate the benefits of infromal apprenticeship training for both apprentices and training firms. All sampled firms trained at least one apprentice who applied to the 2019 cohort Bénin's dual training accreditation scheme, the _Certificat de Qualification Professionnelle_ (CQP) program. Dual apprenticeship is a specific form of apprenticeship in which on-the-job training is supplemented by external classroom teaching. While popular in several European countries, most notably Germany and Switzerland, it has yet to be proven as a workable model in informal apprenticeship markets. To investigate the viability of the program for apprentices and firms, we thus run a cost and benefit analysis to account
+In 2008, the West African country of Bénin introduced the _Certificat de Qualification Professionnelle_ (CQP) program, which combines national accreditation with the dual system approach popularized in Switzerland and Germany. In the dual system, apprentices in informal firms supplement on-the-job training with weekly classroom training. Dual training entails higher costs than traditional apprenticeship, and the long-term viability of such a scheme rests on its value proposition for apprentices, firms, and any external subsidizing sponsors (aid agencies and the government). Thus, an understanding of the cost-sharing underpinning the program is crucial for planning an incentive structure that motivates both firm and apprentice participation.
 
-Dual training entails higher costs than traditional apprenticeship, and the long-term viability of such a scheme rests on its value proposition for apprentices, firms, and any external subsidizing sponsors (aid agencies and the government). Thus, an understanding of the cost-sharing underpinning the program is crucial for planning an incentive structure that motivates both firm and apprentice participation.
+In this paper, we employ matched firm-apprentice survey data collected in two waves (2019 and 2021) to estimate the net benefit of training for firms, then investigate the impact of informal and dual system apprenticeship training on both apprentice learning and the profitability of their training firms. Outcomes are collected for CQP participants, traditional apprentices who unsuccessfully applied to the CQP program, and non-applicants, allowing us to identify the impact of dual system training and potential selection effects into CQP training.
+
+We find that the majority of firms suffer net losses over the duration of the apprenticeship. The proportion of firms with negative net benefits from training, and the magnitude these losses, vary considerably depending on assumptions around allowances disbursed by the firms. Larger firms benefit the most, while smaller firms suffer the largest losses, suggesting that economies of scale contribute to the incentive structures surrounding firm training.
 
 The paper proceeds as follows. Informal apprenticeship in Bénin and the CQP program are described in detail in Section \ref{background}. The survey data used for the analysis is presented in Section \ref{background}. Results are presented in Section \ref{results}. Section \ref{conclusion} concludes.
 
 \FloatBarrier 
 
-# Background {#background}
+# Country Context {#background}
 
-Despite the relative stability of its democratic government and strategic importance as a transportation hub, Bénin (population approx. 12.1 million) performs poorly on many development indicators, ranking 158th out of 189 countries on the Human Development Index in 2020. Youth employment is a particularly pressing issue, with an alarming decrease in youth labor force participation in the past decade. As in other parts of SSA, secondary and tertiary school enrollment has seen a steady increase in the past two decades, but with the primary effect of displacing employment: according to the most recent labor force surveys, the youth employment-to-population ratio decreased by 22\%, from 40\% to 31\%, between 2011 and 2018, compared to an 8\% decrease for adults over the age of 25 over the same time period. Meanwhile, the share of youth neither in school, employment nor training increased from 17.2\% in 2011 to 35.1\% in 2018 (Figure \@ref(fig:enrolment)) - one the highest rates in West Africa, and the world [@ilo2022].
+_In Benin, access to formal technical and vocational education and training (TVET) is conditional on finishing the second year of secondary school, equivalent to completing nine years of education. However, among 5- to 17-year-olds, the median years in education is four. As a result, only 5 per cent of secondary age youth are in TVET, totalling around 50,000 young people. (ILO case study) However, net enrolment among 12- to 19-year-olds is only around 35 per cent. All the other young people have no other choice but to turn to the informal economy to acquire skills through informal apprenticeship, which allows them to enter the labour market. It is estimated that these young people in apprenticeships account for more than 300,000._[@ilo2021]
+
+Despite the relative stability of its democratic government and strategic importance as a transportation hub, Bénin (population approx. 12.1 million) performs poorly on many development indicators, ranking 158th out of 189 countries on the Human Development Index in 2020. Youth employment is a particularly pressing issue, with an alarming decrease in youth labor force participation in the past decade. As in other parts of SSA, secondary and tertiary school enrollment has seen a steady increase in the past two decades, but with the primary effect of displacing employment: according to the most recent labor force surveys, the youth employment-to-population ratio decreased by 22\%, from 40\% to 31\%, between 2011 and 2018, compared to an 8\% decrease for adults over the age of 25 over the same time period. Meanwhile, the share of youth neither in employment, education or training (NEET) increased from 17.2\% in 2011 to 35.1\% in 2018 (Figure \@ref(fig:enrolment)) - one the highest rates in West Africa, and the world [@ilo2022].
 
 ```{r enrolment, fig.cap="Rates of youth enrolment and inactivity: Bénin and SSA", fig.height=4, fig.width=8, , fig.pos='H'}
 
 x <- read_csv("../data/API_SE.SEC.ENRR_DS2_en_csv_v2_4029558.csv", show_col_types = FALSE) %>% as.data.frame() %>% mutate(Indicator = "Enrolment ratio")
 
-y <- read_csv("../data/EIP_2EET_SEX_RT_A-filtered-2022-05-20.csv", show_col_types = FALSE) %>% as.data.frame() %>% select(Country = "ref_area.label", value = "obs_value", Year = time) %>% mutate(Indicator = "NEET rate")
+y <- read_csv("../data/EIP_2EET_SEX_RT_A-filtered-2022-05-20.csv", show_col_types = FALSE) %>% as.data.frame() %>% select(Country = "ref_area.label", value = "obs_value", Year = time) %>% mutate(Indicator = "% of youth not in\n employment,\n education, or \n training (NEET)")
 
 z = rbind(x, y)
 
@@ -117,7 +147,7 @@ The CQP is currently available for 13 out of the more than 300 trades listed in 
 
 The financing of dual training comprises three main budget items: the firm/workshop, the training center and certification. While on-the-job training in the firm is paid for by the parents, training in the training center is largely financed through FODEFCA from various sources (national budget, donors, NGOs, etc.). Certification upon successful completion of the CQP exam is allocated to the national budget via the Directorate of Examinations, DEC [@david-gnahoui2017].
 
-CQP qualification is attained upon the completion of a three to four year apprenticeship with a training firm in one of the designated trades or crafts and the passing of the annual national CQP examination. Competency charts ("_matrices des compétences_") published separately for each participating trade specify the knowledge and know-how that must be acquired to obtain the diploma, and a detailed testing procedure for the skills that the holder of the diploma must possess are published in a evaluation guide (_grille evaluation_) for each trade. The final examination is carried out by state representatives and local craftsmen, and apprentices receive a nationally-recognized certificate upon passing.
+CQP qualification is attained upon the completion of a three to four year apprenticeship with a training firm in one of the designated trades or crafts and the passing of the annual national CQP examination. Competency charts ("_matrices des compétences_") published separately for each participating trade specify the knowledge and know-how that must be acquired to obtain the diploma, and a detailed testing procedure for the skills that the holder of the diploma must possess are published in a evaluation guide (_grille evaluation_) for each trade. The final examination has a practical and a written component and is carried out by state representatives and local craftsmen. Upon successful completion, apprentices receive a nationally-recognized certificate.
 
 Criticisms of the CQP include the lack of certified and accredited trainers at the training centers and unstable financing, which leads to high fluctuation in the number of applicants admitted to the program [@david-gnahoui2017; @ilo2020a].
 
@@ -158,9 +188,34 @@ _From an economic point of view, it seems obvious that a firm would hire the mor
 
 \FloatBarrier
 
-# Data {#data}
+# Methods and Data {#data}
 
+## Country Context
+## Sampling
 The data for this study was collected in two separate surveys. The first consisted of interviews with apprentices who had applied to the CQP program, and the other with the owners of these apprentices' respective training firms. The two surveys were conducted in parallel in two waves: the baseline was collected in July and August 2019 and the endline was completed in September 2021. Of the 13 participating crafts sectors participating in the program, five were chosen to maximize sample size and geographic concentration: electrical installation, carpentry, masonry, metalwork (primarily welding of gates for living compounds), and plumbing.
+Summary statistics for the apprentice sample are shown in Table \@ref(tab:appdesc). Data on 432 apprentices working for 199 unique firms was collected at baseline. Of these firms, 155 were available for an endline survey. Data was collected for only 245 apprentices at endline; this drop-off was partially by design, to limit the duration of the interview with the firm owners (who were asked detailed questions about individual apprentices).
+Each firm in the sample contains at least one CQP applicant (though not necessarily a successful one), allowing us to identify the impact of participation in the program: all firms trained at least a single applicant to the CQP (though not every firm necessarily contained a participating apprentice). Detailed survey data on individual apprentices is matched from the apprentices themselves and their training craftsman. 
+## Attrition (Bias)
+## Methods
+### Apprentice Benefits
+We first look at the benefits from apprenticeship accruing to the trainees themselves over the observed time period. Since the CQP program is still undergoing frequent reforms, the progress of apprentices participating in both traditional and dual training in informal firms is of interest to policy makers involved in its future development.
+
+The benefit to apprentices takes the form of skills and competencies relevant accumulated over the course of training, which allows them to seek employment or open their own business upon graduation. In the survey, three sets of trade-specific human capital indicators were collected for each apprentice.
+
+First, **knowledge questions** were drawn from the official competency charts for each trade and posed directly to the apprentices. Each question was a multiple choice question, and between 4 and 5 knowledge questions were posed to each apprentice. Because apprentices who did not apply to the CQP were not interviewed directly, knowledge questions were only collected for Selected into CQPs and unsuccessful CQP applicants.
+
+Second, **competency questions** refer to sets of trade-specific tasks which were collected directly from practicing craftsmen in field interviews. Each competency is evaluated on a binary scale for each apprentice: an apprentice is either considered capable of carrying out a given task, or not. Apprentice competency was evaluated by master trainers at both baseline and endline, while apprentices were asked to self-evaluate at endline only. Between 10 and 15 competency questions were used per trade.
+
+Finally, **experience questions** were based on the same list of trade-specific tasks, except that trainers and apprentices were asked to tally which tasks the apprentice already had performed at least once in the past. As with apprentice competency, experience was evaluated by master trainers at both baseline and endline and self-evaluated by apprentices at endline.
+
+The final metric used in evaluating apprentice progress was the proportion of knowledge questions answered correctly and the proportion of tasks in which apprentices were deemed competent or experienced, respectively. Each metric is evaluated at baseline and endline for each individual apprentice, with the results shown in Table \@ref(tab:skills) in the Appendix. Changes in scores averaged across wave and trade are shown in Figure \@ref(fig:improvement1) in the Appendix. We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 5% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing. 
+
+### Firm Benefits
+Firm owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
+
+**Allowances** are disbursed irregularly by the firm owner for small expenses such as travel and meals. These are reported by firms at the apprentice level (separate reported allowances for each apprentice). To estimate total annual allowance expenditures per apprentice, we thus sum over all allowance categories and assume that apprentices work 20 days per month; the extrapolated monthly sum is then multiplied by the number of months the training firm was operating in the past year to arrive at an annual estimate for each apprentice.
+
+Finally, **foregone trainer productivity** is calculated as the wage of a trained employee times the number of hours trained in the firm per year, extrapolated from the reported hours trained in the past month (as reported by the firm owner). Annual training hours are then multiplied by the number of training staff and divided by the number of apprentices benefiting from training to arrive at foregone trainer productivity per apprentice.
 
 ```{r appdesc}
 df %>% select(age, sex, SELECTED, duration, FS1.11, wave) %>%
@@ -185,7 +240,33 @@ df %>% select(age, sex, SELECTED, duration, FS1.11, wave) %>%
                  position = "H")
 ```
 
-Summary statistics for the apprentice sample are shown in Table \@ref(tab:appdesc). Data on 432 apprentices working for 199 unique firms was collected at baseline. Of these firms, 155 were available for an endline survey. Data was collected for only 245 apprentices at endline; this drop-off was partially by design, to limit the duration of the interview with the firm owners (who were asked detailed questions about individual apprentices). 
+```{r firmdesc}
+
+df %>% select(FS1.2, firm_size, FS3.4, FS6.1, contains("FS3.5"), wave) %>%
+  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
+  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
+  tbl_summary(by=wave,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              digits = list(everything() ~ c(1, 1)),
+              label = list(FS3.4 ~ "Firm size (reported)",
+                           firm_size ~ "Firm size (calculated)",
+                           FS6.1 ~ "Apprentices",
+                           FS3.5_2 ~ "Permanent employees",
+                           FS3.5_3 ~ "Paid family workers",
+                           FS3.5_4 ~ "Unpaid family workers",
+                           FS3.5_5 ~ "Occasional workers"),
+              include = -c(FS1.2, FS3.5_1)) %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Total firm size includes owner."
+  ) %>% 
+  as_kable_extra(caption = "Firm size", 
+                 booktabs = T,
+                 linesep = "",
+                 position = "H")
+
+```
 
 ## Training
 Before proceeding with the cost and benefit analysis, we provide some background on apprenticeship training and the CQP program using apprentice and firm owner survey responses.
@@ -211,19 +292,9 @@ Apprentices report working `r round(mean(df$a_weekly_hours, na.rm = T),2)` hours
 
 In this section, we analyze the benefits of apprenticeship training for apprentices and training firms. 
 
+## Training Firms and Dual Apprenticeship in Low Income Settings
+
 ## Apprentice benefits {#appbenefits}
-
-We first look at the benefits from apprenticeship accruing to the trainees themselves over the observed time period. Since the CQP program is still undergoing frequent reforms, the progress of apprentices participating in both traditional and dual training in informal firms is of interest to policy makers involved in its future development.
-
-The benefit to apprentices takes the form of skills and competencies relevant accumulated over the course of training, which allows them to seek employment or open their own business upon graduation. In the survey, three sets of trade-specific human capital indicators were collected for each apprentice.
-
-First, **knowledge questions** were drawn from the official competency charts for each trade and posed directly to the apprentices. Each question was a multiple choice question, and between 4 and 5 knowledge questions were posed to each apprentice. Because apprentices who did not apply to the CQP were not interviewed directly, knowledge questions were only collected for Selected into CQPs and unsuccessful CQP applicants.
-
-Second, **competency questions** refer to sets of trade-specific tasks which were collected directly from practicing craftsmen in field interviews. Each competency is evaluated on a binary scale for each apprentice: an apprentice is either considered capable of carrying out a given task, or not. Apprentice competency was evaluated by master trainers at both baseline and endline, while apprentices were asked to self-evaluate at endline only. Between 10 and 15 competency questions were used per trade.
-
-Finally, **experience questions** were based on the same list of trade-specific tasks, except that trainers and apprentices were asked to tally which tasks the apprentice already had performed at least once in the past. As with apprentice competency, experience was evaluated by master trainers at both baseline and endline and self-evaluated by apprentices at endline.
-
-The final metric used in evaluating apprentice progress was the proportion of knowledge questions answered correctly and the proportion of tasks in which apprentices were deemed competent or experienced, respectively. Each metric is evaluated at baseline and endline for each individual apprentice, with the results shown in Table \@ref(tab:skills) in the Appendix. Changes in scores averaged across wave and trade are shown in Figure \@ref(fig:improvement1) in the Appendix. We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 5% level.) Mean knowledge score increase for each individual trade, though the increase is only statistically significant for plumbing. 
 
 ``` {r improvement2, fig.width=7,fig.height=4, fig.cap = "Change in apprentice human capital scores", fig.pos='H'}
 y <- df %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, FS1.11, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = ifelse(comp_all_trades_0 != 0, (comp_all_trades_1-comp_all_trades_0)/comp_all_trades_0*100, 1), exp_diff = ifelse(exp_all_trades_0 > 0, (exp_all_trades_1-exp_all_trades_0)/exp_all_trades_0*100, 1), skills_diff = ifelse(skills_all_trades_0 != 0, (skills_all_trades_1-skills_all_trades_0)/skills_all_trades_0*100), 1) %>% mutate(trade = FS1.11)
@@ -262,34 +333,6 @@ _@mohrenweiser2009: The German dual apprenticeship system is often regarded as a
 In the German and Swiss context, the primary benefit of training for firms is the productive value of apprentices during and after their apprenticeship. This value is generated when the apprentices is working in the firm, performing skilled or unskilled tasks that would otherwise be carried out by the firm owner, paid employees, or unpaid labor. These benefits accumulate after graduation if the apprentice is hired for less than the labor market wage for workers of equal productivity, as well as any savings on recruitment and hiring costs [@acemogluWhyFirmsTrain1998, @acemogluStructureWagesInvestment1999, acemogluTrainingImperfectLabour1999].
 
 In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007, @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:firmdesc)).
-
-```{r firmdesc}
-
-df %>% select(FS1.2, firm_size, FS3.4, FS6.1, contains("FS3.5"), wave) %>%
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
-  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = list(everything() ~ c(1, 1)),
-              label = list(FS3.4 ~ "Firm size (reported)",
-                           firm_size ~ "Firm size (calculated)",
-                           FS6.1 ~ "Apprentices",
-                           FS3.5_2 ~ "Permanent employees",
-                           FS3.5_3 ~ "Paid family workers",
-                           FS3.5_4 ~ "Unpaid family workers",
-                           FS3.5_5 ~ "Occasional workers"),
-              include = -c(FS1.2, FS3.5_1)) %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Total firm size includes owner."
-  ) %>% 
-  as_kable_extra(caption = "Firm size", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
-
-```
 
 If this is the case, why do craftsmen in Bénin train at all? First, apprentices are the cheapest and most abundant source of labor, and can be hired to complete unskilled tasks at little overhead. Second, if trades can be mastered relatively quickly, apprentices will provide skilled labor in the later years of their graduation (and after graduation as well, for as long as they need to work to pay off outstanding training fees or save up for their own workshop). Finally, the apprentices (or, more often, their families) traditionally pay fees to the master craftsmen in return for the provision of training [@velenchikApprenticeshipContractsSmall1995; @frazer2006; @bankole2020]. Aside from the training fee, these include minor fees to cover the provision of equipment and materials, application fees (pertinent for the CQP, as the master trainer must submit paperwork in their apprentices' stead), and initiation and graduation fees. In total, apprentices report paying about 175,000 FCFA (280 \$US) in fees for training, while firm owner report around 160,000 FCFA (255 \$US) in fees per apprentice. This indicates an minor increase in the costs of training in Benin over the past two decades: @walther2007 reports total fees ranging from 50,000 to 150,000 FCFA (96-290 \$US, inflation adjusted). Though generally unregulated, in some cases professional associations and public authorities step in to regulate fees, particularly those levied for initiation and graduation ceremonies.
 
@@ -363,11 +406,6 @@ _The methodology behind the German and Swiss large-scale assessments is the same
 _Another approach is offered by QEK/CBQ, a method established by the University of Bremen in Germany, that has been developed as an online measurement instrument based on self-evaluation and designed to deliver individual, company-specific results. The initiative to set up this instrument was taken within a project called IBB 2010 (Innovative Berufliche Bildung 2010) that was launched in 2006 as part of a larger EU-project consisting of a total of 14 sub-projects. Aiming at proving training firms with a tool-kit to investigate an individual cost-benefit situation, but simultaneously opening the opportunity to consulting activities in this domain, the instrument was not meant to be applied on a very large-scale as it was /is the case with the original BIBB approach. Since 2006, the QEK instrument has been applied in a number of local and regional projects, for example in Bremen/Bremerhaven, or in Saxony, as well as in a national sector study in elderly care. To date, about 1,000 companies have applied QEK in Germany so far. In addition, it has been modified and adapted for South Africa, where approximately 150 companies have used it thus far._
 --->
 
-Firm owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
-
-**Allowances** are disbursed irregularly by the firm owner for small expenses such as travel and meals. These are reported by firms at the apprentice level (separate reported allowances for each apprentice). To estimate total annual allowance expenditures per apprentice, we thus sum over all allowance categories and assume that apprentices work 20 days per month; the extrapolated monthly sum is then multiplied by the number of months the training firm was operating in the past year to arrive at an annual estimate for each apprentice.
-
-Finally, **foregone trainer productivity** is calculated as the wage of a trained employee times the number of hours trained in the firm per year, extrapolated from the reported hours trained in the past month (as reported by the firm owner). Annual training hours are then multiplied by the number of training staff and divided by the number of apprentices benefiting from training to arrive at foregone trainer productivity per apprentice. 
 
 <!---
 Raw materials take a particular toll on small firms (no more than one employee and one apprentice) and carpentry workshops, accounting for xx% of total costs for the former and xx% of total costs for the latter. Since questions addressed apprenticeship in the firm in general, not a specific program, we are not able to differentiate between CQP and traditional apprentices in estimating cost of training, and will assume equal costs in the net benefit analysis in the following section.
@@ -391,8 +429,6 @@ x <- x %>% mutate(name=fct_relevel(name,c("trainers_wages","all_allowances")))
 ggplot(x, aes(x="", y=value, fill=factor(name, levels = c("all_allowances", "trainers_wages", "FE5.1_4", "FE5.1_3", "FE5.1_1", "FE5.1_2")))) +
   geom_bar(stat="identity", width=1, color="white") +
   coord_polar("y", start=0) + geom_label(aes(x = 1.25, label = labels), size = 3.25, color = c("white", 1, 1, 1, "white", "white"), position = position_stack(vjust = .5), show.legend = FALSE) + scale_fill_viridis_d(name = "", labels = c("Allowances", "Foregone trainer productivity", "Raw materials", "Books and training materials",  "Rent for training facilities",  "Equipment and tools"), guide = guide_legend(reverse = TRUE)) + theme_void()
-
-
 ```
 
 Figure \@ref(fig:costspie) shows the breakdown of various costs per apprentice, averaged over both interview waves. All costs total to approximately 240,000 FCFA, or 400 \$US, per apprentice per year. The largest expenses are associated with allowances and raw materials (which are particularly high in the carpentry trade). They also in line with the upper range of costs from @david-gnahoui2017, who, citing Zinsou, 2012, reported total costs of 100,000 to 250,000 FCFA (\$165-\$413) for a complete CQP training program in 2012.
@@ -717,7 +753,13 @@ In sum, we find that training with informal firms fulfills its promise to appren
 
 \clearpage
 
-
+### Recommmendations
+_
+- _The number of trades in which the CQP and CQM are awarded must be increased. Indeed, while the Benin craft trades register lists 310 trades, the CQP only covers 13 and the CQM fewer than 100. It is essential to develop the design tools needed to organize the CQP and CQM. This requires the training of a sufficient number of methodology experts across all departments nationwide. In addition to these methodology experts, trainers in all crafts and trades need to be trained in sufficient numbers._
+- _There are no qualifications that recognize the learning done by employers. As a result, some employers still refuse to enter their apprentices for the CQP or the CQM, as they think that their apprentices will become better skilled than them. In order to maintain the system, it is essential to introduce a mechanism for validating and recognizing the skills of employers. ● Both the apprentices and their employers show more interest in the CQM than the CQP, as the conditions for the CQP – namely required educational level (completed primary education), attendance at a (dual) training centre, preparation for and successful completion of an admission test, and the irregular financing of the FODEFCA – constitute obstacles that they cannot overcome. If these conditions are not reviewed or improved, there is a risk that the CQP will lose its candidates._
+- _Internal and external financial resources must be mobilized to manage the increased number of trades and apprentices involved in the CQP and CQM._
+- _The DEC needs to allocate or obtain timely budgetary resources to organize the CQM examinations._
+- _UCIM-B demands responsibility for organizing the CQP and CQM examinations in accordance with the West African Economic and Monetary Union (WAEMU) community code on crafts. Dialogue between this body and the ministry responsible for training should facilitate resolving the matter of the transfer of powers_ [@ilo2021]
 
 
 # References {.unnumbered}
@@ -888,11 +930,37 @@ y %>% select(SELECTED, comp_diff, exp_diff, skills_diff) %>%
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
               label = list(comp_diff ~ "Competence",
                            exp_diff ~ "Experience",
-                           skills_diff~ "Knowledge")) %>% add_p() %>% 
-    as_kable_extra(caption = "Net benefits", 
+                           skills_diff~ "Knowledge")) %>% 
+    as_kable_extra(caption = "Change in apprentice human capital scores", 
                  booktabs = T,
                  linesep = "",
                  position = "H")
+
+```
+
+```{r anova}
+
+data <- df %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, SELECTED, wave)
+
+res.aov <- anova_test(
+  data = data, dv = comp_all_trades, wid = IDYouth,
+  between = SELECTED, within = wave
+  )
+get_anova_table(res.aov)
+
+res.aov <- anova_test(
+  data = data, dv = exp_all_trades, wid = IDYouth,
+  between = SELECTED, within = wave
+  )
+get_anova_table(res.aov)
+
+res.aov <- anova_test(
+  data = data, dv = skills_all_trades, wid = IDYouth,
+  between = SELECTED, within = wave
+  )
+get_anova_table(res.aov)
+
+
 
 ```
 
@@ -1204,6 +1272,13 @@ stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.s
           label = "tab:knowreg",
           add.lines = list(c("Individual FE", "NO", "NO", "YES", "YES", "NO", "NO", "NO", "NO")))
 ```             
+
+\renewcommand{\arraystretch}{2}
+```{r, test-a, echo=FALSE}
+```
+
+```{r, test-b, echo=FALSE}
+```
 
 <!---
 

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  7 JUN 2022 18:44
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  24 JUN 2022 18:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1234,47 +1234,134 @@ Applying: [2015/01/01] float order in 2-column on input line 49.
 Already applied: [0000/00/00] float order in 2-column on input line 151.
 ) (/usr/local/texlive/2019/texmf-dist/tex/latex/placeins/placeins.sty
 Package: placeins 2005/04/18  v 2.2
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2019/01/01 v2.4 Span multiple rows of a table
+\multirow@colwidth=\skip76
+\multirow@cntb=\count312
+\multirow@dima=\skip77
+\bigstrutjot=\dimen192
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen193
+\WF@size=\dimen194
+\c@WF@wrappedlines=\count313
+\WF@box=\box59
+\WF@everypar=\toks28
+Package: wrapfig 2003/01/31  v 3.6
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/colortbl/colortbl.sty
+Package: colortbl 2018/12/12 v1.0d Color table columns (DPC)
+\everycr=\toks29
+\minrowclearance=\skip78
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/oberdiek/pdflscape.sty
+Package: pdflscape 2016/05/14 v0.11 Display of landscape pages in PDF (HO)
+(/usr/local/texlive/2019/texmf-dist/tex/latex/graphics/lscape.sty
+Package: lscape 2000/10/22 v3.01 Landscape Pages (DPC)
 )
-\cslhangindent=\skip76
-\csllabelwidth=\skip77
+Package pdflscape Info: Auto-detected driver: dvipdfm (xetex) on input line 99.
+
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/tabu/tabu.sty
+Package: tabu 2019/01/11 v2.9 - flexible LaTeX tabulars (FC+tabu-fixed)
+(/usr/local/texlive/2019/texmf-dist/tex/latex/varwidth/varwidth.sty
+Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
+\@vwid@box=\box60
+\sift@deathcycles=\count314
+\@vwid@loff=\dimen195
+\@vwid@roff=\dimen196
+)
+\c@taburow=\count315
+\tabu@nbcols=\count316
+\tabu@cnt=\count317
+\tabu@Xcol=\count318
+\tabu@alloc=\count319
+\tabu@nested=\count320
+\tabu@target=\dimen197
+\tabu@spreadtarget=\dimen198
+\tabu@naturalX=\dimen199
+\tabucolX=\dimen256
+\tabu@Xsum=\dimen257
+\extrarowdepth=\dimen258
+\abovetabulinesep=\dimen259
+\belowtabulinesep=\dimen260
+\tabustrutrule=\dimen261
+\tabu@thebody=\toks30
+\tabu@footnotes=\toks31
+\tabu@box=\box61
+\tabu@arstrutbox=\box62
+\tabu@hleads=\box63
+\tabu@vleads=\box64
+\tabu@cellskip=\skip79
+)
+(/usr/local/texlive/2019/texmf-dist/tex/latex/threeparttable/threeparttable.sty
+Package: threeparttable 2003/06/13  v 3.0
+\@tempboxb=\box65
+)
+(/usr/local/texlive/2019/texmf-dist/tex/latex/threeparttablex/threeparttablex.s
+ty
+Package: threeparttablex 2013/07/23 v0.3 by daleif
+(/usr/local/texlive/2019/texmf-dist/tex/latex/environ/environ.sty
+Package: environ 2014/05/04 v0.3 A new way to define environments
+(/usr/local/texlive/2019/texmf-dist/tex/latex/trimspaces/trimspaces.sty
+Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
+))
+\TPTL@width=\skip80
+) (/usr/local/texlive/2019/texmf-dist/tex/generic/ulem/ulem.sty
+\UL@box=\box66
+\UL@hyphenbox=\box67
+\UL@skip=\skip81
+\UL@hook=\toks32
+\UL@height=\dimen262
+\UL@pe=\count321
+\UL@pixel=\dimen263
+\ULC@box=\box68
+Package: ulem 2012/05/18
+\ULdepth=\dimen264
+) (/usr/local/texlive/2019/texmf-dist/tex/latex/makecell/makecell.sty
+Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
+\rotheadsize=\dimen265
+\c@nlinenum=\count322
+\TeXr@lab=\toks33
+)
+\cslhangindent=\skip82
+\csllabelwidth=\skip83
 (./cnb_apprenticeship.aux)
 \openout1 = `cnb_apprenticeship.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 149.
-LaTeX Font Info:    ... okay on input line 149.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: longtable package is loaded.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/caption/ltcaption.sty
 Package: ltcaption 2018/08/26 v1.4-95 longtable captions (AR)
 )
+Package caption Info: threeparttable package is loaded.
+Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/floatrow/fr-longtable.sty
 Package: fr-longtable 2007/11/28 v0.1b (beta) floatrow: additions for longtable
 
-\flrow@LT@lasthead=\box59
-\flrow@LT@prelastfoot=\box60
-\c@FBLTpage=\count312
+\flrow@LT@lasthead=\box69
+\flrow@LT@prelastfoot=\box70
+\c@FBLTpage=\count323
 )
-LaTeX Info: Redefining \microtypecontext on input line 149.
+LaTeX Info: Redefining \microtypecontext on input line 163.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: No adjustment of tracking.
@@ -1284,18 +1371,18 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `texgyrepagella' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
-\AtBeginShipoutBox=\box61
-Package hyperref Info: Link coloring ON on input line 149.
+\AtBeginShipoutBox=\box71
+Package hyperref Info: Link coloring ON on input line 163.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 (/usr/local/texlive/2019/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count313
+\c@section@level=\count324
 )
-LaTeX Info: Redefining \ref on input line 149.
-LaTeX Info: Redefining \pageref on input line 149.
-LaTeX Info: Redefining \nameref on input line 149.
+LaTeX Info: Redefining \ref on input line 163.
+LaTeX Info: Redefining \pageref on input line 163.
+LaTeX Info: Redefining \nameref on input line 163.
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
 *geometry* verbose mode - [ preamble ] result:
@@ -1363,47 +1450,47 @@ LaTeX Info: Redefining \nameref on input line 149.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 17.28183pt on input line 156.
+(Font)              scaled to size 17.28183pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 12.00128pt on input line 156.
+(Font)              scaled to size 12.00128pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00107pt on input line 156.
+(Font)              scaled to size 10.00107pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 17.27815pt on input line 156.
+(Font)              scaled to size 17.27815pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 11.99872pt on input line 156.
+(Font)              scaled to size 11.99872pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 156.
-LaTeX Font Info:    Try loading font information for U+msa on input line 156.
+(Font)              scaled to size 9.99893pt on input line 170.
+LaTeX Font Info:    Try loading font information for U+msa on input line 170.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2019/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 156.
+LaTeX Font Info:    Try loading font information for U+msb on input line 170.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/local/texlive/2019/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 8.00085pt on input line 156.
+(Font)              scaled to size 8.00085pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.00064pt on input line 156.
+(Font)              scaled to size 6.00064pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 7.99915pt on input line 156.
+(Font)              scaled to size 7.99915pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 5.99936pt on input line 156.
+(Font)              scaled to size 5.99936pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 9.00096pt on input line 156.
+(Font)              scaled to size 9.00096pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00053pt on input line 156.
+(Font)              scaled to size 5.00053pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 8.99904pt on input line 156.
+(Font)              scaled to size 8.99904pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 156.
+(Font)              scaled to size 4.99947pt on input line 170.
 
-Underfull \hbox (badness 10000) in paragraph at lines 158--159
+Underfull \hbox (badness 10000) in paragraph at lines 172--173
 
  []
 
@@ -1412,99 +1499,103 @@ Underfull \hbox (badness 10000) in paragraph at lines 158--159
 
 ] [2
 
-]
+] [3]
 File: figures/enrolment-1.pdf Graphic file (type pdf)
 <use figures/enrolment-1.pdf>
-[3] [4] [5]
+[4] [5] [6]
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.95116pt on input line 209.
+(Font)              scaled to size 10.95116pt on input line 229.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 8.10385pt on input line 209.
+(Font)              scaled to size 8.10385pt on input line 229.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.02315pt on input line 209.
+(Font)              scaled to size 6.02315pt on input line 229.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 10.94882pt on input line 209.
+(Font)              scaled to size 10.94882pt on input line 229.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 8.10213pt on input line 209.
+(Font)              scaled to size 8.10213pt on input line 229.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.02185pt on input line 209.
-[6]
-Overfull \hbox (6.44041pt too wide) in paragraph at lines 211--212
+(Font)              scaled to size 6.02185pt on input line 229.
+[7]
+Overfull \hbox (6.44041pt too wide) in paragraph at lines 231--232
 []\TU/texgyrepagella(0)/m/n/10.95 The financing of dual training comprises thre
 e main budget items: the firm/workshop,
  []
 
-[7] [8]
+[8] [9] [10] [11] [12]
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00075pt on input line 239.
+(Font)              scaled to size 7.00075pt on input line 290.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 239.
-[9] [10] [11] [12]
+(Font)              scaled to size 6.99925pt on input line 290.
+[13] [14] [15]
 File: figures/improvement2-1.pdf Graphic file (type pdf)
 <use figures/improvement2-1.pdf>
-[13] [14] [15]
-Underfull \hbox (badness 1320) in paragraph at lines 312--313
+[16] [17]
+Underfull \hbox (badness 1320) in paragraph at lines 372--373
 []\TU/texgyrepagella(0)/m/n/10.95 To summarize, satisfaction is generally high 
 and stable among all apprentice
  []
 
-[16] [17] [18]
+[18] [19]
 File: figures/costspie-1.pdf Graphic file (type pdf)
 <use figures/costspie-1.pdf>
-[19] [20] [21] [22]
+[20] [21] [22] [23]
 File: figures/hist-1.pdf Graphic file (type pdf)
 <use figures/hist-1.pdf>
-[23] [24]
+[24] [25]
 File: figures/hist2-1.pdf Graphic file (type pdf)
 <use figures/hist2-1.pdf>
-[25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36
+[26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37
 
-] [37] [38]
-Overfull \hbox (15.60641pt too wide) in paragraph at lines 833--844
- [][] 
- []
-
+] [38] [39] [40]
+LaTeX Font Info:    Font shape `TU/FiraMono(0)/m/n' will be
+(Font)              scaled to size 9.74481pt on input line 895.
+[41] [42]
 File: figures/improvement1-1.pdf Graphic file (type pdf)
 <use figures/improvement1-1.pdf>
-[39]
-Overfull \hbox (8.69643pt too wide) in paragraph at lines 878--900
- [][] 
- []
 
-[40]
-Overfull \hbox (18.71642pt too wide) in paragraph at lines 906--934
- [][] 
- []
-
-[41]
-File: figures/costspie2-1.pdf Graphic file (type pdf)
-<use figures/costspie2-1.pdf>
-[42]
-Overfull \hbox (14.89641pt too wide) in paragraph at lines 963--977
+Overfull \hbox (8.69633pt too wide) in paragraph at lines 954--976
  [][] 
  []
 
 
-Overfull \hbox (28.46652pt too wide) in paragraph at lines 982--1020
+Overfull \hbox (18.71634pt too wide) in paragraph at lines 982--1010
  [][] 
  []
 
 [43]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1022.
+File: figures/costspie2-1.pdf Graphic file (type pdf)
+<use figures/costspie2-1.pdf>
 [44]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1022.
+Overfull \hbox (14.89632pt too wide) in paragraph at lines 1039--1053
+ [][] 
+ []
+
+
+Overfull \hbox (28.46638pt too wide) in paragraph at lines 1058--1096
+ [][] 
+ []
+
+[45]
+Overfull \hbox (0.87633pt too wide) in paragraph at lines 1103--1128
+ [][] 
+ []
+
+[46] [47]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1149.
+[48]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1149.
 (./cnb_apprenticeship.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1022.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1022.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1022.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1149.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1149.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1149.
  ) 
 Here is how much of TeX's memory you used:
- 29653 strings out of 492916
- 545188 string characters out of 6133345
- 792419 words of memory out of 5000000
- 33378 multiletter control sequences out of 15000+600000
- 542697 words of font info for 132 fonts, out of 8000000 for 9000
+ 30882 strings out of 492916
+ 562954 string characters out of 6133345
+ 820992 words of memory out of 5000000
+ 34553 multiletter control sequences out of 15000+600000
+ 542819 words of font info for 135 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 70i,12n,118p,1615b,513s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 70i,17n,118p,1615b,513s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on cnb_apprenticeship.pdf (44 pages).
+Output written on cnb_apprenticeship.pdf (48 pages).
