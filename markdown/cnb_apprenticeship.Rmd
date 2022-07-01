@@ -85,8 +85,6 @@ ggplot2::theme_set(ggplot2::theme_bw())  ## (sets the ggplot2 theme to theme_bw)
 
 # Introduction {#intro}
 
-[@davodoun2011]
-
 In sub-Saharan Africa (SSA), interest in apprenticeship is on the rise. According to survey data, informal apprenticeships (also referred to as apprenticeships in the informal economy or traditional apprenticeships) are estimated to provide as much as 95 percent of technical and vocational education and training (TVET) in SSA, and in many cases account for as much as 90 percent of total employment in the crafts sector [@walther2007; @worldbank2017]. Informal sector training is seen by many policy experts as an important tool to tackle the youth employment challenge facing the continent [@filmer2014].
 
 For youth who drop out of school early, informal on-the-job training is often the best alternative route to acquiring skills necessary for starting a business or seeking employment. Many African youth cannot afford to stay enrolled in formal schooling, and several studies have indeed documented positive returns to informal apprenticeship training, especially for youth with no or little education [@monk2008; @teal2016]. 
@@ -192,12 +190,12 @@ _From an economic point of view, it seems obvious that a firm would hire the mor
 
 # Methods and Data {#data}
 
-## Country Context
 ## Sampling
 The data for this study was collected in two separate surveys. The first consisted of interviews with apprentices who had applied to the CQP program, and the other with the owners of these apprentices' respective training firms. The two surveys were conducted in parallel in two waves: the baseline was collected in July and August 2019 and the endline was completed in September 2021. Of the 13 participating crafts sectors participating in the program, five were chosen to maximize sample size and geographic concentration: electrical installation, carpentry, masonry, metalwork (primarily welding of gates for living compounds), and plumbing.
 Summary statistics for the apprentice sample are shown in Table \@ref(tab:appdesc). Data on 432 apprentices working for 199 unique firms was collected at baseline. Of these firms, 155 were available for an endline survey. Data was collected for only 245 apprentices at endline; this drop-off was partially by design, to limit the duration of the interview with the firm owners (who were asked detailed questions about individual apprentices).
 Each firm in the sample contains at least one CQP applicant (though not necessarily a successful one), allowing us to identify the impact of participation in the program: all firms trained at least a single applicant to the CQP (though not every firm necessarily contained a participating apprentice). Detailed survey data on individual apprentices is matched from the apprentices themselves and their training craftsman. 
-## Attrition (Bias)
+
+### Attrition
 ## Methods
 ### Apprentice Benefits
 We first look at the benefits from apprenticeship accruing to the trainees themselves over the observed time period. Since the CQP program is still undergoing frequent reforms, the progress of apprentices participating in both traditional and dual training in informal firms is of interest to policy makers involved in its future development.
@@ -219,6 +217,9 @@ Firm owners were asked to identify any costs directly or indirectly related to t
 
 Finally, **foregone trainer productivity** is calculated as the wage of a trained employee times the number of hours trained in the firm per year, extrapolated from the reported hours trained in the past month (as reported by the firm owner). Annual training hours are then multiplied by the number of training staff and divided by the number of apprentices benefiting from training to arrive at foregone trainer productivity per apprentice.
 
+
+
+<!---
 ```{r appdesc}
 df %>% select(age, sex, SELECTED, duration, FS1.11, wave) %>%
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
@@ -236,8 +237,7 @@ df %>% select(age, sex, SELECTED, duration, FS1.11, wave) %>%
               label = list(Trade ~ "Trade",
                            duration ~ "Experience")) %>% 
   modify_header(label = "**Characteristic**") %>% 
-  as_kable_extra(caption = "Summary statistics: apprentices", 
-                 booktabs = T,
+  as_kable_extra(booktabs = T,
                  linesep = "",
                  position = "H")
 ```
@@ -269,8 +269,111 @@ df %>% select(FS1.2, firm_size, FS3.4, FS6.1, contains("FS3.5"), wave) %>%
                  position = "H")
 
 ```
+--->
 
-## Training
+```{r desc}
+
+apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, SELECTED, duration, FS1.11, wave) %>%
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('Selected', 'Not Selected', 'Did Not Apply')),
+         wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
+         FS1.11 = factor(FS1.11, levels = 1:5, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.')),
+         sex = factor(sex, levels = 0:1, labels = c("Female", "Male"))) %>% 
+  rename("CQP Status" = SELECTED, "Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
+  tbl_summary(by=wave,
+              type = list(Age ~ "continuous",
+                          duration ~ "continuous",
+                          Gender ~ "categorical"),
+              statistic = list(all_continuous() ~ c("{mean} ({sd})"),
+                               N ~ "{N}"),
+              missing = "no",
+              label = list(Trade ~ "Trade",
+                           duration ~ "Experience, years")) %>% 
+  modify_header(all_stat_cols() ~ "**{level}**")
+
+firms <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier_selected,
+                                         did_not_apply = FS6.1-dossier_apps) %>% 
+  select(N, FS1.2, firm_size, FS3.4, FS6.1, dossier_selected, not_selected, did_not_apply,contains("FS3.5"), FS1.11, wave) %>%
+  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
+  mutate(wave = factor(wave, labels = c("Baseline", "Endline")),
+         FS1.11 = factor(FS1.11, levels = 1:5, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
+  tbl_summary(by=wave,
+              type = list(c(firm_size, FS3.4, FS6.1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)  ~ "continuous",
+                          FS1.11 ~ "categorical"),
+              statistic = list(all_continuous() ~ c("{mean} ({sd})",
+                                                    N ~ "{N}")),
+              missing = "no",
+              digits = list(firm_size ~ c(1, 1),
+                            starts_with("FS3.5") ~ c(2, 1)),
+              label = list(FS3.4 ~ "Size (reported)",
+                           firm_size ~ "Size (calculated)",
+                           dossier_selected ~ "Selected",
+                           not_selected ~ "Not Selected",
+                           did_not_apply ~ "Did Not Apply",
+                           FS6.1 ~ "Total",
+                           FS3.5_2 ~ "Permanent employees",
+                           FS3.5_3 ~ "Paid family workers",
+                           FS3.5_4 ~ "Unpaid family workers",
+                           FS3.5_5 ~ "Occasional workers",
+                           FS1.11 ~ "Trade"),
+              include = -c(FS1.2, FS3.5_1)) %>% 
+  modify_header(all_stat_cols() ~ "**{level}**", label = "")
+
+tbl_stack(list(apps, firms)) %>% 
+  as_kable_extra(caption = "Descriptive Statistics",
+                 booktabs = T,
+                 linesep = "",
+                 position = "H") %>%
+  kableExtra::group_rows(start_row = 1,
+                         end_row = 16,
+                         group_label = "Apprentices") %>% 
+  kableExtra::group_rows(start_row = 17,
+                         end_row = 33,
+                         group_label = "Firms",
+                         hline_before = TRUE) %>% 
+  kableExtra::group_rows(start_row = 20,
+                         end_row = 23,
+                         group_label = "\\hspace{1em}Apprentices",
+                         escape = F,
+                         indent = T,
+                         bold = F)
+
+```
+
+### Cost-Benefit Models {#cnbmodel}
+
+The accounting approach involves subtracting the costs of training from its benefits and is a simple way of estimating the value that training apprentices generates for the training firm. More advanced methods such as cost and benefit projection [@bolli2020] or simulation [@wolter2015] can be used to estimate net benefits when firm data is lacking or in order to account for unobserved characteristics such as post-graduation productivity. In this study, we restrict ourselves to the costs and benefits described above. Benefits are taken to be the sum of the various fees paid by the apprentices' family to the trainer, as outlined in Section \@ref(firmbenefits) and, in a second, more complex model, the productive activities of the apprentice during the training period. Costs are taken to be the various expenditures reported by the firm, such as training equipment and raw materials, as well as apprentice allowances, as detailed in Section \@ref(firmcosts). In the second model, foregone trainer productivity is also taken into account.
+
+The simplest model of net benefits reduces the value of training for the firm to the direct material incomes and expenditures related to training; namely, apprenticeship fees from the apprentices and their parents, an approximation of training costs, and the total reported allowances disbursed to the apprentice. These are estimated as detailed in Sections \@ref(firmcosts) and \@ref(firmbenefits) above.
+
+The first model used to estimate net benefits accruing the firm per apprentice per year is thus:
+
+$$ \textbf{Model I:} $$
+$$\textit{annual net benefits}_i = \frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j}$$
+
+\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.
+
+In a second approach, we keep all components of Model I and add two additional factors. First, we estimate an additional benefit of training to the firm: apprentices' net productive value to the firm. In the competitive model of labor markets (with heterogeneous wages), workers are paid their marginal productivity. We assume competitive labor markets and use detailed wage information elicited from each firm to estimate the total productive output of apprentices. Namely, we assume apprentice productivity is equal to that of an untrained employee with no more than a primary education for the first two years of training, and increases to that of trained employee (who had trained at the training firm) for the final two years. Under these assumptions, the annual productive value generated by apprentice work amounts to the average of these two wages\footnote{A popular alternative to this admittedly unpolished approach involves eliciting specific tasks performed by apprentices and estimating costs savings based on the wages paid to workers who would otherwise be responsible for said tasks [@hauschildt2018]. Our firm-apprentice data did not cover specific tasks and is thus not equipped to carry out such an analysis.}.
+
+Second, we add to Model I an additional estimated cost of training: foregone trainer productivity. Firms estimated the hours trained on the last day the firm stopped all productive activities to train apprentices, as well as the number of days per week that such training occurred. We use this information as the basis for our estimation. We extrapolate weekly hours of training (hours trained on previous day of training x days trained per week) to annual hours by assuming four work weeks per month and multiplying by the number of months the firm owner reported being open in the previous year. As when estimating apprentice productivity, we set reported monthly wages for skilled workers (wage employees who had trained with the current firm) equal to trainer productivity and divide by the approximate hours worked in the past month to arrive at approximate hourly wage per trainer (assuming four work weeks per month and using firm-reported days open last week and hours worked on the last day). Finally, we multiply by the number of trainers and divide by the number apprentices per firm to arrive at an estimated cost, per apprentice, in terms of total foregone employee productivity resulting from training activities.
+
+In this formulation, the net annual benefits accruing to the firm take the form:
+
+$$ \textbf{Model II:} $$
+
+$$ \begin{aligned} \textit{annual net benefits}_i =  &\frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j} + \\ & \textit{estimated apprentice productivity}_i - \\[1em] & \frac{\textit{estimated foregone productivity per trainer}_j}{N_j} \end{aligned} $$
+
+\vspace{.5cm}
+\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.
+
+\FloatBarrier
+
+# Results {#results}
+
+In this section, we analyze the benefits of apprenticeship training for apprentices and training firms. 
+
+## Training Firms and Dual Apprenticeship in Low Income Settings
+
 Before proceeding with the cost and benefit analysis, we provide some background on apprenticeship training and the CQP program using apprentice and firm owner survey responses.
 
 Though dual training is predicated on classroom teaching about once a week, we found that external training (classes or training that took place outside of their master's workshop) was not limited to CQP participants. At baseline, `r mean(as.numeric(df$YS4.43), na.rm = T)*100`% of apprentices reported participating in such training in the preceding three months. However, only `r mean(as.numeric((df %>% filter(SELECTED == 1))$YS4.43), na.rm = T)*100`% of CQP participants reported doing so, despite external training being a constituent and necessary component of the CQP program's dual training structure. Interruptions due to the Covid-19 pandemic may have played an important role in extending the duration of training in the period of observation: `r prop.table(table(df$COV15))[1]*100`% of apprentices reported reduced hours of training, while `r prop.table(table(df$COV15))[2]*100`% reported complete work stoppages at their training firm, due to the pandemic. Covid-19 is also likely to have had an outsized impact on participants in the CQP program, `r prop.table(table(df$COV15))[3]*100`% of whom reported that their training center had suspended classes. Among apprentices who participated in any external training, `r sum(df$YS4.44[!is.na(df$YS4.44)]>6)/length(df$YS4.44[!is.na(df$YS4.44)])*100`% reported working spending at least 10 days in this training in the preceding three months (approximately equal for the CQP subsample), while the average reported training duration was `r mean(df$YS4.46, na.rm = T)` hours. Thus, CQP apprentices reported training externally at only a marginally higher rate than apprentices who applied but were not accepted into the program. 
@@ -281,22 +384,14 @@ Apprentices also explained their motivation for starting an apprenticeship. The 
 
 By combining time trained at the time of the survey with the expected graduation date, we find that apprentices expect their training to last `r mean(df$projected_duration, na.rm = T)` years, with a standard deviation of `r sd(df$projected_duration, na.rm = T)` years, in line with our assumption of four-year apprenticeships being the norm. Metalworking apprenticeships reportedly last almost a year longer than the other trades in the sample.
 
+
 <!---
 
 Inconsistent responses make it difficult to estimate how many apprentices had graduated in the interval between the two survey rounds, though the majority (`r (df %>% filter(SELECTED == 1) %>% select(YE3.29) %>% table() %>% prop.table())[1]*100`%) of CQP participants reported still taking part in the program at endline. 
 
 Apprentices report working `r round(mean(df$a_weekly_hours, na.rm = T),2)` hours in the previous week, compared to `r round(df %>% group_by(FS1.2) %>% summarise(x = mean(firm_weekly_hours)) %>% select(x) %>% colMeans(na.rm = T),2)` hours reported by the patron.
 -->
-
-\FloatBarrier
-
-# Results {#results}
-
-In this section, we analyze the benefits of apprenticeship training for apprentices and training firms. 
-
-## Training Firms and Dual Apprenticeship in Low Income Settings
-
-## Apprentice benefits {#appbenefits}
+##	Impact of Informal and Dual Training on Individuals {#appbenefits}
 
 ```{r skills}
 df %>% select(contains("skills"), wave, IDYouth) %>%
@@ -343,7 +438,9 @@ Most classroom training takes place in training centers that are less than an ho
 According to survey data, about a quarter of respondents say training does not take place at a training center, but rather at another firm. At endline, when the answer choice was first included, 50% of apprentices reported attending a technical high school and 44 reported attending a training center. 70% report continuing CQP classes during the Coronavirus pandemic.
 --> 
 
-## Firm Benefits {#firmbenefits}
+## Impact of Informal and Dual Training on Firms  {#firmimpact}
+
+### Benefits {#firmbenefits}
 <!---
 _@mohrenweiser2009: The German dual apprenticeship system is often regarded as a potential model for other countries because it allows enterprises to provide and pay for training in specific and general human capital (Harhoff and Kane, 1997; Acemoglu and Pischke, 1999b; Steedman 2001)...We show that employing apprentices in trade, commercial, craft, and construction occupations instead of unskilled or semi-skilled employees has a positive impact on contemporary establishment performance. In contrast, apprentices in manufacturing occupations have higher relative training costs in comparison to their benefits — contemporary establishment performance declines when their share of employees increases while those of unskilled or semi-skilled employees decreases...The net costs assumption stems from a series of descriptive cost–benefit-studies conducted by the BIBB (Bardeleben et al., 1997; Beicht et al., 2004; Wenzelmann et al., 2009). These evaluations calculate relevant costs during apprenticeship training for about 50 occupations and compare them with the economic value of the productivity contribution of a typical apprentice. Evaluations are based on surveys of about 2500 (personnel) managers who assessed one occupation each. They consistently find that all occupations and almost all companies face sizeable net costs during the apprenticeship period...Fougère and Schwerdt (2002) find a positive effect of apprentices on value added only in medium-sized German establishments. Askilden and Nilsen (2005) analyse the recruitment of apprentices during the business cycle in Norway. They find that apprentices are substitutes for skilled workers and are primarily recruited in boom phases. Zwick (2007) finds on the basis of panel estimations that an increase in the share of apprentices does not decrease profits on average_
 --> 
@@ -412,7 +509,7 @@ Apprentices report significantly higher fees than firms, for this specific fee i
 Averaging over both survey waves, the largest fees reported by the firms are training fees, totalling `r round(mean(df$fee_formation, na.rm = T), 0)` FCFA (`r round(mean(df$fee_formation/605, na.rm = T), 0)` \$US). The remaining fees total `r round(mean(df$fee_entry, na.rm = T) + mean(df$fee_liberation, na.rm = T) + mean(df$fee_materials, na.rm = T) + mean(df$fee_contract, na.rm = T) + mean(df$fee_application, na.rm = T), 0)` FCFA (`r round((mean(df$fee_entry, na.rm = T) + mean(df$fee_liberation, na.rm = T) + mean(df$fee_materials, na.rm = T) + mean(df$fee_contract, na.rm = T) + mean(df$fee_application, na.rm = T))/605, 0)` \$US).
 --->
 
-## Costs to Firm {#firmcosts}
+### Costs {#firmcosts}
 
 <!---
 As argued by @muhlemann2016: "_Dual apprenticeship training requires a firm to make a training investment, mainly in the form of personnel costs for apprentice instructors and paying apprentices a salary. However, a training firm also receives a benefit because apprentices work productively during training._"
@@ -456,31 +553,7 @@ Figure \@ref(fig:costspie) shows the breakdown of various costs per apprentice, 
 
 Figure \@ref(fig:costspie2) in the Appendix accounts for the number of apprentices training in firms and reports mean total training expenditures per firm. These total, on average, 1.4 million FCFA, or 2,325 \$US, per firm, corresponding to over half of the reported annual firm revenues (`r round(mean(df$FS4.7/605*df$FS4.1, na.rm = T), 0)` \$US) and about 135\% of reported total annual costs (`r round(mean(df$FS5.1/605*df$FS4.1, na.rm = T), 0)` \$US), as averaged over the two survey waves.
 
-## Cost-Benefit Models {#cnbmodel}
-
-The accounting approach involves subtracting the costs of training from its benefits and is a simple way of estimating the value that training apprentices generates for the training firm. More advanced methods such as cost and benefit projection [@bolli2020] or simulation [@wolter2015] can be used to estimate net benefits when firm data is lacking or in order to account for unobserved characteristics such as post-graduation productivity. In this study, we restrict ourselves to the costs and benefits described above. Benefits are taken to be the sum of the various fees paid by the apprentices' family to the trainer, as outlined in Section \@ref(firmbenefits) and, in a second, more complex model, the productive activities of the apprentice during the training period. Costs are taken to be the various expenditures reported by the firm, such as training equipment and raw materials, as well as apprentice allowances, as detailed in Section \@ref(firmcosts). In the second model, foregone trainer productivity is also taken into account.
-
-The simplest model of net benefits reduces the value of training for the firm to the direct material incomes and expenditures related to training; namely, apprenticeship fees from the apprentices and their parents, an approximation of training costs, and the total reported allowances disbursed to the apprentice. These are estimated as detailed in Sections \@ref(firmcosts) and \@ref(firmbenefits) above.
-
-The first model used to estimate net benefits accruing the firm per apprentice per year is thus:
-
-$$ \textbf{Model I:} $$
-$$\textit{annual net benefits}_i = \frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j}$$
-
-\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.
-
-In a second approach, we keep all components of Model I and add two additional factors. First, we estimate an additional benefit of training to the firm: apprentices' net productive value to the firm. In the competitive model of labor markets (with heterogeneous wages), workers are paid their marginal productivity. We assume competitive labor markets and use detailed wage information elicited from each firm to estimate the total productive output of apprentices. Namely, we assume apprentice productivity is equal to that of an untrained employee with no more than a primary education for the first two years of training, and increases to that of trained employee (who had trained at the training firm) for the final two years. Under these assumptions, the annual productive value generated by apprentice work amounts to the average of these two wages\footnote{A popular alternative to this admittedly unpolished approach involves eliciting specific tasks performed by apprentices and estimating costs savings based on the wages paid to workers who would otherwise be responsible for said tasks [@hauschildt2018]. Our firm-apprentice data did not cover specific tasks and is thus not equipped to carry out such an analysis.}.
-
-Second, we add to Model I an additional estimated cost of training: foregone trainer productivity. Firms estimated the hours trained on the last day the firm stopped all productive activities to train apprentices, as well as the number of days per week that such training occurred. We use this information as the basis for our estimation. We extrapolate weekly hours of training (hours trained on previous day of training x days trained per week) to annual hours by assuming four work weeks per month and multiplying by the number of months the firm owner reported being open in the previous year. As when estimating apprentice productivity, we set reported monthly wages for skilled workers (wage employees who had trained with the current firm) equal to trainer productivity and divide by the approximate hours worked in the past month to arrive at approximate hourly wage per trainer (assuming four work weeks per month and using firm-reported days open last week and hours worked on the last day). Finally, we multiply by the number of trainers and divide by the number apprentices per firm to arrive at an estimated cost, per apprentice, in terms of total foregone employee productivity resulting from training activities.
-
-In this formulation, the net annual benefits accruing to the firm take the form:
-
-$$ \textbf{Model II:} $$
-
-$$ \begin{aligned} \textit{annual net benefits}_i =  &\frac{\textit{fees paid}_i}{4} + \textit{estimated apprentice productivity}_i - \\ & \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j} - \\ & \frac{\textit{estimated foregone productivity per trainer}_j}{N_j} \end{aligned} $$
-
-\vspace{.5cm}
-\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.
+### Impact (Net Benefits)
 
 <!-- \noindent An even more comprehensive accounting of firm costs and benefits from training may account for factors which are not directly observable, such as technological upgrading and savings on hiring costs, as well as benefits that materialize in the future, such as apprentice labor after graduation [@walther2007]. However, savings on hiring costs are bound to be minimal, as firms are composed primarily of apprentices, and future productive value can also be ignored at first pass, since most apprentices strike out on their own upon graduation. The costs of recruiting and hiring apprentices may be an important omitted cost which was not covered by the survey, but even in this regard, many firms reported that parents and apprentices approached them rather than _vice-versa_. -->
 
@@ -510,7 +583,7 @@ df %>% select(cb_2, cb_3, IDYouth, SELECTED) %>%
 
 \noindent Table \@ref(tab:netbenefits) shows the estimated annual net benefits of training apprentices, calculated separately for apprentices who successfully applied to the CQP program, applied to the CQP program but were not accepted, and did not apply at all. Depending on which model is used, training is, on average, associated with a net loss ranging from about 30 \$US to about 125 \$US per apprentice per year for the training firm. 
 
-The net costs of apprenticeship according to Model I are lower for CQP apprentices, despite CQP apprentices paying the lowest fees (see Table \@ref(tab:fees2) in the Appendix) and receiving higher allowances than non-applicants (and on par with unsuccessful applicants, see \@ref(tab:allowances) in the Appendix). **This suggests that firms training CQP participants have lower training costs per apprentice, on average, than firms without successful CQP applicants**. Estimated net benefits do not change drastically over the course of the program (Table \@ref(tab:netbenefits1) in the Appendix). 
+The net costs of apprenticeship according to Model I are lower for CQP apprentices, despite CQP apprentices paying the lowest fees (see Table \@ref(tab:fees2) in the Appendix) and receiving higher allowances than non-applicants (and on par with unsuccessful applicants, see \@ref(tab:allowances) in the Appendix). **This suggests that firms bletraining CQP participants have lower training costs per apprentice, on average, than firms without successful CQP applicants**. Estimated net benefits do not change drastically over the course of the program (Table \@ref(tab:netbenefits1) in the Appendix). 
 
 ```{r hist, fig.height=3, fig.cap = "Annual net benefits per apprentice (in USD), truncated at varying percentiles", results = 'asis', fig.pos='H'}
 pct = .01
@@ -776,8 +849,6 @@ In sum, we find that training with informal firms fulfills its promise to appren
 
 \clearpage
 
-### Recommmendations
-_
 - _The number of trades in which the CQP and CQM are awarded must be increased. Indeed, while the Benin craft trades register lists 310 trades, the CQP only covers 13 and the CQM fewer than 100. It is essential to develop the design tools needed to organize the CQP and CQM. This requires the training of a sufficient number of methodology experts across all departments nationwide. In addition to these methodology experts, trainers in all crafts and trades need to be trained in sufficient numbers._
 - _There are no qualifications that recognize the learning done by employers. As a result, some employers still refuse to enter their apprentices for the CQP or the CQM, as they think that their apprentices will become better skilled than them. In order to maintain the system, it is essential to introduce a mechanism for validating and recognizing the skills of employers. ● Both the apprentices and their employers show more interest in the CQM than the CQP, as the conditions for the CQP – namely required educational level (completed primary education), attendance at a (dual) training centre, preparation for and successful completion of an admission test, and the irregular financing of the FODEFCA – constitute obstacles that they cannot overcome. If these conditions are not reviewed or improved, there is a risk that the CQP will lose its candidates._
 - _Internal and external financial resources must be mobilized to manage the increased number of trades and apprentices involved in the CQP and CQM._

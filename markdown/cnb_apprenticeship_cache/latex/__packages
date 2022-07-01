@@ -2,11 +2,13 @@ Matrix
 lfe
 lme4
 plm
-stargazer
 bookdown
 gtsummary
 labelled
 gridExtra
+rstatix
+kableExtra
+stargazer
 tidyverse
 ggplot2
 tibble
@@ -16,5 +18,3 @@ purrr
 dplyr
 stringr
 forcats
-rstatix
-kableExtra

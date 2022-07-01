@@ -228,7 +228,7 @@ $if(csl-refs)$
   \ifnum #2 > 0
   \setlength{\parskip}{#2\baselineskip}
   \fi
- }%
+ }%!TEX encoding = UTF-8 Unicode
  {}
 \usepackage{calc}
 \newcommand{\CSLBlock}[1]{#1\hfill\break}
@@ -284,6 +284,9 @@ $if(abstract)$
 \restoregeometry
 $endif$
 $endif$
+
+\tableofcontents
+\newpage
 
 $for(include-before)$
 $include-before$
