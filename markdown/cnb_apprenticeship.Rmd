@@ -319,7 +319,7 @@ firms <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier_sel
               include = -c(FS1.2, FS3.5_1)) %>% 
   modify_header(all_stat_cols() ~ "**{level}**", label = "")
 
-tbl_stack(list(apps, firms)) %>% 
+tbl_stack(list(apps, firms), quiet = T) %>% 
   as_kable_extra(caption = "Descriptive Statistics",
                  booktabs = T,
                  linesep = "",
