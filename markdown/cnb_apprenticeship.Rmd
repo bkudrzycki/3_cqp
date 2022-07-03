@@ -75,6 +75,10 @@ library(rstatix)
 # source("../code/master.R")
 load("../data/df.rda")
 selected <- df %>% filter(SELECTED == 1)
+baseline <- df %>% filter(wave == 0)
+endline <- df %>% filter (wave == 1)
+firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
+
 # load functions
 source("../functions/add_by_n.R")
 ggplot2::theme_set(ggplot2::theme_bw())  ## (sets the ggplot2 theme to theme_bw)
@@ -192,84 +196,6 @@ _From an economic point of view, it seems obvious that a firm would hire the mor
 
 ## Sampling
 The data for this study was collected in two separate surveys. The first consisted of interviews with apprentices who had applied to the CQP program, and the other with the owners of these apprentices' respective training firms. The two surveys were conducted in parallel in two waves: the baseline was collected in July and August 2019 and the endline was completed in September 2021. Of the 13 participating crafts sectors participating in the program, five were chosen to maximize sample size and geographic concentration: electrical installation, carpentry, masonry, metalwork (primarily welding of gates for living compounds), and plumbing.
-Summary statistics for the apprentice sample are shown in Table \@ref(tab:appdesc). Data on 432 apprentices working for 199 unique firms was collected at baseline. Of these firms, 155 were available for an endline survey. Data was collected for only 245 apprentices at endline; this drop-off was partially by design, to limit the duration of the interview with the firm owners (who were asked detailed questions about individual apprentices).
-Each firm in the sample contains at least one CQP applicant (though not necessarily a successful one), allowing us to identify the impact of participation in the program: all firms trained at least a single applicant to the CQP (though not every firm necessarily contained a participating apprentice). Detailed survey data on individual apprentices is matched from the apprentices themselves and their training craftsman. 
-
-### Attrition
-## Methods
-### Apprentice Benefits
-We first look at the benefits from apprenticeship accruing to the trainees themselves over the observed time period. Since the CQP program is still undergoing frequent reforms, the progress of apprentices participating in both traditional and dual training in informal firms is of interest to policy makers involved in its future development.
-
-The benefit to apprentices takes the form of skills and competencies relevant accumulated over the course of training, which allows them to seek employment or open their own business upon graduation. In the survey, three sets of trade-specific human capital indicators were collected for each apprentice.
-
-First, **knowledge questions** were drawn from the official competency charts for each trade and posed directly to the apprentices. Each question was a multiple choice question, and between 4 and 5 knowledge questions were posed to each apprentice. Because apprentices who did not apply to the CQP were not interviewed directly, knowledge questions were only collected for Selected into CQPs and unsuccessful CQP applicants.
-
-Second, **competency questions** refer to sets of trade-specific tasks which were collected directly from practicing craftsmen in field interviews. Each competency is evaluated on a binary scale for each apprentice: an apprentice is either considered capable of carrying out a given task, or not. Apprentice competency was evaluated by master trainers at both baseline and endline, while apprentices were asked to self-evaluate at endline only. Between 10 and 15 competency questions were used per trade.
-
-Finally, **experience questions** were based on the same list of trade-specific tasks, except that trainers and apprentices were asked to tally which tasks the apprentice already had performed at least once in the past. As with apprentice competency, experience was evaluated by master trainers at both baseline and endline and self-evaluated by apprentices at endline.
-
-The final metric used as an indicator of apprentice human capital is the proportion of knowledge questions answered correctly and the proportion of tasks in which apprentices were deemed competent or experienced, respectively. Each metric is evaluated at baseline and endline for each individual apprentice, with the results shown in Table \@ref(tab:skills) in the Appendix. Changes in scores averaged across wave and trade are shown in Figure \@ref(fig:improvement1) in the Appendix. We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 10% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing; thus, the marginally significant increase in knowledge scores is driven by improvements in a single trade.
-
-### Firm Benefits
-Firm owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
-
-**Allowances** are disbursed irregularly by the firm owner for small expenses such as travel and meals. These are reported by firms at the apprentice level (separate reported allowances for each apprentice). To estimate total annual allowance expenditures per apprentice, we thus sum over all allowance categories and assume that apprentices work 20 days per month; the extrapolated monthly sum is then multiplied by the number of months the training firm was operating in the past year to arrive at an annual estimate for each apprentice.
-
-Finally, **foregone trainer productivity** is calculated as the wage of a trained employee times the number of hours trained in the firm per year, extrapolated from the reported hours trained in the past month (as reported by the firm owner). Annual training hours are then multiplied by the number of training staff and divided by the number of apprentices benefiting from training to arrive at foregone trainer productivity per apprentice.
-
-
-
-<!---
-```{r appdesc}
-df %>% select(age, sex, SELECTED, duration, FS1.11, wave) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply')),
-         wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
-         FS1.11 = factor(FS1.11, levels = 1:5, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.')),
-         sex = factor(sex, levels = 0:1, labels = c("Female", "Male"))) %>% 
-  rename("CQP Status" = SELECTED, "Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
-  tbl_summary(by=wave,
-              type = list(Age ~ "continuous",
-                          duration ~ "continuous",
-                          Gender ~ "categorical"),
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              label = list(Trade ~ "Trade",
-                           duration ~ "Experience")) %>% 
-  modify_header(label = "**Characteristic**") %>% 
-  as_kable_extra(booktabs = T,
-                 linesep = "",
-                 position = "H")
-```
-
-```{r firmdesc}
-
-df %>% select(FS1.2, firm_size, FS3.4, FS6.1, contains("FS3.5"), wave) %>%
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
-  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = list(everything() ~ c(1, 1)),
-              label = list(FS3.4 ~ "Firm size (reported)",
-                           firm_size ~ "Firm size (calculated)",
-                           FS6.1 ~ "Apprentices",
-                           FS3.5_2 ~ "Permanent employees",
-                           FS3.5_3 ~ "Paid family workers",
-                           FS3.5_4 ~ "Unpaid family workers",
-                           FS3.5_5 ~ "Occasional workers"),
-              include = -c(FS1.2, FS3.5_1)) %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Firm size refers to no. of total workers including owner."
-  ) %>% 
-  as_kable_extra(caption = "Firm size", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
-
-```
---->
 
 ```{r desc}
 
@@ -291,7 +217,7 @@ apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, SELECTED, duration, FS1.11
                            duration ~ "Experience, years")) %>% 
   modify_header(all_stat_cols() ~ "**{level}**")
 
-firms <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier_selected,
+workshops <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier_selected,
                                          did_not_apply = FS6.1-dossier_apps) %>% 
   select(N, FS1.2, firm_size, FS3.4, FS6.1, dossier_selected, not_selected, did_not_apply,contains("FS3.5"), FS1.11, wave) %>%
   group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
@@ -319,7 +245,7 @@ firms <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier_sel
               include = -c(FS1.2, FS3.5_1)) %>% 
   modify_header(all_stat_cols() ~ "**{level}**", label = "")
 
-tbl_stack(list(apps, firms), quiet = T) %>% 
+tbl_stack(list(apps, workshops), quiet = T) %>% 
   as_kable_extra(caption = "Descriptive Statistics",
                  booktabs = T,
                  linesep = "",
@@ -337,8 +263,34 @@ tbl_stack(list(apps, firms), quiet = T) %>%
                          escape = F,
                          indent = T,
                          bold = F)
-
 ```
+
+Summary statistics for the apprentice sample are shown in Table \@ref(tab:desc). Data on 432 apprentices working for 199 unique firms was collected at baseline. Of these firms, 155 were available for an endline survey. Data was collected for only 245 apprentices at endline; this drop-off was partially by design, to limit the duration of the interview with the firm owners (who were asked detailed questions about individual apprentices).
+Each firm in the sample contains at least one CQP applicant (though not necessarily a successful one), allowing us to identify the impact of participation in the program: all firms trained at least a single applicant to the CQP (though not every firm necessarily contained a participating apprentice). Detailed survey data on individual apprentices is matched from the apprentices themselves and their training craftsman.
+
+The majority of training firms are small workshops comprising the firm owner --- the master trainer --- and several apprentices. Two firm sizes are shown in Table \@ref(tab:desc): those reported by the owners in response to the question, "How many people (including you and your apprentices) are currently working in your business?" and those calculated by the author by summing up the totals of all types of workers listed separately by the owner, including partners, paid and unpaid family workers, and occasional workers. Using self-reported size, `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:3])*100`% of firms employed no more than ten. Author calculation yield that `r sum(prop.table(table(baseline$firm_size_bins))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins))[1:3])*100`% of firms employed no more than ten. Moreover, the workforce of the average firm is dominated by apprentices: at baseline, the average firm employs about four apprentices for every other type of employee (`r mean((firms %>% filter(wave == 0, firm_size > 1))$FS6.1/((firms %>% filter(wave == 0, firm_size > 1))$firm_size-1), na.rm = T)*100`% of calculated firm size at baseline and `r mean((firms %>% filter(wave == 1, firm_size > 1))$FS6.1/((firms %>% filter(wave == 1, firm_size > 1))$firm_size-1), na.rm = T)*100`% at endline).
+
+### Attrition
+## Methods
+### Apprentice Benefits
+We first look at the benefits from apprenticeship accruing to the trainees themselves over the observed time period. Since the CQP program is still undergoing frequent reforms, the progress of apprentices participating in both traditional and dual training in informal firms is of interest to policy makers involved in its future development.
+
+The benefit to apprentices takes the form of skills and competencies relevant accumulated over the course of training, which allows them to seek employment or open their own business upon graduation. In the survey, three sets of trade-specific human capital indicators were collected for each apprentice.
+
+First, **knowledge questions** were drawn from the official competency charts for each trade and posed directly to the apprentices. Each question was a multiple choice question, and between 4 and 5 knowledge questions were posed to each apprentice. Because apprentices who did not apply to the CQP were not interviewed directly, knowledge questions were only collected for Selected into CQPs and unsuccessful CQP applicants.
+
+Second, **competency questions** refer to sets of trade-specific tasks which were collected directly from practicing craftsmen in field interviews. Each competency is evaluated on a binary scale for each apprentice: an apprentice is either considered capable of carrying out a given task, or not. Apprentice competency was evaluated by master trainers at both baseline and endline, while apprentices were asked to self-evaluate at endline only. Between 10 and 15 competency questions were used per trade.
+
+Finally, **experience questions** were based on the same list of trade-specific tasks, except that trainers and apprentices were asked to tally which tasks the apprentice already had performed at least once in the past. As with apprentice competency, experience was evaluated by master trainers at both baseline and endline and self-evaluated by apprentices at endline.
+
+The final metric used as an indicator of apprentice human capital is the proportion of knowledge questions answered correctly and the proportion of tasks in which apprentices were deemed competent or experienced, respectively. Each metric is evaluated at baseline and endline for each individual apprentice, with the results shown in Table \@ref(tab:skills) in the Appendix. Changes in scores averaged across wave and trade are shown in Figure \@ref(fig:improvement1) in the Appendix. We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 10% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing; thus, the marginally significant increase in knowledge scores is driven by improvements in a single trade.
+
+### Firm Benefits
+Firm owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
+
+**Allowances** are disbursed irregularly by the firm owner for small expenses such as travel and meals. These are reported by firms at the apprentice level (separate reported allowances for each apprentice). To estimate total annual allowance expenditures per apprentice, we thus sum over all allowance categories and assume that apprentices work 20 days per month; the extrapolated monthly sum is then multiplied by the number of months the training firm was operating in the past year to arrive at an annual estimate for each apprentice.
+
+Finally, **foregone trainer productivity** is calculated as the wage of a trained employee times the number of hours trained in the firm per year, extrapolated from the reported hours trained in the past month (as reported by the firm owner). Annual training hours are then multiplied by the number of training staff and divided by the number of apprentices benefiting from training to arrive at foregone trainer productivity per apprentice.
 
 ### Cost-Benefit Models {#cnbmodel}
 
@@ -394,7 +346,48 @@ Apprentices report working `r round(mean(df$a_weekly_hours, na.rm = T),2)` hours
 ##	Impact of Informal and Dual Training on Individuals {#appbenefits}
 
 ```{r skills}
-df %>% select(contains("skills"), wave, IDYouth) %>%
+
+comp <- df %>% select(contains("comp"), -contains("a_"), wave, IDYouth) %>%
+  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
+  tbl_summary(by=wave,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              include = -IDYouth) %>% 
+    add_stat(
+    fns = everything() ~ add_by_n
+  ) %>% 
+  modify_table_body(
+    ~ .x %>%
+      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
+      dplyr::relocate(add_n_stat_2, .before = stat_2)
+  ) %>%
+  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>% 
+  modify_header(stat_by =  "**{level}**",
+                starts_with("add_n_stat") ~ "**N**",
+                label = "**Trade**")
+
+exp <- df %>% select(contains("exp"), -contains("a_"), wave, IDYouth) %>%
+  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
+  tbl_summary(by=wave,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              include = -IDYouth) %>% 
+  add_stat(
+    fns = everything() ~ add_by_n
+  ) %>% 
+  modify_table_body(
+    ~ .x %>%
+      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
+      dplyr::relocate(add_n_stat_2, .before = stat_2)
+  ) %>%
+  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>%  
+  modify_header(stat_by =  "**{level}**",
+                starts_with("add_n_stat") ~ "**N**",
+                label = "**Trade**")
+
+skills <- df %>% select(contains("skills"), wave, IDYouth) %>%
   mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
   tbl_summary(by=wave,
               type = everything() ~ "continuous",
@@ -412,14 +405,15 @@ df %>% select(contains("skills"), wave, IDYouth) %>%
   add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>% 
   modify_header(stat_by =  "**{level}**",
                 starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Proportion of correctly answered knowledge questions."
-  ) %>% 
-  as_kable_extra(caption = "Change in Apprentice Knowledge", 
+                label = "**Trade**")
+
+tbl_stack(list(comp, exp, skills), group_header = c("Competencies", "Experience", "Knowledge"), quiet = TRUE) %>% 
+  as_kable_extra(caption = "Change in apprentice human capital", 
                  booktabs = T,
                  linesep = "",
                  position = "H")
+
+
 ```
 
 In Table \@ref(tab:skills) above, scores are pooled at the trade level in each wave. Alternatively, we can observe the change in scores for individuals before taking means. Individual changes in score averaged across trades are shown in Figure \@ref(fig:improvement2) in the Appendix. Viewed thus, improvements in competence and experience scores are much more pronounced, with apprentices in masonry doubling their experience and nearly doubling their competence (on the other hand, improvements for electrical installation appear lower compared to the case where data is pooled). However, due to attrition between the two waves, this subgroup analysis suffers from small group size, with $N=34$ for masonry and $N=20$ for carpentry.
@@ -447,7 +441,7 @@ _@mohrenweiser2009: The German dual apprenticeship system is often regarded as a
 
 In the German and Swiss context, the primary benefit of training for firms is the productive value of apprentices during and after their apprenticeship. This value is generated when the apprentices is working in the firm, performing skilled or unskilled tasks that would otherwise be carried out by the firm owner, paid employees, or unpaid labor. These benefits accumulate after graduation if the apprentice is hired for less than the labor market wage for workers of equal productivity, as well as any savings on recruitment and hiring costs [@acemogluWhyFirmsTrain1998; @acemogluStructureWagesInvestment1999; @acemogluTrainingImperfectLabour1999].
 
-In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007; @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:firmdesc)).
+In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007; @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:desc)).
 
 If this is the case, why do craftsmen in Bénin train at all? First, apprentices are the cheapest and most abundant source of labor, and can be hired to complete unskilled tasks at little overhead. Second, if trades can be mastered relatively quickly, apprentices will provide skilled labor in the later years of their graduation (and after graduation as well, for as long as they need to work to pay off outstanding training fees or save up for their own workshop). Finally, the apprentices (or, more often, their families) traditionally pay fees to the master craftsmen in return for the provision of training [@velenchikApprenticeshipContractsSmall1995; @frazer2006; @bankole2020].
 
@@ -862,6 +856,23 @@ In sum, we find that training with informal firms fulfills its promise to appren
 <div id="refs"></div>
 
 # Appendix {.unnumbered}
+
+``` {r firmsize, fig.width=7,fig.height=4, fig.cap = "Distribution in firm size", fig.pos='H'}
+x <- df %>% filter(firm_size > 1) %>% select(FS1.2, wave, firm_size, dossier_selected, FS3.4, FS6.1) %>%
+  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
+  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% pivot_wider(names_from = wave, values_from = c(firm_size, FS3.4, FS6.1))
+
+p1 <- ggplot(x, aes(x=firm_size_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Firm size (calculated)") + theme_minimal() + theme(legend.position = "bottom")
+p2 <- ggplot(x, aes(x=log(firm_size_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log Firm size (calculated)") + theme_minimal() + theme(legend.position = "bottom")
+
+p3 <- ggplot(x, aes(x=FS3.4_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Firm size (reported)") + theme_minimal() + theme(legend.position = "bottom")
+p4 <- ggplot(x, aes(x=log(FS3.4_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log Firm size (reported)") + theme_minimal() + theme(legend.position = "bottom")
+
+p5 <- ggplot(x, aes(x=FS6.1_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Apprentices") + theme_minimal() + theme(legend.position = "bottom")
+p6 <- ggplot(x, aes(x=log(FS6.1_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log Apprentices") + theme_minimal() + theme(legend.position = "bottom")
+
+grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
+```
 
 ``` {r improvement2, fig.width=7,fig.height=4, fig.cap = "Change in apprentice human capital scores", fig.pos='H'}
 y <- df %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, FS1.11, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = ifelse(comp_all_trades_0 != 0, (comp_all_trades_1-comp_all_trades_0)/comp_all_trades_0*100, 1), exp_diff = ifelse(exp_all_trades_0 > 0, (exp_all_trades_1-exp_all_trades_0)/exp_all_trades_0*100, 1), skills_diff = ifelse(skills_all_trades_0 != 0, (skills_all_trades_1-skills_all_trades_0)/skills_all_trades_0*100), 1) %>% mutate(trade = FS1.11)
@@ -1913,22 +1924,6 @@ ggplot(data=x, aes(x=duration, y=value, color=name)) +
   xlab("Year of apprenticeship") +
   ylab("Net benefits") + scale_color_viridis_d(guide_legend(title = "Model")) +
   scale_x_discrete(limits = c(0:7)) + theme_minimal()
-```
-
-
-
-``` {r logtrans}
-x <- df %>% filter(firm_size > 1) %>% select(FS1.2, wave, firm_size, dossier_selected, FS3.4, FS6.1, FS1.11) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% pivot_wider(names_from = wave, values_from = c(firm_size, FS3.4, FS6.1))
-
-p1 <- ggplot(x, aes(x=firm_size_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Firm Size") + theme_minimal() + theme(legend.position = "bottom")
-p2 <- ggplot(x, aes(x=log(firm_size_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log(Firm Size)") + theme_minimal() + theme(legend.position = "bottom")
-
-p3 <- ggplot(df, aes(x=FS6.1, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Apprentices") + theme_minimal() + theme(legend.position = "bottom")
-p4 <- ggplot(df, aes(x=log(FS6.1), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log(Apprentices)") + theme_minimal() + theme(legend.position = "bottom")
-
-grid.arrange(p1, p2, p3, p4, nrow = 2)
 ```
 
 ```{r sizefe, results = 'asis'}

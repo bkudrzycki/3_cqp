@@ -35,6 +35,8 @@ fs$FS1.2 <- ifelse(fs$ResponseId == 'R_g6CvEE99F02nSCb', 30, fs$FS1.2)     # cor
 fs$FS1.8_1 <- ifelse(fs$FS1.8_1 == 23 & fs$FS1.2 == 48, 215, fs$FS1.8_1) # according to youth survey, apprentice Sylvain TOFFODJI in workshop 49 is number CQP215 not CQP23
 fs$FS1.8_4 <- ifelse(fs$FS1.8_4 == 21 & fs$FS1.2 == 48, 206, fs$FS1.8_4) # according to youth survey, apprentice Gislain KOUNI in workshop 48 is number CQP206 not CQP21
 
+fs <- fs %>% mutate(ifelse(FS3.5_1 == 0, 1, FS3.5_1))
+
 # Endline cleaning
 fs_end <- read_sav("data/source/Enquête+auprès+des+patrons+-+endline_October+6,+2021_12.12.sav", user_na = TRUE)
 
