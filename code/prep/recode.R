@@ -688,8 +688,8 @@ df <- df %>% mutate(monthly_time_trained = FS6.9*FS6.10*4)
 # estimated trainer hours of training per month: days per week (FS6.9) * hours on last day (FS6.10) * 4 * number of trainers instructing apps (FS6.8)
 # trainer hourly wage: monthly wage of skilled employee (FS5.2_1_2) / days open last week (FS3.1) / hours open on last day (FS3.2) / 4 weeks
 
-df <- df %>% rowwise() %>% mutate(cb_3 = sum(total_fees/4, FS5.2_1_2*6, FS5.2_1_4*6,  -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, -monthly_time_trained*FS6.8*FS5.2_1_2/FS3.1/FS3.2/4/FS6.1*FS4.1, na.rm = T))
-x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate(cb_3_baseline = sum(total_fees/4,  FS5.2_1_2*FS4.1/2, FS5.2_1_4*FS4.1/2, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, -monthly_time_trained*FS6.8*FS5.2_1_2/40/4/FS6.1*FS4.1, na.rm = T)) %>% select(IDYouth, cb_3_baseline)
+df <- df %>% rowwise() %>% mutate(cb_3 = sum(total_fees/4, FS5.2_1_2*6, FS5.2_1_4*6, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, -monthly_time_trained*FS6.8*FS5.2_1_2/FS3.1/FS3.2/4/FS6.1*FS4.1, na.rm = T))
+x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate(cb_3_baseline = sum(total_fees/4,  FS5.2_1_2*6, FS5.2_1_4*6, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, -monthly_time_trained*FS6.8*FS5.2_1_2/FS3.1/FS3.2/4/FS6.1*FS4.1, na.rm = T)) %>% select(IDYouth, cb_3_baseline)
 df <- df %>% left_join(x, by = "IDYouth")
 
 df <- df %>% ungroup()
