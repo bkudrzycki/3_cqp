@@ -24,13 +24,11 @@ df <- unlabelled(df)
 
 ## ---- test-i --------
 
-apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, schooling, SELECTED, duration, FS1.11, wave) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply')),
-         wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
-         FS1.11 = factor(FS1.11, levels = 1:5, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.')),
-         sex = factor(sex, levels = 0:1, labels = c("Female", "Male"))) %>% 
-  rename("CQP status" = SELECTED, "Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
+apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, schooling, wave) %>%
+  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
+         sex = factor(sex, levels = 0:1, labels = c("Female", "Male")),
+         FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
+  rename("Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
   tbl_summary(by=wave,
               type = list(Age ~ "continuous",
                           duration ~ "continuous",
@@ -39,21 +37,22 @@ apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, schooling, SELECTED, durat
                                N ~ "{N}"),
               missing = "no",
               label = list(Trade ~ "Trade",
-                           duration ~ "Training experience, years",
-                           schooling ~ "Education at baseline")) %>% 
+                           duration ~ "Years in training",
+                           schooling ~ "Education")) %>% 
   modify_header(all_stat_cols() ~ "**{level}**")
 
-workshops <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier_selected,
-                                             did_not_apply = FS6.1-dossier_apps) %>% 
-  select(N, FS1.2, FS6.1, dossier_selected, not_selected, did_not_apply, firm_size, FS3.4, contains("FS3.5"), FS1.11, wave) %>%
+workshops <- df %>% mutate(N_firms = 1) %>% mutate(not_selected = dossier_apps-dossier_selected,
+                                             did_not_apply = FS6.1-dossier_apps,
+                                             FS1.11 = as.numeric(FS1.11)) %>% 
+  select(N_firms, FS1.2, FS6.1, dossier_selected, not_selected, did_not_apply, firm_size, FS3.4, contains("FS3.5"), FS1.11, wave) %>%
   group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
   mutate(wave = factor(wave, labels = c("Baseline", "Endline")),
-         FS1.11 = factor(FS1.11, levels = 1:5, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
+         FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
   tbl_summary(by=wave,
               type = list(c(firm_size, FS3.4, FS6.1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)  ~ "continuous",
                           FS1.11 ~ "categorical"),
               statistic = list(all_continuous() ~ "{mean} ({sd})",
-                               N ~ "{N}"),
+                               N_firms ~ "{N}"),
               missing = "no",
               digits = list(firm_size ~ c(1, 1),
                             starts_with("FS3.5") ~ c(2, 1)),
@@ -63,38 +62,61 @@ workshops <- df %>% mutate(N = 1) %>% mutate(not_selected = dossier_apps-dossier
                            not_selected ~ "Not Selected",
                            did_not_apply ~ "Did Not Apply",
                            FS6.1 ~ "Total",
-                           FS3.5_2 ~ "Permanent employees",
-                           FS3.5_3 ~ "Paid family workers",
-                           FS3.5_4 ~ "Unpaid family workers",
-                           FS3.5_5 ~ "Occasional workers",
-                           FS1.11 ~ "Trade"),
+                           FS3.5_2 ~ "Permanent wage",
+                           FS3.5_3 ~ "Paid family",
+                           FS3.5_4 ~ "Unpaid family",
+                           FS3.5_5 ~ "Occasional",
+                           FS1.11 ~ "Trade",
+                           N_firms ~ "N"),
               include = -c(FS1.2, FS3.5_1)) %>% 
   modify_header(all_stat_cols() ~ "**{level}**", label = "")
 
-tbl_stack(list(apps, workshops), quiet = T) %>% 
+x <- tbl_stack(list(apps, workshops), quiet = T) 
+
+y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED, FS1.11, duration, schooling) %>%
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('Selected', 'Not Selected', 'Did Not Apply')),
+         sex = factor(sex, levels = 0:1, labels = c("Female", "Male")),
+         FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
+  rename("Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
+  tbl_summary(by=SELECTED,
+              type = list(Age ~ "continuous",
+                          duration ~ "continuous",
+                          Gender ~ "categorical"),
+              statistic = list(all_continuous() ~ c("{mean} ({sd})"),
+                               N ~ "{N}"),
+              missing = "no",
+              label = list(Trade ~ "Trade",
+                           duration ~ "Years in training",
+                           schooling ~ "Education")) %>% 
+  modify_header(all_stat_cols() ~ "**{level}**")
+
+tbl_merge(list(x, y), tab_spanner = c("Overall", "By baseline status")) %>% 
   as_kable_extra(caption = "Descriptive Statistics",
                  booktabs = T,
                  linesep = "",
                  position = "H") %>%
   kableExtra::group_rows(start_row = 1,
-                         end_row = 23,
+                         end_row = 19,
                          group_label = "Apprentices") %>% 
-  kableExtra::group_rows(start_row = 24,
-                         end_row = 40,
+  kableExtra::group_rows(start_row = 20,
+                         end_row = 36,
                          group_label = "Firms",
                          hline_before = TRUE) %>% 
-  kableExtra::group_rows(start_row = 25,
-                         end_row = 28,
+  kableExtra::group_rows(start_row = 21,
+                         end_row = 24,
                          group_label = "\\hspace{1em}Apprentices trained",
                          escape = F,
                          indent = T,
                          bold = F) %>% 
-  kableExtra::group_rows(start_row = 29,
-                         end_row = 34,
+  kableExtra::group_rows(start_row = 25,
+                         end_row = 30,
                          group_label = "\\hspace{1em}Firm size",
                          escape = F,
                          indent = T,
-                         bold = F)
+                         bold = F) %>% 
+  kableExtra::kable_styling(latex_options="scale_down")
+
 
 ## ---- test-j --------
 
