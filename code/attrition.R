@@ -24,27 +24,36 @@ df <- unlabelled(df)
 
 ## ---- test-i --------
 
-apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, schooling, wave) %>%
+apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, grad, schooling, wave) %>%
   mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
          sex = factor(sex, levels = 0:1, labels = c("Female", "Male")),
-         FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
-  rename("Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
+         FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.')),
+         grad = ifelse(wave == "Baseline", NA, grad)) %>% 
+  mutate(grad = factor(grad, labels = c("Still training", "Graduated", "Dropped out", "Unknown"))) %>% 
+  rename("Age" = age, "Male" = sex, "Trade" = FS1.11) %>% 
   tbl_summary(by=wave,
               type = list(Age ~ "continuous",
                           duration ~ "continuous",
-                          Gender ~ "categorical"),
+                          Male ~ "dichotomous"),
+              value = Male ~ "Male",
               statistic = list(all_continuous() ~ c("{mean} ({sd})"),
+                               all_categorical() ~ c("{p}%"),
                                N ~ "{N}"),
               missing = "no",
               label = list(Trade ~ "Trade",
                            duration ~ "Years in training",
-                           schooling ~ "Education")) %>% 
+                           schooling ~ "Education",
+                           grad ~ "Status at endline")) %>% 
   modify_header(all_stat_cols() ~ "**{level}**")
 
-workshops <- df %>% mutate(N_firms = 1) %>% mutate(not_selected = dossier_apps-dossier_selected,
-                                             did_not_apply = FS6.1-dossier_apps,
+workshops <- df %>% mutate(N_firms = 1) %>% mutate(apps = FS6.1, 
+                                             selected = ifelse(dossier_selected<FS6.1, dossier_selected, FS6.1),
+                                             not_selected = ifelse(dossier_apps-dossier_selected<FS6.1, dossier_apps-dossier_selected, 
+                                                                   ifelse(FS6.1-FS6.2-dossier_selected>0, FS6.1-FS6.2-dossier_selected,
+                                                                          FS6.1-selected)),
+                                             did_not_apply = ifelse(FS6.1-selected-not_selected >= 0, FS6.1-selected-not_selected, FS6.2),
                                              FS1.11 = as.numeric(FS1.11)) %>% 
-  select(N_firms, FS1.2, FS6.1, dossier_selected, not_selected, did_not_apply, firm_size, FS3.4, contains("FS3.5"), FS1.11, wave) %>%
+  select(N_firms, FS1.2, FS6.1, selected, not_selected, did_not_apply, firm_size, FS3.4, apps, contains("FS3.5"), FS1.11, wave) %>%
   group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>%
   mutate(wave = factor(wave, labels = c("Baseline", "Endline")),
          FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
@@ -52,16 +61,18 @@ workshops <- df %>% mutate(N_firms = 1) %>% mutate(not_selected = dossier_apps-d
               type = list(c(firm_size, FS3.4, FS6.1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)  ~ "continuous",
                           FS1.11 ~ "categorical"),
               statistic = list(all_continuous() ~ "{mean} ({sd})",
+                               all_categorical() ~ c("{p}%"),
                                N_firms ~ "{N}"),
               missing = "no",
               digits = list(firm_size ~ c(1, 1),
                             starts_with("FS3.5") ~ c(2, 1)),
               label = list(FS3.4 ~ "Total (reported)",
                            firm_size ~ "Total (calculated)",
-                           dossier_selected ~ "Selected",
+                           selected ~ "Selected",
                            not_selected ~ "Not Selected",
                            did_not_apply ~ "Did Not Apply",
                            FS6.1 ~ "Total",
+                           apps ~ "Apprentices",
                            FS3.5_2 ~ "Permanent wage",
                            FS3.5_3 ~ "Paid family",
                            FS3.5_4 ~ "Unpaid family",
@@ -73,22 +84,25 @@ workshops <- df %>% mutate(N_firms = 1) %>% mutate(not_selected = dossier_apps-d
 
 x <- tbl_stack(list(apps, workshops), quiet = T) 
 
-y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED, FS1.11, duration, schooling) %>%
+y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED, FS1.11, duration, grad, schooling) %>%
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
                            labels = c('Selected', 'Not Selected', 'Did Not Apply')),
          sex = factor(sex, levels = 0:1, labels = c("Female", "Male")),
          FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.'))) %>% 
-  rename("Age" = age, "Gender" = sex, "Trade" = FS1.11) %>% 
+  rename("Age" = age, "Male" = sex, "Trade" = FS1.11) %>% 
   tbl_summary(by=SELECTED,
               type = list(Age ~ "continuous",
                           duration ~ "continuous",
-                          Gender ~ "categorical"),
+                          Male ~ "dichotomous"),
+              value = Male ~ "Male",
               statistic = list(all_continuous() ~ c("{mean} ({sd})"),
+                               all_categorical() ~ c("{p}%"),
                                N ~ "{N}"),
               missing = "no",
               label = list(Trade ~ "Trade",
                            duration ~ "Years in training",
-                           schooling ~ "Education")) %>% 
+                           schooling ~ "Education",
+                           grad ~ "Status at endline")) %>% 
   modify_header(all_stat_cols() ~ "**{level}**")
 
 tbl_merge(list(x, y), tab_spanner = c("Overall", "By baseline status")) %>% 
@@ -97,20 +111,20 @@ tbl_merge(list(x, y), tab_spanner = c("Overall", "By baseline status")) %>%
                  linesep = "",
                  position = "H") %>%
   kableExtra::group_rows(start_row = 1,
-                         end_row = 19,
+                         end_row = 22,
                          group_label = "Apprentices") %>% 
-  kableExtra::group_rows(start_row = 20,
-                         end_row = 36,
+  kableExtra::group_rows(start_row = 23,
+                         end_row = 40,
                          group_label = "Firms",
                          hline_before = TRUE) %>% 
-  kableExtra::group_rows(start_row = 21,
-                         end_row = 24,
+  kableExtra::group_rows(start_row = 24,
+                         end_row = 27,
                          group_label = "\\hspace{1em}Apprentices trained",
                          escape = F,
                          indent = T,
                          bold = F) %>% 
-  kableExtra::group_rows(start_row = 25,
-                         end_row = 30,
+  kableExtra::group_rows(start_row = 28,
+                         end_row = 34,
                          group_label = "\\hspace{1em}Firm size",
                          escape = F,
                          indent = T,

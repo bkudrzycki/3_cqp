@@ -41,7 +41,7 @@ time_inv_ys <- ys %>% select("IDYouth", "baseline_age", "endline_age", "cqp", "b
 #baseline
 base_ys <- ys %>% select(tidyselect::vars_select(names(ys), -matches(c("baseline_age", "endline_age", "YE", "cqp", "birthdate", "sex", "DEPART", "NOTE_OBTENUE", "SELECTED", "DIPLOME", "YS3.16", "YS4.6")))) %>% mutate(wave = 0)
 #endline
-end_ys <- ys %>% select(tidyselect::vars_select(names(ys), matches(c('IDYouth', 'YE3', 'YE5')))) %>% mutate(wave = 1)
+end_ys <- ys %>% select(tidyselect::vars_select(names(ys), matches(c('IDYouth', 'YE3', 'YE5', 'YE7')))) %>% mutate(wave = 1)
 
 # SELECT FIRM (FS) VARIABLES OF INTEREST HERE
 #time-invariant from firm survey
@@ -152,6 +152,24 @@ df <- df %>% left_join(base_trad %>% select(IDYouth, FS7.3) %>% mutate(FS7.3 = r
   schooling == 8 ~ "Tertiary",
   schooling == 9 ~ "Tertiary")) %>% 
   mutate(schooling=fct_relevel(schooling,c("None","<Primary")))
+
+# generate and append graduation statistics
+grads <- df %>% filter(wave == 1) %>% select(IDYouth, wave, YE3.3, YE3.5, YE3.7, FE9.1, YE3.29) %>% zap_label()
+
+# still training in some form: with a master or CQP (line 1), according to trainer (line 2), 
+grads <- grads %>% mutate(grad = ifelse(YE3.7 %in% 1 | YE3.29 %in% 1, 1, # with a master or in CQP
+                                            ifelse(FE9.1 %in% 1, 1, # training according to master craftsman 
+                                                   ifelse(YE3.3 %in% 1 & YE3.5 %in% 1, 2, # graduated and working for former master
+                                                          ifelse(YE3.3 %in% 1 & YE3.29 %in% 2, 2, # graduated but still in CQP
+                                                                 ifelse(FE9.1 %in% 2, 2, # graduated according to master craftsman
+                                                                        ifelse(FE9.1 %in% 4, 3, # dropped out according to master craftsman
+                                                                               ifelse(YE3.3 %in% 0 & YE3.7 %in% 0, 3, 4)))))))) # no grad, NOT training
+
+grads <- grads %>% mutate(grad = factor(grad, labels = c("Still training", "Graduated", "Dropped out", "Unknown")))
+
+grads <- grads %>% mutate(grad_but_cqp = ifelse(YE3.3 %in% 1 & YE3.29 %in% 2, 1, 0)) %>% select(IDYouth, grad, grad_but_cqp)
+
+df <- left_join(df, grads, by = "IDYouth")
 
 # recode revenues, costs, wages, and profits 
 
@@ -676,25 +694,36 @@ df <- df %>% mutate(ext_training = ifelse(wave == 0, YS4.43, YE3.35)) %>%
 
 # cost benefit models
 
+# estimated trainer hours of training per year: days per week (FS6.9) * hours on last day (FS6.10) * 4 * months open last year (FS4.1)
+# trainer hourly wage: monthly wage of skilled employee (FS5.2_1_2) / days open last week (FS3.1) / hours open on last day (FS3.2) / 4 weeks
+# number of trainers per apprentice: FS6.8 / FS6.1
+
+df <- df %>% mutate(annual_fees = total_fees/4,
+                    annual_allowances = all_allowances*5*4*FS4.1,
+                    annual_training_costs = total_training_costs*FS4.1/FS6.1, 
+                    annual_foregone_prod = FS6.9*FS6.10*4*FS4.1*FS5.2_1_2/FS3.1/FS3.2/4*FS6.8/FS6.1) %>% 
+  rowwise() %>% 
+  mutate(total_benefits = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, na.rm = T),
+         total_costs = sum(annual_allowances, annual_training_costs, annual_foregone_prod, na.rm = T))
+
 # model I: fees - allowances
-df <- df %>% rowwise() %>% mutate(cb_1 = sum(total_fees/4, -all_allowances*5*4*FS4.1, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_I = sum(annual_fees, -annual_allowances, na.rm = T))
 
 # model II: fees - allowances - training costs
-df <- df %>% rowwise() %>% mutate(cb_2 = sum(total_fees/4, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, na.rm = T))
-x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate(cb_2_baseline = sum(total_fees/4, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, na.rm = T)) %>% select(IDYouth, cb_2_baseline)
-df <- df %>% left_join(x, by = "IDYouth")
+df <- df %>% rowwise() %>% mutate(cb_II = sum(annual_fees, -annual_allowances, -annual_training_costs, na.rm = T))
 
-# model III: fees - allowances - training costs + apprentice productivity - trainer wages
+# model III: fees + productivity - allowances
+df <- df %>% rowwise() %>% mutate(cb_III = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, -annual_allowances, na.rm = T))
 
-df <- df %>% mutate(monthly_time_trained = FS6.9*FS6.10*4)
-# estimated trainer hours of training per month: days per week (FS6.9) * hours on last day (FS6.10) * 4 * number of trainers instructing apps (FS6.8)
-# trainer hourly wage: monthly wage of skilled employee (FS5.2_1_2) / days open last week (FS3.1) / hours open on last day (FS3.2) / 4 weeks
+# model IV: fees + productivity - training_costs - allowances
+df <- df %>% rowwise() %>% mutate(cb_IV = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, -annual_training_costs, -annual_allowances, na.rm = T))
 
-df <- df %>% rowwise() %>% mutate(cb_3 = sum(total_fees/4, FS5.2_1_2*6, FS5.2_1_4*6, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, -monthly_time_trained*FS6.8*FS5.2_1_2/FS3.1/FS3.2/4/FS6.1*FS4.1, na.rm = T))
-x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate(cb_3_baseline = sum(total_fees/4,  FS5.2_1_2*6, FS5.2_1_4*6, -all_allowances*5*4*FS4.1, -total_training_costs*FS4.1/FS6.1, -monthly_time_trained*FS6.8*FS5.2_1_2/FS3.1/FS3.2/4/FS6.1*FS4.1, na.rm = T)) %>% select(IDYouth, cb_3_baseline)
-df <- df %>% left_join(x, by = "IDYouth")
+# model V: fees + productivity - training_costs - allowances - foregone trainer productivity
+df <- df %>% rowwise() %>% mutate(cb_V = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, -annual_training_costs, -annual_allowances, -annual_foregone_prod, na.rm = T))
 
 df <- df %>% ungroup()
+
+df <- unlabelled(df)
 
 save(df, file = "data/df.rda")
 
