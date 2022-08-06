@@ -1,4 +1,4 @@
-## ---- cbend --------
+## ---- tbl-cbend --------
 
 z <- x %>% filter(wave == "Endline") %>% mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
                                                                   labels = c('Selected', 'Not Selected', 'Did Not Apply')))
@@ -73,3 +73,53 @@ tbl_merge(list(y, z), tab_spanner = c("**Baseline**", "**Endline**")) %>%
                  addtl_fmt = F) %>%
   add_footnote("\\scriptsize Mean (SD). All fees are total amounts to be paid over the course of the apprenticeship. Amounts in \\$US.", notation = "none", threeparttable = T, escape = F) %>% 
   kableExtra::kable_styling(latex_options="scale_down")
+
+## ---- tbl-cblongbycqp --------
+
+firms <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED, firm_size_bins, dossier_selected, dossier_apps, FS3.4, FS4.1, FS4.7, annual_app_prod, FS5.4, FS6.1, FS6.2, firm_size, profits, expenses, annual_fees, total_benefits, annual_allowances, annual_training_costs, annual_foregone_prod, total_costs, contains("cb")) %>%
+  group_by(FS1.2) %>% 
+  summarise_all(mean, na.rm = T) %>% 
+  ungroup() %>% 
+  rowwise() %>% 
+  mutate(annual_fees_extrap = FS6.1*annual_fees,
+         apprentice_prod_extrap = FS6.1*annual_app_prod,
+         total_benefits_extrap = FS6.1*total_benefits,
+         annual_allowances_extrap = FS6.1*annual_allowances,
+         annual_training_costs_extrap = FS6.1*annual_training_costs,
+         annual_foregone_prod_extrap = FS6.1*annual_foregone_prod,
+         total_costs_extrap = FS6.1*total_costs,
+         cb_I_extrap = FS6.1*cb_I,
+         cb_II_extrap = FS6.1*cb_II,
+         cb_III_extrap = FS6.1*cb_III,
+         cb_IV_extrap = FS6.1*cb_IV,
+         cb_V_extrap = FS6.1*cb_V) %>% 
+  mutate(annual_revenues = FS4.7 * FS4.1,
+         annual_expenses = expenses * FS4.1,
+         annual_rep_profits = FS5.4 * FS4.1,
+         annual_profits = profits * FS4.1,
+         firm_size_bins = cut(firm_size, breaks = c(1,2,5,10,20,50,107))) %>% 
+  mutate_at(vars(contains(c('annual', 'extrap'))), ~./605)
+
+firms %>% select(firm_size_bins, annual_revenues, annual_expenses, annual_rep_profits, annual_profits, annual_fees_extrap, apprentice_prod_extrap, total_benefits_extrap, annual_allowances_extrap, annual_training_costs_extrap, annual_foregone_prod_extrap, total_costs_extrap, contains("extrap")) %>% 
+  tbl_summary(by = firm_size_bins,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              digits = list(everything() ~ c(0, 0)),
+              label = list(annual_revenues ~ "Revenues",
+                           annual_expenses ~ "Expenses",
+                           annual_rep_profits ~ "Profits (reported)",
+                           annual_profits ~ "Profits (calculated)",
+                           annual_fees_extrap ~ "Extrapolated total fees",
+                           apprentice_prod_extrap ~ "Extrapolated total apprentice productivity",
+                           total_benefits_extrap ~ "Extrapolated total benefits",
+                           annual_allowances_extrap ~ "Extrapolated allowances",
+                           annual_training_costs_extrap ~ "Total reported training costs",
+                           annual_foregone_prod_extrap ~ "Total foregone trainer productivity",
+                           total_costs_extrap ~ "Extrapolated total costs",
+                           cb_I_extrap ~ "Model I",
+                           cb_II_extrap ~ "Model II",
+                           cb_III_extrap ~ "Model III",
+                           cb_IV_extrap ~ "Model IV",
+                           cb_V_extrap ~ "Model V")) %>% 
+  add_overall()

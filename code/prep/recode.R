@@ -218,7 +218,8 @@ df <- df %>% mutate_at(c("FS5.3"), recode,
                        `11` = 1300000) %>% 
   mutate_at(c("FS5.3"), na_if, 12)
 
-df <- df %>% rowwise() %>% mutate(profits = sum(c(FS4.7-FS5.1-FS5.3))) %>% ungroup()
+df <- df %>% rowwise() %>% mutate(profits = sum(c(FS4.7, -FS5.1, -FS5.3), na.rm = T),
+                                  expenses = sum(c(FS5.1, FS5.3), na.rm = T)) %>% ungroup()
 
 # recode training costs (ENDLINE ONLY!)
 df <- df %>% mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), recode,
@@ -649,8 +650,16 @@ df <- df %>% rowwise() %>% mutate(fees_avg = mean(c(total_fees, a_total_fees), n
 # firm size (calculated by adding up total number of all types of workers), as well as bins
 df <- df %>% rowwise() %>% mutate(firm_size = sum(c(FS6.1, FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)),
                                   firm_size_sans_app = sum(c(FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)),
-                    firm_size_bins = cut(firm_size, breaks = c(1,2,5,10,20,50,107)),
-                    firm_size_bins_reported = cut(FS3.4, breaks = c(1,2,5,10,20,50))) %>% ungroup()
+                    firm_size_bins = cut(firm_size, breaks = c(1,20,40,60,80,107)),
+                    firm_size_bins_reported = cut(FS3.4, breaks = c(1,10,20,30,40,50))) %>% ungroup()
+
+
+# types of apprentices working in firm, roughly deduced from FS6.1 and dossier data (caution! in a few cases inconsistent)
+df <- df %>% mutate(selected = ifelse(dossier_selected<FS6.1, dossier_selected, FS6.1),
+                    not_selected = ifelse(dossier_apps-dossier_selected<FS6.1, dossier_apps-dossier_selected, 
+                                          ifelse(FS6.1-FS6.2-dossier_selected>0, FS6.1-FS6.2-dossier_selected,
+                                                 FS6.1-selected)),
+                    did_not_apply = ifelse(FS6.1-selected-not_selected >= 0, FS6.1-selected-not_selected, FS6.2))
 
 # firm weekly hours (more accurately: number of hours worked by patron)
 
@@ -688,12 +697,36 @@ wages <- rbind(JoinCQPMatch(c('FS5.2')), JoinTradMatch(c('FS5.2'))) %>%
 
 df <- left_join(df, wages, by = c('IDYouth', 'wave'))
 
+a_fees <- a_fees %>% filter(a_total_fees != 0) %>% replace(is.na(.), 0)
+
 # training dummy
 df <- df %>% mutate(ext_training = ifelse(wave == 0, YS4.43, YE3.35)) %>% 
   mutate(ext_training = ifelse(ext_training == 0, 0, 1))
 
 # cost benefit models
 
+#estimating app productivity. use employee wages where available (average of mean trained and mean untrained monthly wage * months worked). otherwise use reported apprentive wage where available
+app_prod <- df %>% select(IDYouth, wave, SELECTED, FS4.1, contains("FS5.2_1"))
+app_prod <- app_prod %>% mutate_at(vars(contains("FS5.2_1")), na_if, 0)
+
+app_prod <- app_prod %>% mutate(annual_app_prod = case_when(rowMeans(across(c(FS5.2_1_1, FS5.2_1_2)), na.rm = T)>0 & 
+                                                              rowMeans(across(c(FS5.2_1_3, FS5.2_1_4)), na.rm = T)>0 ~ 
+                                                              (rowMeans(across(c(FS5.2_1_1, FS5.2_1_2)), na.rm = T) + 
+                                                                 rowMeans(across(c(FS5.2_1_3, FS5.2_1_4)), na.rm = T))/2*FS4.1,
+                                                            rowMeans(across(c(FS5.2_1_1, FS5.2_1_2)), na.rm = T)>0 ~ 
+                                                              rowMeans(across(c(FS5.2_1_1, FS5.2_1_2)), na.rm = T)*FS4.1,
+                                                            rowMeans(across(c(FS5.2_1_3, FS5.2_1_4)), na.rm = T)>0 ~ 
+                                                              rowMeans(across(c(FS5.2_1_3, FS5.2_1_4)), na.rm = T)*FS4.1,
+                                                            rowMeans(across(c(FS5.2_1_10, FS5.2_1_11)), na.rm = T)>0 & SELECTED == 1 ~ 
+                                                              rowMeans(across(c(FS5.2_1_10, FS5.2_1_11)), na.rm = T)/2*FS4.1,
+                                                            rowMeans(across(c(FS5.2_1_8, FS5.2_1_9)), na.rm = T)>0 & SELECTED != 1 ~ 
+                                                              rowMeans(across(c(FS5.2_1_8, FS5.2_1_9)), na.rm = T)/2*FS4.1,
+                                                            rowMeans(across(c(FS5.2_1_8, FS5.2_1_9, FS5.2_1_10, FS5.2_1_11)), na.rm = T)>0 ~ 
+                                                              rowMeans(across(c(FS5.2_1_8, FS5.2_1_9, FS5.2_1_10, FS5.2_1_11)), na.rm = T))) %>% 
+  select(IDYouth, wave, annual_app_prod)
+
+df <- left_join(df, app_prod, by = c('IDYouth', 'wave'))                                                        
+  
 # estimated trainer hours of training per year: days per week (FS6.9) * hours on last day (FS6.10) * 4 * months open last year (FS4.1)
 # trainer hourly wage: monthly wage of skilled employee (FS5.2_1_2) / days open last week (FS3.1) / hours open on last day (FS3.2) / 4 weeks
 # number of trainers per apprentice: FS6.8 / FS6.1
@@ -701,9 +734,14 @@ df <- df %>% mutate(ext_training = ifelse(wave == 0, YS4.43, YE3.35)) %>%
 df <- df %>% mutate(annual_fees = total_fees/4,
                     annual_allowances = all_allowances*5*4*FS4.1,
                     annual_training_costs = total_training_costs*FS4.1/FS6.1, 
-                    annual_foregone_prod = FS6.9*FS6.10*4*FS4.1*FS5.2_1_2/FS3.1/FS3.2/4*FS6.8/FS6.1) %>% 
+                    annual_foregone_prod = case_when(FS5.2_1_2>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_2/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_1>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_1/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_3>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_3/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_4>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_4/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_7>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_7/FS3.1/FS3.2/4*FS6.8/FS6.1))
+df <- df %>% 
   rowwise() %>% 
-  mutate(total_benefits = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, na.rm = T),
+  mutate(total_benefits = sum(annual_fees, annual_app_prod, na.rm = T),
          total_costs = sum(annual_allowances, annual_training_costs, annual_foregone_prod, na.rm = T))
 
 # model I: fees - allowances
@@ -713,13 +751,13 @@ df <- df %>% rowwise() %>% mutate(cb_I = sum(annual_fees, -annual_allowances, na
 df <- df %>% rowwise() %>% mutate(cb_II = sum(annual_fees, -annual_allowances, -annual_training_costs, na.rm = T))
 
 # model III: fees + productivity - allowances
-df <- df %>% rowwise() %>% mutate(cb_III = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, -annual_allowances, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_III = sum(annual_fees, annual_app_prod, -annual_allowances, na.rm = T))
 
 # model IV: fees + productivity - training_costs - allowances
-df <- df %>% rowwise() %>% mutate(cb_IV = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, -annual_training_costs, -annual_allowances, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_IV = sum(annual_fees, annual_app_prod, -annual_training_costs, -annual_allowances, na.rm = T))
 
 # model V: fees + productivity - training_costs - allowances - foregone trainer productivity
-df <- df %>% rowwise() %>% mutate(cb_V = sum(annual_fees, FS5.2_1_2*6, FS5.2_1_4*6, -annual_training_costs, -annual_allowances, -annual_foregone_prod, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_V = sum(annual_fees, annual_app_prod, -annual_training_costs, -annual_allowances, -annual_foregone_prod, na.rm = T))
 
 df <- df %>% ungroup()
 

@@ -7,7 +7,7 @@ header-includes:
   - \usepackage{setspace}
 date: \today
 abstract: |
-   This paper evaluates the impact of and provides a detailed account of the costs and benefits associated with (dual) apprenticeship training in the informal sector in Bénin using unique matched apprentice-firm survey data. To study the effectiveness of dual training in an informal economy, successful applicants to the _Certificat de Qualification Professionelle_, program, a national training program that combines in-firm training with classroom teaching, are compared to unsuccessful applicants and non-applicants three years after program start.  Human capital gains among all apprentices, as measured by trainers' subjective appraisal of apprentice experience and competence, are significant, with improvements of .73 and .66 standard deviation between survey waves, respectively. Gains were concentrated in the masonry and carpentry sector, in larger firms, and among apprentices who did not apply for the CQP program. To study net benefits of training for firms, two cost and benefit models are used. When only fees, allowances, and reported training costs are considered, firms suffer a net loss of 130 $US per apprentice per year: an average of 630 $US total per firm. When projected apprentice contributions and foregone trainer productivity are included, net estimated losses are reduced to 33 \$US per apprentice per year, and an overall estimated benefit of 218 $US per firm. Fees paid to the training firms account are not enough to defray the expenses associated with training, which are dominated by allowances paid to apprentices. Apprentices who do not apply to the CQP program are associated with somewhat lower net losses to their training firms when estimated using the first model. Apprentices hired at larger firms are associated with higher net benefits. In sum, we find that participation in the CQP program is not associated in any benefits for either trainees or firms relative to non-participating apprentices, though effectiveness of dual training may have been negatively impacted by the Covid-19 crisis.
+   This paper evaluates the impact of and provides a detailed account of the costs and benefits associated with (dual) apprenticeship training in the informal sector in Bénin using unique matched apprentice-firm survey data. To study the effectiveness of dual training in an informal economy, successful applicants to the _Certificat de Qualification Professionelle_, program, a national training program that combines in-firm training with classroom teaching, are compared to unsuccessful applicants and non-applicants three years after program start.  Human capital gains among all apprentices, as measured by trainers' subjective appraisal of apprentice experience and competence, are significant, with improvements of .73 and .66 standard deviation between survey waves, respectively. Gains were 3concentrated in the masonry and carpentry sector, in larger firms, and among apprentices who did not apply for the CQP program. To study net benefits of training for firms, two cost and benefit models are used. When only fees, allowances, and reported training costs are considered, firms suffer a net loss of 130 $US per apprentice per year: an average of 630 $US total per firm. When projected apprentice contributions and foregone trainer productivity are included, net estimated losses are reduced to 33 \$US per apprentice per year, and an overall estimated benefit of 218 $US per firm. Fees paid to the training firms account are not enough to defray the expenses associated with training, which are dominated by allowances paid to apprentices. Apprentices who do not apply to the CQP program are associated with somewhat lower net losses to their training firms when estimated using the first model. Apprentices hired at larger firms are associated with higher net benefits. In sum, we find that participation in the CQP program is not associated in any benefits for either trainees or firms relative to non-participating apprentices, though effectiveness of dual training may have been negatively impacted by the Covid-19 crisis.
   
 thanks: |
   Thanks to Dario for the Markdown template.
@@ -35,6 +35,7 @@ knitr::read_chunk('../code/costbenefits_big_table.R')
 knitr::read_chunk('../code/attrition.R')
 knitr::read_chunk('../code/tbls_body.R')
 knitr::read_chunk('../code/tbls_appendix.R')
+knitr::read_chunk('../code/figures.R')
 
 options(scipen=2, digits=2)
 ```
@@ -42,7 +43,7 @@ options(scipen=2, digits=2)
 
 ```{r installlibraries, include=FALSE, cache = FALSE}
 
-packages <- c("lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "gridExtra", "rstatix", "kableExtra")
+packages <- c("lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "kableExtra")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -80,7 +81,7 @@ load("../data/df.rda")
 selected <- df %>% filter(SELECTED == 1)
 baseline <- df %>% filter(wave == 0)
 endline <- df %>% filter (wave == 1)
-firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
+firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1, contains("cb")) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
 
 # load functions
 source("../functions/add_by_n.R")
@@ -196,14 +197,14 @@ In addition to questions regarding training practices and firm performance, mast
 
 Table: (\#tab:sampling) Apprentice Sampling
 
-The baseline wave for the two surveys was collected in July-August 2019. The apprentice survey included questions on training characteristics, employment outcomes, skill and competency assessments and apprentice assessments of training quality, while the firm survey included questions on workforce composition in the firm, wages, costs and revenues. In addition, we surveyed all MCs about the firm's training practices and expenditures for training, as well as their perception of individual apprentices’ skills, experience, diligence, efficiency, learning ability, and so on. Data on `r (df %>% group_by(wave) %>% summarise(n_distinct(IDYouth)))[1,2]` apprentices working for `r (df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[1,2]` unique firms was collected at baseline. Descriptive statistics for apprentices and firms is shown in Table \@ref(tab:test-i) below. 
+The baseline wave for the two surveys was collected in July-August 2019. The apprentice survey included questions on training characteristics, employment outcomes, skill and competency assessments and apprentice assessments of training quality, while the firm survey included questions on workforce composition in the firm, wages, costs and revenues. In addition, we surveyed all MCs about the firm's training practices and expenditures for training, as well as their perception of individual apprentices’ skills, experience, diligence, efficiency, learning ability, and so on. Data on `r (df %>% group_by(wave) %>% summarise(n_distinct(IDYouth)))[1,2]` apprentices working for `r (df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[1,2]` unique firms was collected at baseline. Descriptive statistics for apprentices and firms is shown in Table \@ref(tab:tbl-desc) below. 
 
-```{r, test-i, echo=FALSE}
+```{r, tbl-desc, echo=FALSE}
 ```
 
 Summary statistics from the baseline survey show the sample to be predominantly male youth who, though of average age for an apprenticeship at `r mean(baseline$age, na.rm = T)` years [@ilo2022], are significantly more educated than is typical for traditional apprentices, with over half having completed at least some secondary schooling. Apprentices selected for participation in the CQP are more educated than those not selected. Though all applicants applied to the same cohort of the CQP program, they came in having more experience than the required six months: the average apprentice had `r mean((df %>% filter(SELECTED == 3))$baseline_duration, na.rm = T)` years of experience at the time of application. Non-applicants have the lowest educational attainment and are the least experienced at baseline, suggesting that master craftsmen send most able apprentices to stand for the entrance exam. Finally, it is notable that CQP applicants have over three years of apprenticeship experience on average, though the CQP entrance requirement only stipulates six months. This again suggests a selection mechanism for more experienced/able applicants that may indicate that the CQP is considered more of a continuing education program among craftsmen than an entry-level apprenticeship program.
 
-The majority of training firms are small workshops comprising the firm owner --- the master trainer --- and several apprentices. Two firm sizes are shown in Table \@ref(tab:test-i): those stated directly by the firm owner in response to the question, "How many people (including you and your apprentices) are currently working in your business?" and those calculated by the author by summing the number of apprentices, partners, paid and unpaid family workers, and occasional workers engaged by the firm owner. Using self-reported size, `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:3])*100`% of firms employed no more than ten. Using the calculated firm size, `r sum(prop.table(table(baseline$firm_size_bins))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins))[1:3])*100`% of firms employed no more than ten. Thus, training firms in the sample are small, in line with observations from the informal sector in Ghana [@frazer2006, @velenchikApprenticeshipContractsSmall1995]. Moreover, the workforce of the average firm in the sample is dominated by apprentices: at baseline, the average firm employs about four apprentices for every other type of employee (`r mean((firms %>% filter(wave == 0, firm_size > 1))$FS6.1/((firms %>% filter(wave == 0, firm_size > 1))$firm_size-1), na.rm = T)*100`% of calculated firm size at baseline and `r mean((firms %>% filter(wave == 1, firm_size > 1))$FS6.1/((firms %>% filter(wave == 1, firm_size > 1))$firm_size-1), na.rm = T)*100`% at endline).
+The majority of training firms are small workshops comprising the firm owner --- the master trainer --- and several apprentices. Two firm sizes are shown in Table \@ref(tab:tbl-desc): those stated directly by the firm owner in response to the question, "How many people (including you and your apprentices) are currently working in your business?" and those calculated by the author by summing the number of apprentices, partners, paid and unpaid family workers, and occasional workers engaged by the firm owner. Using self-reported size, `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:3])*100`% of firms employed no more than ten. Using the calculated firm size, `r sum(prop.table(table(baseline$firm_size_bins))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins))[1:3])*100`% of firms employed no more than ten. Thus, training firms in the sample are small, in line with observations from the informal sector in Ghana [@frazer2006, @velenchikApprenticeshipContractsSmall1995]. Moreover, the workforce of the average firm in the sample is dominated by apprentices: at baseline, the average firm employs about four apprentices for every other type of employee (`r mean((firms %>% filter(wave == 0, firm_size > 1))$FS6.1/((firms %>% filter(wave == 0, firm_size > 1))$firm_size-1), na.rm = T)*100`% of calculated firm size at baseline and `r mean((firms %>% filter(wave == 1, firm_size > 1))$FS6.1/((firms %>% filter(wave == 1, firm_size > 1))$firm_size-1), na.rm = T)*100`% at endline).
 
 The endline survey was conducted in August-September 2021. It is quite common for studies of training programs to be affected by high rates of attrition [@mckenzie2017]. Overall apprentice attrition in our sample, at `r round((1-(df %>% group_by(wave) %>% summarise(n_distinct(IDYouth)))[2,2]/(df %>% group_by(wave) %>% summarise(n_distinct(IDYouth)))[1,2])*100,1)`%, is clearly very high, even when compared to studies in similar contexts: for instance, @crepon2019 and @hardy2019 both report youth attrition of around 10%. It is driven both by youth non-response and firm non-response^[Data on apprentices who had not applied to the CQP was only obtained from firm owners, and thus only subject to firm attrition.]. However, dropout rates suggest that survey attrition is not caused predominantly by apprenticeship leavers: even when considering as dropouts apprentices whose reason for discontinuing training is unknown, just `r sum(endline$grad == "Dropped out" | endline$grad == "Unknown", na.rm = T)/nrow(endline)*100`% of all apprentices for whom data was collected at endline left their program before graduation. `r sum(endline$grad == "Graduated", na.rm = T)/nrow(endline)*100`% had graduated after three years, and the majority, `r sum(endline$grad == "Still training", na.rm = T)/nrow(endline)*100`%, were still training. Graduation rates are highest for electrician apprentices, at `r sum((endline %>% filter(FS1.11 == 5))$grad == "Graduated", na.rm = T)/nrow((endline %>% filter(FS1.11 == 5)))*100`%, but comparable across trades. However, graduation rates were much lower for participants in the CQP than non-participants, potentially caused by Covid-19 related training delays. As we were observing the cohort that began training in 2019, it is consistent with an apprenticeship duration of 4 years that the majority of the sample was still training after three years. Program dropout is quite low compared to similar studies, e.g. @crepon2019 who report 31.2% dropout for dual apprenticeships and 32.5% for traditional apprenticeships. Table \@ref(tab:test-j) in the Appendix gives no indication of attrition bias, as there is no systematic difference in the sample composition by CQP participation status, trade, or relevant socioeconomic variables.  
 
@@ -346,7 +347,6 @@ tbl_stack(list(comp, exp, skills), group_header = c("Competencies", "Experience"
                  linesep = "",
                  position = "H")
 
-
 ```
 
 Changes in the three human capital measures are presented in Table \@ref(tab:skills). We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 10% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing; thus, the marginally significant increase in knowledge scores is driven by improvements in a single trade. Evidence of apprenticeship effectiveness is clearer when regarding the apprentice competency and experience metrics. Table \@ref(tab:skills) shows that mean competency score among all apprentices improved from 76% of tasks at baseline to 92% at endline, an improvement of .66 standard deviations. Improvements were observed across all trades, and all differences were statistically significant at standard levels (with the exception of carpentry). Similarly, apprentice experience improved from having performed 73% of tasks at baseline to 92% at endline, an improvement of .73 standard deviations.
@@ -408,10 +408,10 @@ According to survey data, about a quarter of respondents say training does not t
 
 ## Impact of Informal and Dual Training on Firms  {#firmimpact}
 
-```{r, test-g, echo=FALSE}
+```{r, tbl-netbenefits, echo=FALSE}
 ```
 
-In contrast to the dual training program studies by @crepon2019, the CQP program did not eliminate fees or directly subsidize apprentices. Training fees for both CQP participants and other, traditional apprentices are summarized in Table \@ref(tab:test-g). General training fees represent the largest single fee paid to the firms and account for over half of total fees paid. Other minor fees cover the provision of equipment and materials, application fees (pertinent for the CQP, as the master trainer must submit paperwork in their apprentices' stead), and initiation and graduation fees. In total, apprentices report paying about 175,000 FCFA (280 \$US) in fees for training, while firm owner report around 160,000 FCFA (255 \$US) in fees per apprentice. This indicates a minor increase in the costs of training in Bénin over the past two decades: @walther2007 reports total fees ranging from 50,000 to 150,000 FCFA (96-290 \$US, inflation adjusted). Though generally unregulated, in some cases professional associations and public authorities step in to regulate fees, particularly those levied for initiation and graduation ceremonies.
+In contrast to the dual training program studies by @crepon2019, the CQP program did not eliminate fees or directly subsidize apprentices. Training fees for both CQP participants and other, traditional apprentices are summarized in Table \@ref(tab:tbl-netbenefits). General training fees represent the largest single fee paid to the firms and account for over half of total fees paid. Other minor fees cover the provision of equipment and materials, application fees (pertinent for the CQP, as the master trainer must submit paperwork in their apprentices' stead), and initiation and graduation fees. In total, apprentices report paying about 175,000 FCFA (280 \$US) in fees for training, while firm owner report around 160,000 FCFA (255 \$US) in fees per apprentice. This indicates a minor increase in the costs of training in Bénin over the past two decades: @walther2007 reports total fees ranging from 50,000 to 150,000 FCFA (96-290 \$US, inflation adjusted). Though generally unregulated, in some cases professional associations and public authorities step in to regulate fees, particularly those levied for initiation and graduation ceremonies.
 
 Apprentices report significantly higher fees than firms, for the training fee in particular (Table \@ref(tab:tbl-fees) in the Appendix). Firms may underreport fees to avoid accusations of gauging, but are at the same time likely to have more direct knowledge of all fees than apprentices, whose parents and relatives usually pay the craftsmen directly. Finally, firms report collecting higher initiation and application fees at the time of the endline survey. This may indicate a shift to fee payments to the beginning of the apprenticeship as graduation ceremonies (and the concomitant graduation fees) are phased out as legislation prohibiting graduation ceremonies is put into practice over time.
 
@@ -442,7 +442,7 @@ Figure \@ref(fig:costspie) shows the breakdown of various costs per apprentice, 
 
 <!-- \noindent An even more comprehensive accounting of firm costs and benefits from training may account for factors which are not directly observable, such as technological upgrading and savings on hiring costs, as well as benefits that materialize in the future, such as apprentice labor after graduation [@walther2007]. However, savings on hiring costs are bound to be minimal, as firms are composed primarily of apprentices, and future productive value can also be ignored at first pass, since most apprentices strike out on their own upon graduation. The costs of recruiting and hiring apprentices may be an important omitted cost which was not covered by the survey, but even in this regard, many firms reported that parents and apprentices approached them rather than _vice-versa_. -->
 
-\noindent Table \@ref(tab:test-g) shows the estimated annual net benefits of training per apprentice by wave. Estimated benefits by CQP status are also shown for baseline numbers. Depending on which model is used, training is, on average, associated with a net loss ranging from about 30 \$US to about 120 \$US per apprentice per year for the training firm.
+\noindent Table \@ref(tab:tbl-netbenefits) shows the estimated annual net benefits of training per apprentice by wave. Estimated benefits by CQP status are also shown for baseline numbers. Depending on which model is used, training is, on average, associated with a net loss ranging from about 30 \$US to about 120 \$US per apprentice per year for the training firm.
 
 The net costs of apprenticeship according to Model I are lower for CQP apprentices, despite CQP apprentices paying the lowest fees (see Table \@ref(tab:fees2) in the Appendix) and receiving higher allowances than non-applicants (and on par with unsuccessful applicants, see Table \@ref(tab:allowances) in the Appendix). This suggests that CQP participants train predominantly in firms with lower reported training costs. Estimated net benefits do not change drastically between the baseline and the endline (Table \@ref(tab:netbenefits1) in the Appendix). 
 
@@ -490,30 +490,7 @@ Mean net benefits are thus even more sensitive to large outliers, especially pos
 According to Model I, `r round(sum(baseline1$cb_I>0)/count(baseline1)*100, 2)`\% and `r round(sum(endline1$cb_I>0)/count(endline1)*100, 2)`\% of firms are estimated to earn a positive net benefit from training (positive net benefits) at baseline and endline, respectively; using Model II, `r round(sum(baseline1$cb_II>0)/count(baseline1)*100, 2)`\% are estimated to do so at baseline and `r round(sum(endline1$cb_II>0)/count(endline1)*100, 2)`\% at endline, using Model III, `r round(sum(baseline1$cb_III>0)/count(baseline1)*100, 2)`\% are estimated to do so at baseline and `r round(sum(endline1$cb_III>0)/count(endline1)*100, 2)`\% at endline; using Model IV, `r round(sum(baseline1$cb_IV>0)/count(baseline1)*100, 2)`\% are estimated to do so at baseline and `r round(sum(endline1$cb_IV>0)/count(endline1)*100, 2)`\% at endline; using Model V, `r round(sum(baseline1$cb_V>0)/count(baseline1)*100, 2)`\% are estimated to do so at baseline and `r round(sum(endline1$cb_V>0)/count(endline1)*100, 2)`\% at endline.
  
  
-``` {r profits}
-df %>% select(FS1.2, FS4.1, FS4.7, FS5.1, FS5.3, FS5.4, profits, wave) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  mutate_at(c("FS4.7", "FS5.1", "FS5.3", "FS5.4", "profits"), ~./605*FS4.1) %>% 
-  group_by(FS1.2, wave) %>% summarise_at(c("FS4.1", "FS4.7", "FS5.1", "FS5.3", "FS5.4", "profits"), mean, na.rm = T) %>% ungroup() %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = list(everything() ~ c(2, 2)),
-              include = -c(FS1.2, FS4.1),
-              label = list(FS4.7 ~ "Revenues",
-                           FS5.3 ~ "Total wages",
-                           FS5.1 ~ "Non-wage expenses",
-                           FS5.4 ~ "Profits (reported)",
-                           profits ~ "Profits (calculated)"))  %>% 
-  modify_header(stat_by =  "**{level}**",
-                label = "") %>% 
-  modify_footnote(all_stat_cols() ~ "Mean (SD). Revenues, expenses, and profits in USD.") %>% 
-  add_overall() %>% 
-  as_kable_extra(caption = "Annual firm accounts", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
+``` {r tbl-cblong, echo = FALSE}
 ```
 
 <!---
@@ -590,7 +567,7 @@ _@mohrenweiser2009: The German dual apprenticeship system is often regarded as a
 
 In the German and Swiss context, the primary benefit of training for firms is the productive value of apprentices during and after their apprenticeship. This value is generated when the apprentices is working in the firm, performing skilled or unskilled tasks that would otherwise be carried out by the firm owner, paid employees, or unpaid labor. These benefits accumulate after graduation if the apprentice is hired for less than the labor market wage for workers of equal productivity, as well as any savings on recruitment and hiring costs [@acemogluWhyFirmsTrain1998; @acemogluStructureWagesInvestment1999; @acemogluTrainingImperfectLabour1999].
 
-In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007; @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:test-i)).
+In comparison to Swiss or German apprentices, youth in SSA are less likely to continue working for their training firm upon graduation. For example, in Ghana, three out of every four apprentices plan to start their own business within five years [@breyer2007; @ahadzie2009]. Many who don't set off on their own are unable to, citing "high start-up costs, the unavailability of land and hostile planning policies tend to obstruct the ability of newly qualified craftsmen to set up on their own" [@ahadzie2009]. Informal firms must thus recoup their costs during the training period (or within a few years) if hiring apprentices is to remain a profitable enterprise. Moreover, workshops rarely hire skilled wage employees, and thus any benefits from "screening" apprentices for their productive capabilities (i.e. wage compression) or savings in hiring costs play a relatively minor role in the training decision (Table \@ref(tab:tbl-desc)).
 
 If this is the case, why do craftsmen in Bénin train at all? First, apprentices are the cheapest and most abundant source of labor, and can be hired to complete unskilled tasks at little overhead. Second, if trades can be mastered relatively quickly, apprentices will provide skilled labor in the later years of their graduation (and after graduation as well, for as long as they need to work to pay off outstanding training fees or save up for their own workshop). Finally, the apprentices (or, more often, their families) traditionally pay fees to the master craftsmen in return for the provision of training [@velenchikApprenticeshipContractsSmall1995; @frazer2006; @bankole2020].
 
@@ -734,7 +711,7 @@ y <- df  %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades,
 
 y %>% select(SELECTED, comp_diff, exp_diff, skills_diff) %>%
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   tbl_summary(by = SELECTED, missing = "no",
               digits = list(everything() ~ 3),
               statistic = list(all_continuous() ~ "{mean} ({sd})"),
@@ -795,7 +772,7 @@ df %>% select(contains("FS5.2"), wave, FS1.2) %>%
 ```{r allowances}
 baseline <- df %>% filter(wave == 0) %>% select(contains("allow"), "SELECTED", -"a_allow", -"allow_avg") %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~.*5*4/605) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
@@ -810,7 +787,7 @@ baseline <- df %>% filter(wave == 0) %>% select(contains("allow"), "SELECTED", -
 
 endline <- df %>% filter(wave == 1) %>% select(contains("allow"), "SELECTED", -"a_allow", -"allow_avg") %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~.*5*4/605) %>%  
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
@@ -825,7 +802,7 @@ endline <- df %>% filter(wave == 1) %>% select(contains("allow"), "SELECTED", -"
 
 overall <- df %>% select(contains("allow"), "SELECTED", -"a_allow", -"allow_avg") %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~.*5*4/605) %>%  
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
@@ -849,7 +826,7 @@ tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endlin
 baseline <- df %>% filter(wave == 0) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
   mutate(across(contains("fee"), ~./605)) %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                        labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                        labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -862,7 +839,7 @@ baseline <- df %>% filter(wave == 0) %>% select(c("fee_entry", "fee_formation", 
 endline <- df %>% filter(wave == 1) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
   mutate(across(contains("fee"), ~./605)) %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                        labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                        labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -874,7 +851,7 @@ endline <- df %>% filter(wave == 1) %>% select(c("fee_entry", "fee_formation", "
 
 overall <- df %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                        labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                        labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   mutate(across(contains("fee"), ~./605)) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
@@ -959,7 +936,7 @@ x %>% tbl_summary(by=wave,
 ```
 
 <!-- 
-r, cbend, echo=FALSE}
+r, tbl-cbend, echo=FALSE}
 -->
 
 ```{r netbenefits1}
@@ -970,7 +947,7 @@ baseline <- df %>% filter(wave == 0) %>% select(cb_II, cb_V, IDYouth, SELECTED) 
   mutate(cb_II = cb_II/605,
          cb_V = cb_V/605) %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -987,7 +964,7 @@ endline <- df %>% filter(wave == 1) %>% select(cb_II, cb_V, IDYouth, SELECTED) %
   mutate(cb_II = cb_II/605,
          cb_V = cb_V/605) %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -1004,7 +981,7 @@ overall <- df %>% select(cb_II, cb_V, IDYouth, SELECTED) %>%
   mutate(cb_II = cb_II/605,
          cb_V = cb_V/605) %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
   tbl_summary(by=SELECTED,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -1024,40 +1001,7 @@ tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endlin
                  position = "H")
 ```
 
-```{r hist, fig.height=3, fig.cap = "Annual net benefits per apprentice (in USD), truncated at varying percentiles", results = 'asis', fig.pos='H'}
-pct = .01
-x <- df %>% filter(wave == 0, between(cb_II, quantile(cb_II, pct), quantile(cb_II, 1-pct))) %>% select("value" = cb_II) %>% mutate(name = "cb_II", value = value / 605, mean = mean(value), pct = "1%")
-y <- df %>% filter(wave == 0, between(cb_V, quantile(cb_V, pct), quantile(cb_V, 1-pct))) %>% select("value" = cb_V) %>% mutate(name = "cb_V", value = value / 605, mean = mean(value), pct = "1%")
-
-pct = .05
-x1 <- df %>% filter(wave == 0, between(cb_II, quantile(cb_II, pct), quantile(cb_II, 1-pct))) %>% select("value" = cb_II) %>% mutate(name = "cb_II", value = value / 605, mean = mean(value), pct = "5%")
-y1 <- df %>% filter(wave == 0, between(cb_V, quantile(cb_V, pct), quantile(cb_V, 1-pct))) %>% select("value" = cb_V) %>% mutate(name = "cb_V", value = value / 605, mean = mean(value), pct = "5%")
-
-pct = .1
-x2 <- df %>% filter(wave == 0, between(cb_II, quantile(cb_II, pct), quantile(cb_II, 1-pct))) %>% select("value" = cb_II) %>% mutate(name = "cb_II", value = value / 605, mean = mean(value), pct = "10%")
-y2 <- df %>% filter(wave == 0, between(cb_V, quantile(cb_V, pct), quantile(cb_V, 1-pct))) %>% select("value" = cb_V) %>% mutate(name = "cb_V", value = value / 605, mean = mean(value), pct = "10%")
-
-z <- rbind(x,y,x1,y1,x2,y2) %>% mutate(pct=fct_relevel(pct,c("1%", "5%", "10%")))
-
-ggplot(z, aes(x=value, y=..density.., fill = name)) + geom_histogram(binwidth = 25, alpha=0.75) + geom_density(alpha = .75) + labs(y = "Density", x = "") + geom_vline(aes(xintercept=mean, color=name), linetype="dashed")+ scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9"), guide = "none") + scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"), labels = c("Model I", "Model II"), name = "") + theme_minimal() + theme(legend.position = "bottom") + facet_wrap(~ pct, scales = "free") + theme(axis.text.x=element_text(angle=45,hjust=1))
-```
-
-```{r hist2, fig.height=3, fig.cap = "Annual net benefits per firm (in USD), truncated at varying percentiles", results = 'asis', fig.pos='H'}
-pct = .01
-x <- df1 %>% filter(wave == 0, between(cb_II, quantile(cb_II, pct), quantile(cb_II, 1-pct))) %>% select("value" = cb_II) %>% mutate(name = "cb_II", value = value / 605, mean = mean(value), pct = "1%")
-y <- df1 %>% filter(wave == 0, between(cb_V, quantile(cb_V, pct), quantile(cb_V, 1-pct))) %>% select("value" = cb_V) %>% mutate(name = "cb_V", value = value / 605, mean = mean(value), pct = "1%")
-
-pct = .05
-x1 <- df1 %>% filter(wave == 0, between(cb_II, quantile(cb_II, pct), quantile(cb_II, 1-pct))) %>% select("value" = cb_II) %>% mutate(name = "cb_II", value = value / 605, mean = mean(value), pct = "5%")
-y1 <- df1 %>% filter(wave == 0, between(cb_V, quantile(cb_V, pct), quantile(cb_V, 1-pct))) %>% select("value" = cb_V) %>% mutate(name = "cb_V", value = value / 605, mean = mean(value), pct = "5%")
-
-pct = .1
-x2 <- df1 %>% filter(wave == 0, between(cb_II, quantile(cb_II, pct), quantile(cb_II, 1-pct))) %>% select("value" = cb_II) %>% mutate(name = "cb_II", value = value / 605, mean = mean(value), pct = "10%")
-y2 <- df1 %>% filter(wave == 0, between(cb_V, quantile(cb_V, pct), quantile(cb_V, 1-pct))) %>% select("value" = cb_V) %>% mutate(name = "cb_V", value = value / 605, mean = mean(value), pct = "10%")
-
-z <- rbind(x,y,x1,y1,x2,y2) %>% mutate(pct=fct_relevel(pct,c("1%", "5%", "10%")))
-
-ggplot(z, aes(x=value, y=..density.., fill = name)) + geom_histogram(binwidth = 100, alpha=0.75) + geom_density(alpha = .75) + labs(y = "Density", x = "") + geom_vline(aes(xintercept=mean, color=name), linetype="dashed")+ scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9"), guide = "none") + scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"), labels = c("Model I", "Model II"), name = "") + theme_minimal() + theme(legend.position = "bottom") + facet_wrap(~ pct, scales = "free") + theme(axis.text.x=element_text(angle=45,hjust=1))
+```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Truncated distributions of net benefits per firm"}
 ```
 
 ``` {r knowreg, results = 'asis'}
@@ -1105,6 +1049,9 @@ stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.s
 ```
 
 ```{r, test-b, echo=FALSE}
+```
+
+``` {r tbl-cblongbycqp, echo = FALSE}
 ```
 
 # Appendix B
