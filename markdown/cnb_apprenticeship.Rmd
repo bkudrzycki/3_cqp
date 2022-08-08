@@ -23,13 +23,31 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message=FALSE,
-                      warning=FALSE,
-                      echo = FALSE,
-                      cache = TRUE,
-                      fig.path='figures/',
-                      out.extra = "",
-                      floatfoot.envs = c("figure", "table", "longtabu")) 
+packages <- c("lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "kableExtra", "stargazer", "tidyverse")
+
+# install packages not yet installed
+installed_packages <- packages %in% rownames(installed.packages())
+if (any(installed_packages == FALSE)) {
+  install.packages(packages[!installed_packages], silent = TRUE)
+}
+
+# load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+rm(packages, installed_packages)
+
+# load functions
+source("../functions/add_by_n.R")
+
+# load data
+# source("../code/master.R") # to rerun all code periodically
+load("../data/df.rda")
+selected <- df %>% filter(SELECTED == 1)
+baseline <- df %>% filter(wave == 0)
+endline <- df %>% filter (wave == 1)
+firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1, contains("cb")) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
+
+# load code chunks
 knitr::read_chunk('../code/allowances_big_table.R')
 knitr::read_chunk('../code/costbenefits_big_table.R')
 knitr::read_chunk('../code/attrition.R')
@@ -37,55 +55,25 @@ knitr::read_chunk('../code/tbls_body.R')
 knitr::read_chunk('../code/tbls_appendix.R')
 knitr::read_chunk('../code/figures.R')
 
+# set R options
+ggplot2::theme_set(ggplot2::theme_bw())
 options(scipen=2, digits=2)
+
+# set knitr options
+knitr::opts_chunk$set(message=FALSE,
+                      warning=FALSE,
+                      echo = FALSE,
+                      cache = TRUE,
+                      fig.path='figures/',
+                      out.extra = "",
+                      floatfoot.envs = c("figure", "table", "longtabu"))
 ```
 
 
-```{r installlibraries, include=FALSE, cache = FALSE}
+```{r loaddata, include=FALSE, cache = TRUE}
 
-packages <- c("lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "kableExtra")
 
-# Install packages not yet installed
-installed_packages <- packages %in% rownames(installed.packages())
-if (any(installed_packages == FALSE)) {
-  install.packages(packages[!installed_packages], silent = TRUE)
-}
 
-# Load packages
-invisible(lapply(packages, library, character.only = TRUE))
-
-rm(packages, installed_packages)
-
-suppressMessages(library(stargazer))
-suppressMessages(library(tidyverse))
-
-```
-
-```{r loadlibraries, include=FALSE, cache = FALSE}
-library(lfe)
-library(lme4)
-library(plm)
-suppressMessages(library(stargazer))
-library(bookdown)
-library(gtsummary)
-library(labelled)
-library(gridExtra)
-suppressMessages(library(tidyverse))
-library(rstatix)
-```
-
-```{r loaddata, include=FALSE}
-# rerun all code periodically
-# source("../code/master.R")
-load("../data/df.rda")
-selected <- df %>% filter(SELECTED == 1)
-baseline <- df %>% filter(wave == 0)
-endline <- df %>% filter (wave == 1)
-firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1, contains("cb")) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
-
-# load functions
-source("../functions/add_by_n.R")
-ggplot2::theme_set(ggplot2::theme_bw())  ## (sets the ggplot2 theme to theme_bw)
 
 ```
 
@@ -239,18 +227,20 @@ where $y_{it}$ is the outcome for apprentice $i$ at time $t$, $\text{status}_{ij
 
 ## Estimating Firm Benefits
 
-Firm benefits were calculated using the accounting approach [@gambinlynn2013; @muehlemann2014], which relies on survey data from training firms to identify and quantify the costs and benefits arising from training provision, and which has recently started to be applied in lower-middle income countries [@renold2018; @bolli2020; @bolli2021]. This approach involves subtracting the costs of training from its benefits and is a simple way of estimating the value that training apprentices generates for the training firm. Additionally, we use regression analysis to directly assess the impact of hiring an additional apprentice, for both traditional and CQP apprentices, on firm profits and firm size.
+\input{tables/tbl-cbmodels}
 
-To identify **costs** accruing to the firm, owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
+Firm benefits were calculated using the accounting approach [@gambinlynn2013; @muehlemann2014], which relies on survey data from training firms to identify and quantify the costs and benefits arising from training provision, and which has recently started to be applied in lower-middle income countries [@renold2018; @bolli2020; @bolli2021]. This approach involves subtracting the costs of training from its benefits and is a simple way of estimating the value that training apprentices generates for the training firm. In a second step, regression analysis is used to directly assess the impact of hiring additional apprentices, both traditional and CQP dual trainees, on firm profits and firm size.
+
+The components of the accounting approach used in this study are summarized in Table \@ref(tab:cbmodels). To identify **costs** accruing to the firm, owners were asked to identify any costs directly or indirectly related to their training activities. These costs can be divided into two categories: **Equipment costs** comprise all costs for physical infrastructure necessary for training: **raw materials** such as cement, lumber, or scrap metal used in the course of training; **training equipment** such as workbenches, toolkits, or other machines purchased or rented specifically for training purposes, **rent** for training facilities if training was not conducted exclusively in the firm owner's workshop, and **books and any other training materials**. Firms report training costs for each category the past month; to estimate annual training costs per apprentice per year, the reported costs are thus divided by the number of apprentices training in the firm and multiplied by the number of months the firm was open in the previous year. Annual sums for training costs are reported at the firm level and thus normalized by the number of apprentices training in the firm, yielding approximate costs per apprentice per year.
 
 **Allowances** are disbursed irregularly by the firm owner for small expenses such as travel and meals. These are reported by firms at the apprentice level (separate reported allowances for each apprentice). To estimate total annual allowance expenditures per apprentice, we thus sum over all allowance categories and assume that apprentices work 20 days per month; the extrapolated monthly sum is then multiplied by the number of months the training firm was operating in the past year to arrive at an annual estimate for each apprentice.
 
 The simplest model of net benefits reduces the value of training accruing to the firm to the direct material incomes and expenditures related to training; namely, apprenticeship fees from the apprentices and their parents, an approximation of training costs, and the total reported allowances disbursed to the apprentice. This model estimates the benefit per apprentice per year thus:
 
-$$ \textbf{Model I:} $$
-$$\textit{annual net benefits}_i = \frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j}$$
+<!-- $$ \textbf{Model I:} $$ -->
+<!-- $$\textit{annual net benefits}_i = \frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j}$$ 
 
-\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.
+\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.-->
 
 In a second approach, we keep all components of Model I and add two additional factors. 
 
@@ -260,12 +250,12 @@ Second, we add to Model I an additional estimated cost of training: **foregone t
 
 In this formulation, the net annual benefits accruing to the firm take the form:
 
-$$ \textbf{Model II:} $$
+<!-- $$ \textbf{Model V:} $$ -->
 
-$$ \begin{aligned} \textit{annual net benefits}_i =  &\frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j} + \\ & \textit{estimated apprentice productivity}_i - \\[1em] & \frac{\textit{estimated foregone productivity per trainer}_j}{N_j} \end{aligned} $$
+<!-- $$ \begin{aligned} \textit{annual net benefits}_i =  &\frac{\textit{fees paid}_i}{4} - \textit{apprentice allowances}_i - \frac{\textit{total training costs}_j}{N_j} + \\ & \textit{estimated apprentice productivity}_i - \\[1em] & \frac{\textit{estimated foregone productivity per trainer}_j}{N_j} \end{aligned} $$
 
 \vspace{.5cm}
-\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.
+\noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.  -->
 
 To estimate the effect dual training on firm size and profits, we run a simple pooled OLS regression taking the form
 
@@ -279,74 +269,7 @@ where $y_{it}$ is the outcome of interest, $\mathbf{X}_{it}$ is a matrix of addi
 
 ##	Impact of Informal and Dual Training on Individuals {#appbenefits}
 
-```{r skills}
-
-comp <- df %>% select(contains("comp"), -contains("a_"), wave, IDYouth) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-    add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>% 
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**")
-
-exp <- df %>% select(contains("exp"), -contains("a_"), wave, IDYouth) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>%  
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**")
-
-skills <- df %>% select(contains("skills"), wave, IDYouth) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-      add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  add_p(all_continuous() ~ "paired.t.test", group = IDYouth) %>% 
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**")
-
-tbl_stack(list(comp, exp, skills), group_header = c("Competencies", "Experience", "Knowledge"), quiet = TRUE) %>% 
-  as_kable_extra(caption = "Change in apprentice human capital", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
-
+```{r tbl-skills}
 ```
 
 Changes in the three human capital measures are presented in Table \@ref(tab:skills). We find that apprentice knowledge indeed increased between 2019 and 2021, from an average knowledge score of 77% to 81% across all trades (paired t-test significant at the 10% level.) Mean knowledge scores increase in each individual trade, though the increase is only statistically significant for plumbing; thus, the marginally significant increase in knowledge scores is driven by improvements in a single trade. Evidence of apprenticeship effectiveness is clearer when regarding the apprentice competency and experience metrics. Table \@ref(tab:skills) shows that mean competency score among all apprentices improved from 76% of tasks at baseline to 92% at endline, an improvement of .66 standard deviations. Improvements were observed across all trades, and all differences were statistically significant at standard levels (with the exception of carpentry). Similarly, apprentice experience improved from having performed 73% of tasks at baseline to 92% at endline, an improvement of .73 standard deviations.
@@ -364,41 +287,52 @@ To summarize, satisfaction is generally high and stable among all apprentice thr
 # interaction term
 df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
 
-x <- df %>% filter(SELECTED != 3)
+x <- df %>% mutate(total_apps = selected + not_selected + did_not_apply)
+y <- x %>% filter(SELECTED != 3)
 
-m1 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app, data = df)
-m2 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app + did, data = df)
-m3 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app + did + as.factor(IDYouth), data = df)
-m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app + did + as.factor(IDYouth), data = x)
+m1 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m2 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m3 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(IDYouth), data = x)
+m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(IDYouth), data = y)
 
-m5 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app, data = df)
-m6 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app + did, data = df)
-m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app + did + as.factor(IDYouth), data = df)
-m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + firm_size_sans_app + did + as.factor(IDYouth), data = x)
+m5 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m6 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(IDYouth), data = x)
+m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(IDYouth), data = y)
+
+m9 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = y)
+m10 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(IDYouth), data = y)
 
 
-stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.sep.width = "-8pt",
+stargazer(m1, m3, m4, m5, m7, m8, m9, m10, df = FALSE, omit = "IDYouth", column.sep.width = "-8pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("Omitted CQP category: applied but did not participate."),
+          notes = c("Omitted CQP category: applied but did not participate.",
+                    "$^†$Baseline experience refers to years of training prior to 2019.",
+                    "$^{††}$Excluding apprentices."),
           notes.align = "r",
           notes.append = TRUE,
           covariate.labels = c("CQP participant",
                                "CQP non-applicant",
                                "Endline",
-                               "Firm size$^†$",
-                               "CQP x Endline"),
+                               "CQP participant x endline",
+                               "Baseline experience$^†$",
+                               "Firm size$^{††}$",
+                               "Total apprentices"),
           title = "Apprentice regressions",
           omit.stat=c("aic", "bic", "adj.rsq", "ser"),
-          dep.var.labels = c("Experience", "Competence"),
+          dep.var.labels = c("Experience", "Competence", "Knowledge"),
           model.names = FALSE,
           dep.var.caption = "",
           label = "tab:appregnew",
-          add.lines = list(c("Individual FE", "NO", "NO", "YES", "YES", "NO", "NO", "YES", "YES")))
+          add.lines = list(c("Individual FE", "NO", "YES", "YES", "NO", "YES", "YES", "NO", "YES")))
 ```
      
 \noindent Table \@ref(tab:appregnew) reports knowledge and competence score regressions. For each of the two measures, the first two columns report coefficient estimates without firm fixed effects; in the third column, fixed effects are added, and in the fourth column apprentices who did not apply to the CQP program are dropped from the analysis.
 
 The results indicate that while apprentices show gains in experience and competence scores, participation in the CQP program is not associated with greater gains along these two metrics. All CQP applicants (including those not accepted into the program) receive higher scores than non-applicants. This suggests that trainers choose the more experience of their existing apprentices to apply to the dual apprenticeship program. An analogous analysis of apprentice performance on knowledge questions (which were posed directly to apprentices, rather than their trainers) shows a similar pattern (see Table \@ref(tab:knowreg) in the Appendix): participation in the CQP has no measurable effect on apprentice knowledge, while apprentices in the program score slightly lower on the metric than those who apply but do not get in.
+
+```{r, tbl-netappbenefits, echo=FALSE}
+```
 
 <!---
 Most classroom training takes place in training centers that are less than an hour away from the apprentices' domicile. 
@@ -450,7 +384,7 @@ Mean benefits per apprentice total `r mean(df$cb_I/605, na.rm = T)` \$US when us
 
 The distributions of net benefits by individual apprentice have long left and right tails. With higher wages (reported especially by larger firms) skewing the projected apprentice productivity estimates, and the high number of apprentices in certain firms generating unrealistic annual allowance totals, Model V generates especially exaggerated numbers, extending from `r min(df$cb_V/605)` \$US in losses for a single apprentice to as much `r max(df$cb_V/605)` \$US in annual benefits. Such estimates should be taken with caution as they suggest apprentices generate costs and/or benefits out of proportion with firm revenues.
 
-To account for such outliers, we truncate estimated net benefits per apprentice at the 1st, 5th and 10th percentiles and present the truncated distributions in a histogram and kernel density plot, shown in Figure \@ref(fig:hist) in the Appendix. Using Model I, mean net benefits amount to `r mean(df[between(df$cb_I, quantile(df$cb_I, .01), quantile(df$cb_I, .99)), ]$cb_I/605, na.rm = T)` \$US per apprentice when dropping the top and bottom percentile, `r mean(df[between(df$cb_I, quantile(df$cb_I, .05), quantile(df$cb_I, .95)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_I, quantile(df$cb_I, .1), quantile(df$cb_I, .9)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom deciles are dropped.
+To account for such outliers, we truncate estimated net benefits per apprentice at the 1st, 5th and 10th percentiles and present the truncated distributions in a histogram and kernel density plot, shown in Figure \@ref(fig-apphist) in the Appendix. Using Model I, mean net benefits amount to `r mean(df[between(df$cb_I, quantile(df$cb_I, .01), quantile(df$cb_I, .99)), ]$cb_I/605, na.rm = T)` \$US per apprentice when dropping the top and bottom percentile, `r mean(df[between(df$cb_I, quantile(df$cb_I, .05), quantile(df$cb_I, .95)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_I, quantile(df$cb_I, .1), quantile(df$cb_I, .9)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom deciles are dropped.
 
 Using Model II, mean net benefits per apprentice are `r mean(df[between(df$cb_II, quantile(df$cb_II, .01), quantile(df$cb_II, .99)), ]$cb_II/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_II, quantile(df$cb_II, .05), quantile(df$cb_II, .95)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_II, quantile(df$cb_II, .1), quantile(df$cb_II, .9)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
@@ -505,30 +439,33 @@ In addition to direct financial benefits associated with training, which are ref
 
 
 ``` {r firmregs, results = 'asis'}
-x <- df %>% select(FS1.2, FS4.7, wave, firm_size_sans_app, dossier_selected, FS6.1, profits) %>%
+x <- df %>% select(FS1.2, FS4.7, wave, firm_size_sans_app, selected, not_selected, did_not_apply, profits) %>%
   mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
          revenues = FS4.7/605*12,
-         profits = profits / 605 * 12) %>% 
+         profits = profits / 605 * 12,
+         apps_sans_cqp = not_selected + did_not_apply,
+         total_apps = selected + not_selected + did_not_apply) %>% 
   group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% 
   mutate(revenues = ifelse(revenues > 0, log(revenues), NA),
          profits = ifelse(profits > 0, log(profits), NA),
          firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA))
 
 
-m1 <- lm(revenues ~ FS6.1 + dossier_selected + as.factor(wave) + firm_size_sans_app, data = x)
-m2 <- plm(revenues ~ FS6.1 + firm_size_sans_app + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
-m3 <- lm(profits ~ FS6.1 + dossier_selected + as.factor(wave) + firm_size_sans_app, data = x)
-m4 <- plm(profits ~ FS6.1 + as.factor(wave) + firm_size_sans_app , data = x, index = c("FS1.2", "wave"), model = "within")
-m5 <- lm(firm_size_sans_app ~ FS6.1 + dossier_selected + as.factor(wave), data = x)
-m6 <- plm(firm_size_sans_app ~ FS6.1 + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
+m1 <- lm(revenues ~ apps_sans_cqp + selected + as.factor(wave) + firm_size_sans_app, data = x)
+m2 <- plm(revenues ~ total_apps + firm_size_sans_app + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
+m3 <- lm(profits ~ apps_sans_cqp + selected + as.factor(wave) + firm_size_sans_app, data = x)
+m4 <- plm(profits ~ total_apps + as.factor(wave) + firm_size_sans_app , data = x, index = c("FS1.2", "wave"), model = "within")
+m5 <- lm(firm_size_sans_app ~ apps_sans_cqp + selected + as.factor(wave), data = x)
+m6 <- plm(firm_size_sans_app ~ total_apps + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
 
 stargazer(m1, m2, m3, m4, m5, m6, df = FALSE, omit = "FS1.2",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
           notes = c("$^†$Excluding apprentices."),
           notes.align = "r",
           notes.append = TRUE,
-          covariate.labels = c("Apprentices",
-                               "CQPs",
+          covariate.labels = c("Non-CQP apprentices",
+                               "CQP selected",
+                               "Total apprentices",
                                "Endline",
                                "log Firm size$^†$"),
           title = "Firm-level regressions",
@@ -609,7 +546,8 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 ```{r, test-k, echo=FALSE}
 ```
 
-``` {r firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size dsitributions", fig.pos='H'}
+
+``` {r firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
 x <- df %>% filter(firm_size > 1) %>% select(FS1.2, wave, firm_size, dossier_selected, FS3.4, FS6.1) %>%
   mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
   group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% pivot_wider(names_from = wave, values_from = c(firm_size, FS3.4, FS6.1))
@@ -679,7 +617,7 @@ comp <- x %>% select(tidyselect::vars_select(names(x), matches("comp")), side, I
   modify_footnote(
     all_stat_cols() ~ "Mean (SD). Proportion of tasks elicited at endline.")
 
-exp <- x %>% select(tidyselect::vars_select(names(x), matches("exp")), side, IDYouth) %>% 
+exp <- x %>% select(tidyselect::vars_select(names(x), matches("exp"), -expenses), side, IDYouth) %>% 
   tbl_summary(by=side,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -723,6 +661,9 @@ y %>% select(SELECTED, comp_diff, exp_diff, skills_diff) %>%
                  linesep = "",
                  position = "H")
 
+```
+
+```{r, tbl-skillsbycqp, echo=FALSE}
 ```
 
 ```{r wages}
@@ -1001,7 +942,10 @@ tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endlin
                  position = "H")
 ```
 
-```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Truncated distributions of net benefits per firm"}
+```{r, fig-apphist, fig.height=9, out.width="100%", fig.cap = "Net benefits of training, per apprentice"}
+```
+
+```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Net benefits of training, total per firm"}
 ```
 
 ``` {r knowreg, results = 'asis'}
@@ -1049,9 +993,6 @@ stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.s
 ```
 
 ```{r, test-b, echo=FALSE}
-```
-
-``` {r tbl-cblongbycqp, echo = FALSE}
 ```
 
 # Appendix B
