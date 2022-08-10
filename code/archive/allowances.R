@@ -1,8 +1,8 @@
 ################
-## Allowances ##
+## ALLOWANCES ##
 ################
 
-packages <- c("haven", "tidyverse", "labelled", "gtsummary")
+packages <- c("tidyverse", "labelled", "gtsummary")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -18,135 +18,132 @@ rm(packages, installed_packages)
 # Set working directory
 setwd("~/polybox/Youth Employment/2 CQP/Paper")
 
-# load reshaped apprentice-level data
-load("data/base_cqps.rda")
-load("data/base_trad.rda")
-load("data/end_cqps.rda")
-load("data/end_trad.rda")
+# load data
+load("data/df.rda")
 
 # load functions
-source("functions/join_cqp_trad.R")
+source("functions/add_by_n.R")
 
-# apprenticeship status (CQP = 3, CQM, traditional, other) for each apprentice and status2 (CQP = 1, unsuccessful applicant = 2, traditional = 0)
-status <- base_cqps %>% select(IDYouth, status = FS9.3, status2 = SELECTED) %>% 
-  rbind(base_trad %>% select(IDYouth, status = FS7.4) %>% mutate(status2 = 0)) %>% 
-  mutate(status = ifelse(status == 3, 1, 0))
+df <- unlabelled(df)
 
-benefits <- rbind(JoinCQP(c('FS9.6')) %>% rename(food = FS9.6_1,
-                                                 transport = FS9.6_2,
-                                                 pocket_money = FS9.6_3,
-                                                 other = FS9.6_4) %>% select(-FS9.6_5),
-                  JoinTrad(c('FS7.8')) %>% rename(food = FS7.8_1,
-                                                  transport = FS7.8_2,
-                                                  pocket_money = FS7.8_3,
-                                                  other = FS7.8_4) %>% select(-FS7.8_5))
-
-benefits <- benefits %>% left_join(status, by = "IDYouth")
-
-benefits <- benefits %>% mutate_at(c("food", "transport", "pocket_money", "other"), recode,
-                                   `1` = 150,
-                                   `2` = 325,
-                                   `3` = 475,
-                                   `4` = 875,
-                                   `5` = 1225,
-                                   `6` = 1775,
-                                   `7` = 2425,
-                                   `8` = 3425,
-                                   `9` = 6225,
-                                   `10` = 8725,
-                                   `11` = 11725) %>% 
-  mutate_at(c("food", "transport", "pocket_money", "other"), na_if, 12)
-
-benefits$all_allowances <- benefits %>% select(c("food", "transport", "pocket_money", "other")) %>% 
-  rowMeans(., na.rm = T)
+# firm-side allowances
 
 
-benefits_pooled <- benefits %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
-
-benefits_pooled %>% select(-c(FS1.2)) %>% 
-  select(-c(IDYouth, status, status2)) %>% 
+df %>% select(contains("allow"), wave, -"allow_other", -"a_allow") %>% 
   mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
   tbl_summary(by=wave,
-              type = everything() ~ "continuous2",
-              statistic = all_continuous() ~ "{mean} ({N_nonmiss})",
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
               missing = "no") %>% 
-  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
-  modify_caption("**Apprentice Weekly Allowances Averaged at Firm Level (FCFA)**") %>% 
-  add_difference(test = list(all_continuous() ~ "t.test")) 
-
-
-# benefits averaged at firm level, by apprenticeship type (CQP vs. non-CQP)
-
-benefits_by_type <- benefits %>% group_by(FS1.2, status, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
-
-cqp_table <- benefits_by_type %>% filter(status == 1) %>% 
-  select(-c(IDYouth, status, status2, FS1.2)) %>% 
-  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous2",
-              statistic = all_continuous() ~ "{mean} ({N_nonmiss})",
-              missing = "no") %>% 
-  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
-  modify_caption("**Weekly Benefits Averaged at Firm Level (FCFA)**") %>% 
-  add_difference(test = list(all_continuous() ~ "t.test"))
-
-non_cqp_table <- benefits_by_type %>% filter(status == 0) %>% 
-  select(-c(IDYouth, status, status2, FS1.2)) %>% 
-  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous2",
-              statistic = all_continuous() ~ "{mean} ({N_nonmiss})",
-              missing = "no") %>% 
-  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
-  add_difference(test = list(all_continuous() ~ "t.test"))
-
-tbl_merge(list(cqp_table, non_cqp_table), tab_spanner = c("CQP Apprentices", "Non-CQP Apprentices")) %>% italicize_labels() %>% as_gt() %>%
-  gt::tab_style(
-    style = gt::cell_text(weight = "bold"),
-    locations = gt::cells_row_groups(groups = everything())
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA by firm."
   )
 
-#differentiating between successful/unsuccessful CQP applicants and non-applicants
-
-benefits_by_status <- benefits %>% group_by(FS1.2, status2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
-
-benefits_tbl <- benefits_by_status %>% filter(status2 == 1) %>% 
-  select(-c(IDYouth, status, status2, FS1.2)) %>% 
+df %>% select(contains("allow"), wave, IDYouth, -"allow_other", -"a_allow", -"allow_avg") %>% 
   mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
   tbl_summary(by=wave,
-              type = everything() ~ "continuous2",
-              statistic = all_continuous() ~ "{mean} ({N_nonmiss})",
-              missing = "no") %>% 
-  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
-  modify_caption("**Weekly Benefits Averaged at Firm Level (FCFA)**") %>% 
-  add_p()
-
-benefits_tbl2 <- benefits_by_status %>% filter(status2 == 2) %>% 
-  select(-c(IDYouth, status, status2, FS1.2)) %>% 
-  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous2",
-              statistic = all_continuous() ~ "{mean} ({N_nonmiss})",
-              missing = "no") %>% 
-  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
-  add_p()
-
-benefits_tbl3 <- benefits_by_status %>% filter(status2 == 0) %>% 
-  select(-c(IDYouth, status, status2, FS1.2)) %>% 
-  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous2",
-              statistic = all_continuous() ~ "{mean} ({N_nonmiss})",
-              missing = "no") %>% 
-  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
-  add_p()
-
-tbl_merge(list(benefits_tbl, benefits_tbl2, benefits_tbl3), tab_spanner = c("Selected CQPs", "Unsuccessful CQP applicants", "Traditional (did not apply)")) %>% italicize_labels() %>% as_gt() %>%
-  gt::tab_style(
-    style = gt::cell_text(weight = "bold"),
-    locations = gt::cells_row_groups(groups = everything())
-  )
-
-
-
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              include = -IDYouth) %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA by firm owner."
+  ) %>% 
+  add_p(all_continuous() ~ "paired.t.test", group = IDYouth)
   
+
+baseline <- df %>% filter(wave == 0) %>% select(contains("allow"), "SELECTED", -"allow_other", -"a_allow", -"allow_avg") %>% 
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+  tbl_summary(by=SELECTED,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  add_n() %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA by firm at baseline."
+  )
+
+endline <- df %>% filter(wave == 1) %>% select(contains("allow"), "SELECTED", -"allow_other", -"a_allow", -"allow_avg") %>% 
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('Selected', 'Not Selected', 'Did Not Apply'))) %>% 
+  tbl_summary(by=SELECTED,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  add_n() %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA by firm at endline."
+  )
+
+tbl_stack(list(baseline, endline), group_header = c("Baseline", "Endline"), quiet = TRUE)
+
+
+# apprentice-side allowances (only total allowances reported in YS)
+
+df %>% select(a_allow, wave) %>% 
+  mutate(wave = factor(wave, labels = c("Baseline", "Endline"))) %>% 
+  tbl_summary(by=wave,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  add_n() %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA by apprentices."
+  )
+
+df %>% filter(wave==0) %>% select(a_allow, SELECTED) %>% filter(SELECTED != 3) %>% 
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0),
+                           labels = c('Selected', 'Not Selected'))) %>% 
+  tbl_summary(by=SELECTED,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  add_n() %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA by apprentices."
+  ) %>% 
+  add_p()
+
+# comparing firm-side and apprentice-side fees
+
+x <- df %>% filter(wave == 0, SELECTED != 3) %>% pivot_longer(cols = c(a_allow, all_allowances)) %>% mutate(name = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% select(c(SELECTED, name, value))
+
+cqp <- x %>% filter(SELECTED == 1) %>% select(-SELECTED) %>% 
+  rename("Selected" = value) %>% 
+  tbl_summary(by=name,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  modify_header(stat_by =  "**{level}**") %>%
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA at baseline.") %>% 
+  add_p()
+
+
+noncqp <- x %>% filter(SELECTED == 0) %>% select(-SELECTED) %>% 
+  rename("Not Selected" = value) %>% 
+  tbl_summary(by=name,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  modify_header(update = all_stat_cols() ~ "**{level}**") %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA at baseline.") %>% 
+  add_p()
+
+
+all <- x %>% select(-SELECTED) %>% 
+  rename("Total" = value) %>% 
+  tbl_summary(by=name,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no") %>% 
+  modify_header(stat_by =  "**{level}**") %>% 
+  modify_footnote(
+    all_stat_cols() ~ "Mean (SD). Allowances reported in FCFA at baseline.") %>% 
+  add_p()
+
+tbl_stack(list(cqp, noncqp, all), quiet = TRUE)
+
+rm(list = ls())

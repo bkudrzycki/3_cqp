@@ -48,9 +48,6 @@ endline <- df %>% filter (wave == 1)
 firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1, contains("cb")) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
 
 # load code chunks
-knitr::read_chunk('../code/allowances_big_table.R')
-knitr::read_chunk('../code/costbenefits_big_table.R')
-knitr::read_chunk('../code/attrition.R')
 knitr::read_chunk('../code/tbls_body.R')
 knitr::read_chunk('../code/tbls_appendix.R')
 knitr::read_chunk('../code/figures.R')
@@ -125,24 +122,7 @@ The paper proceeds as follows. Informal apprenticeship in Bénin, the CQP progra
 
 Despite the relative stability of its democratic government and strategic importance as a transportation hub, Bénin (population approx. 12.1 million) performs poorly on many development indicators, ranking 158th out of 189 countries on the 2020 Human Development Index. Youth employment is a particularly pressing issue, with an alarming decrease in youth labor force participation in the past decade. As in other parts of SSA, secondary and tertiary school enrollment has seen a steady increase in the past two decades, with the predominant effect of displacing employment: according to the most recent labor force surveys, the youth employment-to-population ratio decreased by 22\%, from 40\% to 31\%, between 2011 and 2018, compared to an 8\% decrease for adults over the age of 25 over the same time period. Meanwhile, the share of youth neither in employment, education or training (NEET) increased from 17.2\% in 2011 to 35.1\% in 2018 (see Figure \@ref(fig:enrolment)) --- one the highest rates in West Africa, and the world [@ilo2022].
 
-```{r enrolment, fig.cap="Rates of youth enrolment and inactivity: Bénin and SSA", fig.height=4, fig.width=8, , fig.pos='H'}
-
-x <- read_csv("../data/API_SE.SEC.ENRR_DS2_en_csv_v2_4029558.csv", show_col_types = FALSE) %>% as.data.frame() %>% mutate(Indicator = "Enrolment ratio")
-
-y <- read_csv("../data/EIP_2EET_SEX_RT_A-filtered-2022-05-20.csv", show_col_types = FALSE) %>% as.data.frame() %>% select(Country = "ref_area.label", value = "obs_value", Year = time) %>% mutate(Indicator = "% of youth not in\n employment,\n education, or \n training (NEET)")
-
-z = rbind(x, y)
-
-ggplot(z, aes(x=Year, y=value, color=Country, shape = Indicator)) +
-  geom_line(aes(linetype = Indicator), size = .75) +
-  labs(x = "",
-       y = "NEET rate (%), Enrolment ratio (secondary) (%)",
-       color = "Country",
-       fill = "") +
-  theme_minimal() + 
-  scale_color_viridis_d(end = .5) +
-  labs(caption = "Sources: ILOSTAT (NEET rate) and UNESCO (Enrolment ratio)")
-  
+```{r fig-enrolment, fig.cap="Rates of youth enrolment and inactivity: Bénin and SSA", fig.height=4, fig.width=8, , fig.pos='H'}
 ```
 
 As enrollment in formal education has not translated to increasing rates of youth employment, interest in promoting alternative pathways to the labor force in Bénin has grown. Recent examples of investment in Bénin's apprenticeship system include $6.3 million from the World Bank's for the Benin Youth Employment Project (PEJ), completed in 2019, and a planned \$16.4 million dollar investment in strengthening the TVET system starting in 2020 [@worldbank2020].
@@ -371,6 +351,8 @@ _Another approach is offered by QEK/CBQ, a method established by the University 
 Raw materials take a particular toll on small firms (no more than one employee and one apprentice) and carpentry workshops, accounting for xx% of total costs for the former and xx% of total costs for the latter. Since questions addressed apprenticeship in the firm in general, not a specific program, we are not able to differentiate between CQP and traditional apprentices in estimating cost of training, and will assume equal costs in the net benefit analysis in the following section.
 --->
 
+
+
 Figure \@ref(fig:costspie) shows the breakdown of various costs per apprentice, averaged over both interview waves. All costs total to approximately 240,000 FCFA, or 400 \$US, per apprentice per year. The largest expenses are associated with allowances and raw materials (which are particularly high in the carpentry trade). They also in line with the upper range of costs from @david-gnahoui2017, who, citing Zinsou, 2012, reported total costs of 100,000 to 250,000 FCFA (\$165-\$413) for a complete CQP training program in 2012. Figure \@ref(fig:costspie2) in the Appendix accounts for the number of apprentices training in firms and reports mean total training expenditures per firm. These total, on average, 1.4 million FCFA, or 2,325 \$US, per firm, corresponding to over half of the reported annual firm revenues (`r round(mean(df$FS4.7/605*df$FS4.1, na.rm = T), 0)` \$US) and about 135\% of reported total annual costs (`r round(mean(df$FS5.1/605*df$FS4.1, na.rm = T), 0)` \$US), as averaged over the two survey waves.
 
 
@@ -384,15 +366,15 @@ Mean benefits per apprentice total `r mean(df$cb_I/605, na.rm = T)` \$US when us
 
 The distributions of net benefits by individual apprentice have long left and right tails. With higher wages (reported especially by larger firms) skewing the projected apprentice productivity estimates, and the high number of apprentices in certain firms generating unrealistic annual allowance totals, Model V generates especially exaggerated numbers, extending from `r min(df$cb_V/605)` \$US in losses for a single apprentice to as much `r max(df$cb_V/605)` \$US in annual benefits. Such estimates should be taken with caution as they suggest apprentices generate costs and/or benefits out of proportion with firm revenues.
 
-To account for such outliers, we truncate estimated net benefits per apprentice at the 1st, 5th and 10th percentiles and present the truncated distributions in a histogram and kernel density plot, shown in Figure \@ref(fig-apphist) in the Appendix. Using Model I, mean net benefits amount to `r mean(df[between(df$cb_I, quantile(df$cb_I, .01), quantile(df$cb_I, .99)), ]$cb_I/605, na.rm = T)` \$US per apprentice when dropping the top and bottom percentile, `r mean(df[between(df$cb_I, quantile(df$cb_I, .05), quantile(df$cb_I, .95)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_I, quantile(df$cb_I, .1), quantile(df$cb_I, .9)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom deciles are dropped.
+To account for such outliers, we truncate estimated net benefits per apprentice at the 1st, 5th and 10th percentiles and present the truncated distributions in a histogram and kernel density plot, shown in Figure \@ref(fig-apphist) in the Appendix. Using Model I, mean net benefits amount to `r mean(df[between(df$cb_I, quantile(df$cb_I, .01, na.rm = T), quantile(df$cb_I, .99, na.rm = T)), ]$cb_I/605, na.rm = T)` \$US per apprentice when dropping the top and bottom percentile, `r mean(df[between(df$cb_I, quantile(df$cb_I, .05, na.rm = T), quantile(df$cb_I, .95, na.rm = T)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_I, quantile(df$cb_I, .1, na.rm = T), quantile(df$cb_I, .9, na.rm = T)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom deciles are dropped.
 
-Using Model II, mean net benefits per apprentice are `r mean(df[between(df$cb_II, quantile(df$cb_II, .01), quantile(df$cb_II, .99)), ]$cb_II/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_II, quantile(df$cb_II, .05), quantile(df$cb_II, .95)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_II, quantile(df$cb_II, .1), quantile(df$cb_II, .9)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model II, mean net benefits per apprentice are `r mean(df[between(df$cb_II, quantile(df$cb_II, .01, na.rm = T), quantile(df$cb_II, .99, na.rm = T)), ]$cb_II/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_II, quantile(df$cb_II, .05, na.rm = T), quantile(df$cb_II, .95, na.rm = T)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_II, quantile(df$cb_II, .1, na.rm = T), quantile(df$cb_II, .9, na.rm = T)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
-Using Model III, mean net benefits per apprentice are `r mean(df[between(df$cb_III, quantile(df$cb_III, .01), quantile(df$cb_III, .99)), ]$cb_III/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_III, quantile(df$cb_III, .05), quantile(df$cb_III, .95)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_III, quantile(df$cb_III, .1), quantile(df$cb_III, .9)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model III, mean net benefits per apprentice are `r mean(df[between(df$cb_III, quantile(df$cb_III, .01, na.rm = T), quantile(df$cb_III, .99, na.rm = T)), ]$cb_III/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_III, quantile(df$cb_III, .05, na.rm = T), quantile(df$cb_III, .95, na.rm = T)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_III, quantile(df$cb_III, .1, na.rm = T), quantile(df$cb_III, .9, na.rm = T)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
-Using Model IV, mean net benefits per apprentice are `r mean(df[between(df$cb_IV, quantile(df$cb_IV, .01), quantile(df$cb_IV, .99)), ]$cb_IV/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_IV, quantile(df$cb_IV, .05), quantile(df$cb_IV, .95)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_IV, quantile(df$cb_IV, .1), quantile(df$cb_IV, .9)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model IV, mean net benefits per apprentice are `r mean(df[between(df$cb_IV, quantile(df$cb_IV, .01, na.rm = T), quantile(df$cb_IV, .99, na.rm = T)), ]$cb_IV/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_IV, quantile(df$cb_IV, .05, na.rm = T), quantile(df$cb_IV, .95, na.rm = T)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_IV, quantile(df$cb_IV, .1, na.rm = T), quantile(df$cb_IV, .9, na.rm = T)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
-Using Model V, mean net benefits per apprentice are `r mean(df[between(df$cb_V, quantile(df$cb_V, .01), quantile(df$cb_V, .99)), ]$cb_V/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_V, quantile(df$cb_V, .05), quantile(df$cb_V, .95)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_V, quantile(df$cb_V, .1), quantile(df$cb_V, .9)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model V, mean net benefits per apprentice are `r mean(df[between(df$cb_V, quantile(df$cb_V, .01, na.rm = T), quantile(df$cb_V, .99, na.rm = T)), ]$cb_V/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df[between(df$cb_V, quantile(df$cb_V, .05, na.rm = T), quantile(df$cb_V, .95, na.rm = T)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df[between(df$cb_V, quantile(df$cb_V, .1, na.rm = T), quantile(df$cb_V, .9, na.rm = T)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
 <!---
 The distribution of net benefits per apprentice is bimodal in both models, with a concentration of firms breaking even for each apprentice trained and a second clustering of firms with annual net losses of about 100 \$US per apprentice.--->
@@ -409,15 +391,15 @@ We are also interested in total firm benefits from training, i.e. the net benefi
 
 To generate a firm-level distribution of net benefits, apprentice benefits are averaged at the firm level. This firm-specific mean benefit is then multiplied by the number of apprentices training in the firm, thus assuming that the mean net benefits associated with apprentices for whom data was collected are, on average, equal to the net benefits for all unobserved apprentices in the same firm. Net firm benefits total, on average, `r mean(df1$cb_I/605, na.rm = T)` \$US using Model I, `r mean(df1$cb_II/605, na.rm = T)` \$US using Model II, `r mean(df1$cb_III/605, na.rm = T)` \$US using Model III, `r mean(df1$cb_IV/605, na.rm = T)` \$US using Model IV, and `r mean(df1$cb_V/605, na.rm = T)` \$US using Model V.
 
-Truncating again at the 1st, 5th and 10th percentiles and present the truncated distributions in a histogram and kernel density plot, shown in Figure \@ref(fig:hist2) in the Appendix. Using Model I, mean net benefits amount to `r mean(df1[between(df1$cb_I, quantile(df1$cb_I, .01), quantile(df1$cb_I, .99)), ]$cb_I/605, na.rm = T)` \$US per apprentice when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_I, quantile(df1$cb_I, .05), quantile(df1$cb_I, .95)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_I, quantile(df1$cb_I, .1), quantile(df1$cb_I, .9)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom deciles are dropped.
+Truncating again at the 1st, 5th and 10th percentiles and present the truncated distributions in a histogram and kernel density plot, shown in Figure \@ref(fig:hist2) in the Appendix. Using Model I, mean net benefits amount to `r mean(df1[between(df1$cb_I, quantile(df1$cb_I, .01, na.rm = T), quantile(df1$cb_I, .99, na.rm = T)), ]$cb_I/605, na.rm = T)` \$US per apprentice when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_I, quantile(df1$cb_I, .05, na.rm = T), quantile(df1$cb_I, .95, na.rm = T)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_I, quantile(df1$cb_I, .1, na.rm = T), quantile(df1$cb_I, .9, na.rm = T)), ]$cb_I/605, na.rm = T)` \$US per apprentice when the top and bottom deciles are dropped.
 
-Using Model II, mean net benefits per apprentice are `r mean(df1[between(df1$cb_II, quantile(df1$cb_II, .01), quantile(df1$cb_II, .99)), ]$cb_II/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_II, quantile(df1$cb_II, .05), quantile(df1$cb_II, .95)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_II, quantile(df1$cb_II, .1), quantile(df1$cb_II, .9)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model II, mean net benefits per apprentice are `r mean(df1[between(df1$cb_II, quantile(df1$cb_II, .01, na.rm = T), quantile(df1$cb_II, .99, na.rm = T)), ]$cb_II/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_II, quantile(df1$cb_II, .05, na.rm = T), quantile(df1$cb_II, .95, na.rm = T)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_II, quantile(df1$cb_II, .1, na.rm = T), quantile(df1$cb_II, .9, na.rm = T)), ]$cb_II/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
-Using Model III, mean net benefits per apprentice are `r mean(df1[between(df1$cb_III, quantile(df1$cb_III, .01), quantile(df1$cb_III, .99)), ]$cb_III/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_III, quantile(df1$cb_III, .05), quantile(df1$cb_III, .95)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_III, quantile(df1$cb_III, .1), quantile(df1$cb_III, .9)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model III, mean net benefits per apprentice are `r mean(df1[between(df1$cb_III, quantile(df1$cb_III, .01, na.rm = T), quantile(df1$cb_III, .99, na.rm = T)), ]$cb_III/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_III, quantile(df1$cb_III, .05, na.rm = T), quantile(df1$cb_III, .95, na.rm = T)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_III, quantile(df1$cb_III, .1, na.rm = T), quantile(df1$cb_III, .9, na.rm = T)), ]$cb_III/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
-Using Model IV, mean net benefits per apprentice are `r mean(df1[between(df1$cb_IV, quantile(df1$cb_IV, .01), quantile(df1$cb_IV, .99)), ]$cb_IV/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_IV, quantile(df1$cb_IV, .05), quantile(df1$cb_IV, .95)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_IV, quantile(df1$cb_IV, .1), quantile(df1$cb_IV, .9)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model IV, mean net benefits per apprentice are `r mean(df1[between(df1$cb_IV, quantile(df1$cb_IV, .01, na.rm = T), quantile(df1$cb_IV, .99, na.rm = T)), ]$cb_IV/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_IV, quantile(df1$cb_IV, .05, na.rm = T), quantile(df1$cb_IV, .95, na.rm = T)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_IV, quantile(df1$cb_IV, .1, na.rm = T), quantile(df1$cb_IV, .9, na.rm = T)), ]$cb_IV/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
-Using Model V, mean net benefits per apprentice are `r mean(df1[between(df1$cb_V, quantile(df1$cb_V, .01), quantile(df1$cb_V, .99)), ]$cb_V/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_V, quantile(df1$cb_V, .05), quantile(df1$cb_V, .95)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_V, quantile(df1$cb_V, .1), quantile(df1$cb_V, .9)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
+Using Model V, mean net benefits per apprentice are `r mean(df1[between(df1$cb_V, quantile(df1$cb_V, .01, na.rm = T), quantile(df1$cb_V, .99, na.rm = T)), ]$cb_V/605, na.rm = T)` \$US when dropping the top and bottom percentile, `r mean(df1[between(df1$cb_V, quantile(df1$cb_V, .05, na.rm = T), quantile(df1$cb_V, .95, na.rm = T)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom 5% are dropped, and `r mean(df1[between(df1$cb_V, quantile(df1$cb_V, .1, na.rm = T), quantile(df1$cb_V, .9, na.rm = T)), ]$cb_V/605, na.rm = T)` \$US when the top and bottom deciles are dropped.
 
 Mean net benefits are thus even more sensitive to large outliers, especially positive ones, at the firm level than at the apprentice level.
 
@@ -540,406 +522,58 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 \setcounter{table}{0}
 \renewcommand{\thetable}{A\arabic{table}}
 
-```{r, test-j, echo=FALSE}
+```{r, tbl-attritionapps}
 ```
 
-```{r, test-k, echo=FALSE}
+```{r, tbl-attritionfirms}
 ```
 
-
-``` {r firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
-x <- df %>% filter(firm_size > 1) %>% select(FS1.2, wave, firm_size, dossier_selected, FS3.4, FS6.1) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% pivot_wider(names_from = wave, values_from = c(firm_size, FS3.4, FS6.1))
-
-p1 <- ggplot(x, aes(x=firm_size_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Firm size (calculated)") + theme_minimal() + theme(legend.position = "bottom")
-p2 <- ggplot(x, aes(x=log(firm_size_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log Firm size (calculated)") + theme_minimal() + theme(legend.position = "bottom")
-
-p3 <- ggplot(x, aes(x=FS3.4_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Firm size (reported)") + theme_minimal() + theme(legend.position = "bottom")
-p4 <- ggplot(x, aes(x=log(FS3.4_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log Firm size (reported)") + theme_minimal() + theme(legend.position = "bottom")
-
-p5 <- ggplot(x, aes(x=FS6.1_Baseline, y=..density..)) + geom_histogram(binwidth = 1, alpha=0.75) +  labs(y = "Density", x = "Apprentices") + theme_minimal() + theme(legend.position = "bottom")
-p6 <- ggplot(x, aes(x=log(FS6.1_Baseline), y=..density..)) + geom_histogram(binwidth = .33, alpha=0.75) +  labs(y = "Density", x = "log Apprentices") + theme_minimal() + theme(legend.position = "bottom")
-
-grid.arrange(p1, p2, p3, p4, p5, p6, nrow = 3)
+``` {r fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
 ```
 
-
-``` {r improvement2, fig.width=7,fig.height=4, fig.cap = "Change in apprentice human capital scores", fig.pos='H'}
-y <- df %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, FS1.11, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = ifelse(comp_all_trades_0 != 0, (comp_all_trades_1-comp_all_trades_0)/comp_all_trades_0*100, 1), exp_diff = ifelse(exp_all_trades_0 > 0, (exp_all_trades_1-exp_all_trades_0)/exp_all_trades_0*100, 1), skills_diff = ifelse(skills_all_trades_0 != 0, (skills_all_trades_1-skills_all_trades_0)/skills_all_trades_0*100), 1) %>% mutate(trade = FS1.11)
-
-y <- y %>% rbind(y %>% mutate(trade = NA)) %>% mutate(trade = ifelse(is.na(trade), 6, trade)) %>% 
-  select(trade, comp_diff, exp_diff, skills_diff) %>% group_by(trade) %>% summarise_all(mean, na.rm = T) %>% pivot_longer(cols = c(comp_diff, exp_diff, skills_diff))
-
-ggplot(data=y, aes(x=trade, y=value, fill=name)) +
-  geom_bar(stat="identity", color="black", position=position_dodge()) +
-  labs(x = "", y = "Percent change") + scale_fill_viridis_d(name = "", labels = c("Competence", "Experience", "Knowledge")) +
-  theme_minimal() + scale_x_discrete(limits = c("Masonry", "Carpentry", "Plumbing",  "Metalwork", "Electrical Inst.", "Overall"))
-
+```{r tbl-compexp2}
 ```
 
-```{r compexp2}
-x <- df %>% filter(wave == 1, SELECTED != 3) %>% pivot_longer(cols = contains("comp")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, side, name, value)) %>% pivot_wider()
-
-x <- x %>% left_join(df %>% filter(wave == 1, SELECTED != 3) %>% pivot_longer(cols = contains("exp")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, side, name, value)) %>% pivot_wider(), by = c("IDYouth", "side")) %>% mutate(ID = row_number())
-
-var_label(x$comp_elec) <- "Electrical Installation"
-var_label(x$comp_macon) <- "Masonry"
-var_label(x$comp_menuis) <- "Carpentry"
-var_label(x$comp_plomb) <- "Plumbing"
-var_label(x$comp_metal) <- "Metalwork"
-var_label(x$comp_all_trades) <- "Overall"
-var_label(x$exp_elec) <- "Electrical Installation"
-var_label(x$exp_macon) <- "Masonry"
-var_label(x$exp_menuis) <- "Carpentry"
-var_label(x$exp_plomb) <- "Plumbing"
-var_label(x$exp_metal) <- "Metalwork"
-var_label(x$exp_all_trades) <- "Overall"
-
-comp <- x %>% select(tidyselect::vars_select(names(x), matches("comp")), side, ID) %>% 
-  tbl_summary(by=side,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              digits = all_continuous() ~ 2,
-              missing = "no",
-              include = -ID) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Proportion of tasks elicited at endline.")
-
-exp <- x %>% select(tidyselect::vars_select(names(x), matches("exp"), -expenses), side, IDYouth) %>% 
-  tbl_summary(by=side,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Proportion of tasks reported by apprentices and firms at endline.")
-
-tbl_stack(list(comp, exp), group_header = c("Competencies", "Experience"), quiet = TRUE) %>% 
-  as_kable_extra(caption = "Competency and experience, firm rating vs. apprentice self-appraisal", 
-                 booktabs = T,
-                 linesep = "")
-
+```{r tbl-metricsbycqp}
 ```
 
-```{r metricsbycqp}
-y <- df  %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, SELECTED, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = comp_all_trades_1-comp_all_trades_0, exp_diff = exp_all_trades_1-exp_all_trades_0, skills_diff = skills_all_trades_1-skills_all_trades_0)
-
-y %>% select(SELECTED, comp_diff, exp_diff, skills_diff) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by = SELECTED, missing = "no",
-              digits = list(everything() ~ 3),
-              statistic = list(all_continuous() ~ "{mean} ({sd})"),
-              label = list(comp_diff ~ "Competence",
-                           exp_diff ~ "Experience",
-                           skills_diff~ "Knowledge")) %>% 
-    as_kable_extra(caption = "Change in apprentice human capital scores", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
-
-```
+``` {r tbl-knowreg, results = 'asis'}
+```   
 
 ```{r, tbl-skillsbycqp, echo=FALSE}
-```
-
-```{r wages}
-df %>% select(contains("FS5.2"), wave, FS1.2) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% 
-  mutate(across(contains('FS5.2'), ~./605)) %>% 
-  tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -FS1.2,
-              digits = list(everything() ~ c(0, 0)),
-              label = list(FS5.2_1_7 ~ "Firm owner",
-                           FS5.2_1_1 ~ "Former apprentice (diff. workshop)",
-                           FS5.2_1_2 ~ "Former apprentice (same workshop)",
-                           FS5.2_1_3 ~ "Worker with secondary educ. or more",
-                           FS5.2_1_4 ~ "Worker with primary educ. or less",
-                           FS5.2_1_5 ~ "Paid family worker",
-                           FS5.2_1_6 ~ "Occassional worker",
-                           FS5.2_1_8 ~ "Traditional apprentice (first year)",
-                           FS5.2_1_9 ~ "Traditional apprentice (third year)",
-                           FS5.2_1_10 ~ "CQP apprentice (first year)",
-                           FS5.2_1_11 ~ "CQP apprentice (third year)"))  %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Monthly wages in USD."
-  ) %>% 
-  as_kable_extra(caption = "Monthly wages", 
-                 booktabs = T,
-                 linesep = "")
 ```
 
 ```{r, tbl-fees, echo=FALSE}
 ```
 
-```{r allowances}
-baseline <- df %>% filter(wave == 0) %>% select(contains("allow"), "SELECTED", -"a_allow", -"allow_avg") %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~.*5*4/605) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  add_overall() %>% 
-  modify_header(stat_by =  "**{level}**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Allowances reported in USD by firm."
-  )
-
-endline <- df %>% filter(wave == 1) %>% select(contains("allow"), "SELECTED", -"a_allow", -"allow_avg") %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~.*5*4/605) %>%  
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  add_overall() %>% 
-  modify_header(stat_by =  "**{level}**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Allowances reported in USD by firm."
-  )
-
-overall <- df %>% select(contains("allow"), "SELECTED", -"a_allow", -"allow_avg") %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~.*5*4/605) %>%  
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  add_overall() %>% 
-  modify_header(stat_by =  "**{level}**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Allowances reported in USD by firm."
-  )
-
-tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endline", "Overall"), quiet = TRUE) %>% 
-    as_kable_extra(caption = "Monthly allowances", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
+```{r tbl-fees2}
 ```
 
-```{r fees2}
-baseline <- df %>% filter(wave == 0) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
-  mutate(across(contains("fee"), ~./605)) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                        labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Fees reported in USD by firm."
-  )
-
-endline <- df %>% filter(wave == 1) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
-  mutate(across(contains("fee"), ~./605)) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                        labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Fees reported in USD by firm."
-  )
-
-overall <- df %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                        labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  mutate(across(contains("fee"), ~./605)) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Fees reported in USD by firm."
-  )
-
-tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endline", "Overall"), quiet = TRUE) %>% 
-    as_kable_extra(caption = "Fees reported by firm", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
+```{r tbl-allowances}
 ```
 
-``` {r costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice", fig.pos='H'}
-x <- df %>% select(wave, FS1.2, FS4.1, FS6.1, all_allowances, contains("FE5.1"), FS3.1, FS3.2, FS4.1, FS6.9, FS6.10, FS5.2_1_2, FS6.8, annual_foregone_prod) %>%
-  mutate(all_allowances = all_allowances*4*5*FS4.1,
-         FE5.1_1 = FE5.1_1 / FS6.1 * FS4.1,
-         FE5.1_2 = FE5.1_2 / FS6.1 * FS4.1,
-         FE5.1_3 = FE5.1_3 / FS6.1 * FS4.1,
-         FE5.1_4 = FE5.1_4 / FS6.1 * FS4.1) %>% 
-  group_by(wave, FS1.2) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% pivot_longer(cols = c(all_allowances, contains("FE5.1"), annual_foregone_prod)) %>% select(c(name, value)) %>% group_by(name) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% mutate(value = value / 605) %>% mutate(labels = scales::dollar(value, accuracy = .1))
-
-x$name = factor(x$name, ordered = TRUE, levels = c("all_allowances", "FE5.1_3", "FE5.1_4", "annual_foregone_prod", "FE5.1_1", "FE5.1_2"))
-
-x <- x %>% mutate(name=fct_relevel(name,c("annual_foregone_prod","all_allowances")))
-
-ggplot(x, aes(x="", y=value, fill=factor(name, levels = c("all_allowances", "annual_foregone_prod", "FE5.1_4", "FE5.1_3", "FE5.1_1", "FE5.1_2")))) +
-  geom_bar(stat="identity", width=1, color="white") +
-  coord_polar("y", start=0) + geom_label(aes(x = 1.25, label = labels), size = 3.25, color = c("white", 1, 1, 1, "white", "white"), position = position_stack(vjust = .5), show.legend = FALSE) + scale_fill_viridis_d(name = "", labels = c("Allowances", "Foregone trainer productivity", "Raw materials", "Books and training materials",  "Rent for training facilities",  "Equipment and tools"), guide = guide_legend(reverse = TRUE)) + theme_void()
+\renewcommand{\arraystretch}{2}
+```{r, tbl-allowancebounds}
 ```
 
-``` {r costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
-x <- df %>% filter(wave == 0, !is.na(FS6.1)) %>% select(wave, FS1.2, FS4.1, FS6.1, all_allowances, contains("FE5.1"), FS6.9, FS6.10, FS5.2_1_2, FS6.8, annual_foregone_prod) %>%
-  mutate(all_allowances = all_allowances*4*5*FS4.1*FS6.1,
-         FE5.1_1 = FE5.1_1 * FS4.1,
-         FE5.1_2 = FE5.1_2 * FS4.1,
-         FE5.1_3 = FE5.1_3 * FS4.1,
-         FE5.1_4 = FE5.1_4 * FS4.1,
-         annual_foregone_prod = annual_foregone_prod * FS6.1) %>% 
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% pivot_longer(cols = c(all_allowances, contains("FE5.1"), annual_foregone_prod)) %>% select(c(name, value)) %>% group_by(name) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% mutate(value = value / 605) %>% mutate(labels = scales::dollar(value, accuracy = .1))
-
-x$name = factor(x$name, ordered = TRUE, levels = c("all_allowances", "FE5.1_3", "FE5.1_4", "annual_foregone_prod", "FE5.1_1", "FE5.1_2"))
-
-x <- x %>% mutate(name=fct_relevel(name,c("annual_foregone_prod","all_allowances")))
-
-ggplot(x, aes(x="", y=value, fill=factor(name, levels = c("all_allowances", "annual_foregone_prod", "FE5.1_4", "FE5.1_3", "FE5.1_1", "FE5.1_2")))) +
-  geom_bar(stat="identity", width=1, color="white") +
-  coord_polar("y", start=0) + geom_label(aes(x = 1.25, label = labels), size = 3.25, color = c("white", 1, 1, 1, "white", "white"), position = position_stack(vjust = .5), show.legend = FALSE) + scale_fill_viridis_d(name = "", labels = c("Allowances", "Foregone trainer productivity", "Raw materials", "Books and training materials",  "Rent for training facilities",  "Equipment and tools"), guide = guide_legend(reverse = TRUE)) + theme_void()
+```{r, tbl-allowboundsapp}
 ```
 
-```{r costtable}
+\renewcommand{\arraystretch}{1}
 
-x <- df %>% filter(!is.na(FS6.1)) %>% select(wave, FS1.2, FS4.1, FS6.1, all_allowances, contains("FE5.1"), FS6.9, FS6.10, FS5.2_1_2, FS6.8) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
-         Rent = FE5.1_1 / FS6.1,
-         Equipment = FE5.1_2 / FS6.1,
-         Books = FE5.1_3 / FS6.1,
-         "Raw materials" = FE5.1_4 / FS6.1,
-         "Foregone trainer prod." = (FS6.9*FS6.10*4)*(FS5.2_1_2/4/40) / FS6.1,  #hours per month * hourly wage / number of apprentices
-         Allowances = all_allowances*4*5)
+``` {r fig-costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice", fig.pos='H'}
+```
 
-x <- x %>% mutate_at(c("Rent", "Equipment", "Books", "Raw materials", "Foregone trainer prod.", "Allowances"), ~.*FS4.1/605) %>% 
-  group_by(wave, FS1.2) %>% summarise_all(mean, na.rm = T) %>% select(wave, Rent, Equipment, Books, "Raw materials", "Foregone trainer prod.", Allowances) %>% ungroup()
-
-x %>% tbl_summary(by=wave,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = everything() ~ c(2,2)) %>% 
-  add_overall() %>%
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Fees reported by firm, in USD."
-  ) %>% 
-  as_kable_extra(caption = "Summary of firm costs", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
+``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
 ```
 
 <!-- 
 r, tbl-cbend, echo=FALSE}
 -->
+```{r tbl-wages}
+```
 
-```{r netbenefits1}
-var_label(df$cb_II) <- "Model I"
-var_label(df$cb_V) <- "Model II"
-
-baseline <- df %>% filter(wave == 0) %>% select(cb_II, cb_V, IDYouth, SELECTED) %>% 
-  mutate(cb_II = cb_II/605,
-         cb_V = cb_V/605) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2,
-              include = -IDYouth) %>% 
-  modify_header(stat_by =  "**{level}**",
-                label = "") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Annual net benefits per apprentice in $US."
-  ) %>% add_overall()
-
-endline <- df %>% filter(wave == 1) %>% select(cb_II, cb_V, IDYouth, SELECTED) %>% 
-  mutate(cb_II = cb_II/605,
-         cb_V = cb_V/605) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2,
-              include = -IDYouth) %>% 
-  modify_header(stat_by =  "**{level}**",
-                label = "") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Annual net benefits per apprentice in $US."
-  ) %>% add_overall()
-
-overall <- df %>% select(cb_II, cb_V, IDYouth, SELECTED) %>% 
-  mutate(cb_II = cb_II/605,
-         cb_V = cb_V/605) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2,
-              include = -IDYouth) %>% 
-  modify_header(stat_by =  "**{level}**",
-                label = "") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Annual net benefits per apprentice in $US."
-  ) %>% add_overall()
-
-tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endline", "Overall"), quiet = TRUE) %>% 
-    as_kable_extra(caption = "Net benefits", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H")
+```{r tbl-netbenefitsbywave}
 ```
 
 ```{r, fig-apphist, fig.height=9, out.width="100%", fig.cap = "Net benefits of training, per apprentice"}
@@ -948,60 +582,21 @@ tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endlin
 ```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Net benefits of training, total per firm"}
 ```
 
-``` {r knowreg, results = 'asis'}
-# interaction term
-df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
+\begin{landscape}
 
-x <- df %>% filter(SELECTED != 3)
-
-m1 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave), data = df)
-m2 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did, data = df)
-m3 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + as.factor(IDYouth), data = df)
-m4 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + as.factor(IDYouth), data = x)
-
-m5 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration, data = df)
-m6 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1, data = df)
-m7 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1 + FS6.8 + FS6.9 + FS6.10 + ext_training, data = df)
-m8 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1 + FS6.8 + FS6.9 + FS6.10 + ext_training, data = x)
-
-stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.sep.width = "0pt",
-          no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("Omitted CQP category: applied but did not participate."),
-          notes.align = "r",
-          notes.append = TRUE,
-          covariate.labels = c("CQP participant",
-                               "Endline",
-                               "CQP x Endline",
-                               "Experience",
-                               "Firm size",
-                               "Total apprentices",
-                               "Total instructors",
-                               "Days trained per week",
-                               "Duration, last training",
-                               "External training"),
-          title = "Knowledge regressions",
-          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
-          dep.var.labels = "Knowledge",
-          model.names = FALSE,
-          dep.var.caption = "",
-          label = "tab:knowreg",
-          add.lines = list(c("Individual FE", "NO", "NO", "YES", "YES", "NO", "NO", "NO", "NO")))
-```             
-
-\renewcommand{\arraystretch}{2}
-```{r, test-a, echo=FALSE}
+```{r, tbl-appnetbenefitsbytrade, echo=FALSE}
 ```
 
-```{r, test-b, echo=FALSE}
+```{r, tbl-firmnetbenefitsbytrade, echo=FALSE}
 ```
+
+\end{landscape}
 
 # Appendix B
 ## Human Capital Questions {#hcqs}
 
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{B\arabic{section}.\arabic{figure}}
-
-\renewcommand{\arraystretch}{1}
 
 |French                   |English |
 |---------------------------------------------------------|---------------------------------------------------------|

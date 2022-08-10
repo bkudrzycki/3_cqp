@@ -206,7 +206,7 @@ x <- df %>% filter(wave == 0) %>%
 
 #x <- x %>% replace(is.na(.), 0)
 
-var_label(x$a_total_fees) <- "Fees"
+var_label(x$a_total_fees) <- "Total Fees"
 var_label(x$a_fee_entry) <- "Entry"
 var_label(x$a_fee_formation) <- "Formation"
 var_label(x$a_fee_liberation) <- "Liberation"
@@ -215,7 +215,7 @@ var_label(x$a_fee_contract) <- "Contract"
 var_label(x$a_fee_application) <- "Application"
 var_label(x$a_allow) <- "Allowances¹"
 var_label(x$a_net_benefits) <- "Allowances net fees²"
-var_label(x$total_fees) <- "Fees, reported by firm"
+var_label(x$total_fees) <- "Total Fees"
 var_label(x$fee_entry) <- "Entry"
 var_label(x$fee_formation) <- "Formation"
 var_label(x$fee_liberation) <- "Liberation"
@@ -246,7 +246,7 @@ tbl_summary(x, by = SELECTED,
                  linesep = "",
                  position = "H") %>% 
   kableExtra::add_indent(c(2:7), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(11:16), level_of_indent = 1) %>%
+  kableExtra::add_indent(c(12:16), level_of_indent = 1) %>%
   kableExtra::add_indent(c(18:21), level_of_indent = 1) %>% 
   kableExtra::group_rows(start_row = 1,
                          end_row = 10,
@@ -265,30 +265,29 @@ tbl_summary(x, by = SELECTED,
 
 ## ---- tbl-netbenefits --------
 
-x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate_at(c("total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application"), ~./4) %>% mutate_at(vars(contains("allow")), ~.*5*4*FS4.1) %>% 
-  mutate_at(c(vars(contains(("FE5.1")), "total_training_costs")), ~.*FS4.1/FS6.1) %>% 
-  mutate(apprentice_prod = sum(FS5.2_1_2*6, FS5.2_1_4*6, na.rm = T)) %>% ungroup() %>% 
-  select("FS1.2", "SELECTED", "total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "apprentice_prod", "total_benefits", "all_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "total_training_costs", contains("FE5.1"), "annual_foregone_prod", "total_costs", contains("cb")) %>%
-  mutate_at(c("total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "apprentice_prod", "total_benefits", "all_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "total_training_costs", "FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4", "annual_foregone_prod", "total_costs", "cb_I", "cb_II", "cb_III", "cb_IV", "cb_V"), ~./605) %>% ungroup() %>% 
+x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application"), ~./4) %>% mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), ~.*5*4*FS4.1) %>% 
+  mutate_at(c(vars(contains("FE5.1"))), ~.*FS4.1/FS6.1) %>% 
+  select("FS1.2", "SELECTED", "annual_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_app_prod", "total_benefits", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_training_costs", contains("FE5.1"), "annual_foregone_prod", "total_costs", contains("cb")) %>%
+  mutate_at(c("annual_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_app_prod", "total_benefits", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_training_costs", "FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4", "annual_foregone_prod", "total_costs", "cb_I", "cb_II", "cb_III", "cb_IV", "cb_V"), ~./605) %>% ungroup() %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
 
 #x <- x %>% replace(is.na(.), 0)
 
-var_label(x$total_fees) <- "Fees¹"
+var_label(x$annual_fees) <- "Fees¹"
 var_label(x$fee_entry) <- "Entry"
 var_label(x$fee_formation) <- "Formation"
 var_label(x$fee_liberation) <- "Liberation"
 var_label(x$fee_materials) <- "Materials"
 var_label(x$fee_contract) <- "Contract"
 var_label(x$fee_application) <- "Application"
-var_label(x$apprentice_prod) <- "Apprentice prod."
+var_label(x$annual_app_prod) <- "Apprentice prod."
 var_label(x$total_benefits) <- "Total"
-var_label(x$all_allowances) <- "Allowances¹"
+var_label(x$annual_allowances) <- "Allowances¹"
 var_label(x$allow_food) <- "Food"
 var_label(x$allow_transport) <- "Transport"
 var_label(x$allow_pocket_money) <- "Pocket money"
 var_label(x$allow_other) <- "Other"
-var_label(x$total_training_costs) <- "Training costs"
+var_label(x$annual_training_costs) <- "Training costs"
 var_label(x$FE5.1_1) <- "Rent"
 var_label(x$FE5.1_2) <- "Equipment"
 var_label(x$FE5.1_3) <- "Books"
@@ -328,7 +327,7 @@ tbl_summary(x, by = SELECTED,
   kableExtra::add_indent(c(2:7), level_of_indent = 1) %>% 
   kableExtra::add_indent(c(11:14), level_of_indent = 1) %>% 
   kableExtra::add_indent(c(16:19), level_of_indent = 1) %>% 
-  kableExtra::row_spec(c(9,21:26),bold=T) %>% 
+  kableExtra::row_spec(c(9,21),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
   footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
            number = "Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume 20-day apprentice workweek.",
@@ -339,7 +338,7 @@ tbl_summary(x, by = SELECTED,
 
 ## ---- tbl-cblong --------
 
-x <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED, firm_size_bins, dossier_selected, dossier_apps, FS3.4, FS4.1, FS4.7, annual_app_prod, FS5.1, FS5.3, FS5.4, FS6.1, FS6.2, firm_size, profits, expenses, annual_fees, total_benefits, annual_allowances, annual_training_costs, annual_foregone_prod, total_costs, contains("cb")) %>%
+x <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED, firm_size_bins, FS3.4, FS4.1, FS4.7, annual_app_prod, FS5.1, FS5.3, FS5.4, FS6.1, FS6.2, firm_size, profits, expenses, annual_fees, total_benefits, annual_allowances, annual_training_costs, annual_foregone_prod, total_costs, contains("cb")) %>%
   group_by(FS1.2) %>% 
   summarise_all(mean, na.rm = T) %>% 
   ungroup() %>% 

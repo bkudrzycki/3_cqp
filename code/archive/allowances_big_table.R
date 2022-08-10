@@ -24,6 +24,7 @@ source("functions/add_by_n.R")
 
 df <- unlabelled(df)
 
+## ---- test-a --------
 # code upper and lower bounds
 
 df <- df %>% mutate("allow_food_low" = allow_food, "allow_transport_low" = allow_transport, "allow_pocket_money_low" = allow_pocket_money, "allow_other_low" = allow_other,

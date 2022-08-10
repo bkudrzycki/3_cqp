@@ -69,6 +69,33 @@ df <- df %>% mutate(SELECTED = as.factor(recode(SELECTED, "Oui"= 1,
 # subtract 1 from miscoded questions
 df <- df %>% mutate(across(c(FS3.1, FS4.1, YE3.35, FS3.3, FS6.8, FS6.9, contains("FS3.5")), ~(.x-1)))
 
+# remove FS6.1 for firms with over 50 apprentices, because (i) real number unknown, (ii) probably licées and not firms
+df <- df %>% mutate(FS6.1 = replace(FS6.1, FS6.1>50, NA))
+
+# code number of cqp apprentices by status who were actually interviewed per firm
+interviewed <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED) %>% 
+  mutate(selected_interviewed = ifelse(SELECTED == 1, 1, 0),
+         not_selected_interviewed = ifelse(SELECTED == 0, 1, 0),
+         did_not_apply_interviewed = ifelse(SELECTED == 3, 1, 0)) %>% select(-SELECTED) %>% 
+  group_by(FS1.2) %>% summarise_all(sum, na.rm = T) %>% ungroup()
+
+df <- left_join(df, interviewed, by = "FS1.2")
+
+# types of apprentices working in firm at baseline, roughly deduced from FS6.1 and dossier data (caution! in a few cases inconsistent)
+status <- df %>% filter(wave == 0) %>% select(IDYouth, FS6.1, FS6.2, contains(c("dossier", "interviewed"))) %>%
+  mutate(selected = case_when(dossier_selected<=FS6.1 ~ dossier_selected,
+                              FS6.1 == FS6.2 ~ 0),
+         not_selected = case_when(dossier_apps<=FS6.1 & dossier_apps-dossier_selected <= FS6.1 ~ dossier_apps-dossier_selected,
+                                  selected + FS6.2 <= FS6.1 ~ FS6.2,
+                                  selected == FS6.1 ~ 0,
+                                  FS6.1 == FS6.2 ~ 0),
+         did_not_apply = case_when(selected+not_selected <= FS6.1 ~ FS6.1-selected-not_selected,
+                                   FS6.2 <= FS6.1 ~ FS6.2),
+         selected = ifelse(is.na(selected) & FS6.1-did_not_apply == selected_interviewed-not_selected_interviewed, selected_interviewed, selected),
+         not_selected = ifelse(is.na(not_selected) & FS6.1-did_not_apply == selected_interviewed-not_selected_interviewed, not_selected_interviewed, not_selected)) %>% select(IDYouth, selected, not_selected, did_not_apply)
+           
+df <- left_join(df, status, by = "IDYouth") %>% select(-contains("interviewed"))
+
 # code start year
 df <- df %>% left_join(base_trad %>% select(IDYouth, FS7.5), by = "IDYouth")
 
@@ -105,7 +132,7 @@ df <- df %>% mutate(start_year = as.numeric(coalesce(FS7.5, YS4.6)),
                     end_still_training = ifelse(YE3.7 == 1 | YE3.29 == 1, 1, 0))
 
 # no firm with zero apprentices - recode FS6.1
-df <- df %>% mutate(FS6.1 = ifelse(FS6.1 == 0, 1, FS6.1))
+df <- df %>% rowwise() %>% mutate(FS6.1 = ifelse(FS6.1 == 0, sum(selected, not_selected, did_not_apply, na.rm = T), FS6.1))
 
 # recode number of trainers, hours trained on last day of training
 df <- df %>% mutate_at("FS6.8",  na_if, 12) %>% 
@@ -165,7 +192,7 @@ grads <- grads %>% mutate(grad = ifelse(YE3.7 %in% 1 | YE3.29 %in% 1, 1, # with 
                                                                         ifelse(FE9.1 %in% 4, 3, # dropped out according to master craftsman
                                                                                ifelse(YE3.3 %in% 0 & YE3.7 %in% 0, 3, 4)))))))) # no grad, NOT training
 
-grads <- grads %>% mutate(grad = factor(grad, labels = c("Still training", "Graduated", "Dropped out", "Unknown")))
+grads <- grads %>% mutate(grad = factor(grad, levels = c(1:4), labels = c("Still training", "Graduated", "Dropped out", "Unknown")))
 
 grads <- grads %>% mutate(grad_but_cqp = ifelse(YE3.3 %in% 1 & YE3.29 %in% 2, 1, 0)) %>% select(IDYouth, grad, grad_but_cqp)
 
@@ -218,8 +245,8 @@ df <- df %>% mutate_at(c("FS5.3"), recode,
                        `11` = 1300000) %>% 
   mutate_at(c("FS5.3"), na_if, 12)
 
-df <- df %>% rowwise() %>% mutate(profits = sum(c(FS4.7, -FS5.1, -FS5.3), na.rm = T),
-                                  expenses = sum(c(FS5.1, FS5.3), na.rm = T)) %>% ungroup()
+df <- df %>% rowwise() %>% mutate(profits = sum(c(FS4.7, -FS5.1, -FS5.3), na.rm = F),
+                                  expenses = sum(c(FS5.1, FS5.3), na.rm = F)) %>% ungroup()
 
 # recode training costs (ENDLINE ONLY!)
 df <- df %>% mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), recode,
@@ -236,7 +263,8 @@ df <- df %>% mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), recode,
                            `11` = 125000) %>%
   mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), na_if, 12)
 
-df$total_training_costs <- df %>% select(tidyselect::vars_select(names(df), matches('FE5.1'))) %>% rowMeans(., na.rm = T)
+df$total_training_costs <- df %>% select(contains("FE5.1")) %>% rowMeans(., na.rm = T)
+df$total_training_costs[is.na(df$total_training_costs)]<-NA
 
 df <- df %>% mutate(costs_per_app = total_training_costs / FS6.1)
 
@@ -286,11 +314,12 @@ df <- df %>% mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", 
                        `10` = 8725,
                        `11` = 11725) %>% 
   mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), na_if, 12) %>% 
-  mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), replace_na, 0)
+  mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), ~replace(., is.na(.), 0)) #replace NA with 0
 
 df$all_allowances <- df %>% select(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other")) %>% 
   rowSums(., na.rm = T)
 
+# if no allowances are given whatsoever, change total allowances to NA
 df <- df %>% mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances"), ~replace(., all_allowances == 0, NA))
 
 var_label(df$allow_food) <- "Food"
@@ -314,6 +343,8 @@ df <- df %>% mutate_at("YS4.38", recode,
                        `10` = 75000) %>% 
   mutate_at("YS4.38", na_if, 99)
 
+df$YS4.38 <- zap_labels(df$YS4.38)
+
 df <- df %>% mutate_at("YE3.22", recode,
                        `1` = 250,
                        `2` = 750,
@@ -326,6 +357,8 @@ df <- df %>% mutate_at("YE3.22", recode,
                        `9` = 20000,
                        `10` = 37500) %>% 
   mutate_at("YE3.22", na_if, 99)
+
+df$YE3.22 <- zap_labels(df$YE3.22)
                       
 df$a_allow <- coalesce(df$YS4.38, df$YE3.22)
 
@@ -542,10 +575,11 @@ fees <- rbind(JoinCQPMatch(c('FS9.7', 'FS9.8')) %>% rename(fee_entry = FS9.7_1,
                                                         fee_materials = FS7.10_1,
                                                         fee_contract = FS7.10_2,
                                                         fee_application = FS7.10_3))
+df <- left_join(df, fees, by = c('IDYouth', 'wave'))
 
 # recode fees
 
-fees <- fees %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation"), recode,
+df <- df %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation"), recode,
                            `1` = 0,
                            `2` = 5000,
                            `3` = 15000,
@@ -557,9 +591,10 @@ fees <- fees %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation"), re
                            `9` = 212500,
                            `10` = 300000,
                            `11` = 425000) %>%
-  mutate_at(c("fee_entry", "fee_formation", "fee_liberation"), na_if, 12)
+  mutate_at(c("fee_entry", "fee_formation", "fee_liberation"), na_if, 12) %>% 
+  mutate_at(c("fee_entry", "fee_formation", "fee_liberation"), ~replace(., is.na(.), 0)) #replace NA with 0
 
-fees <- fees %>% mutate_at(c("fee_materials", "fee_contract", "fee_application"), recode,
+df <- df %>% mutate_at(c("fee_materials", "fee_contract", "fee_application"), recode,
                            `1` = 0,
                            `2` = 1500,
                            `3` = 4000,
@@ -571,16 +606,14 @@ fees <- fees %>% mutate_at(c("fee_materials", "fee_contract", "fee_application")
                            `9` = 52500,
                            `10` = 82500,
                            `11` = 125000) %>%
-  mutate_at(c("fee_materials", "fee_contract", "fee_application"), na_if, 12)
+  mutate_at(c("fee_materials", "fee_contract", "fee_application"), na_if, 12) %>% 
+  mutate_at(c("fee_materials", "fee_contract", "fee_application"), ~replace(., is.na(.), 0)) #replace NA with 0
 
-fees$total_fees <- fees %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application")) %>% 
+df$total_fees <- df %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application")) %>% 
   rowSums(., na.rm = T)
 
-fees <- fees %>% mutate(total_fees = ifelse(total_fees == 0 & is.na(fee_entry), 99, total_fees)) %>% filter(total_fees != 99)
-
-df <- left_join(df, fees, by = c('IDYouth', 'wave'))
-
-df <- df %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application"), ~replace(., total_fees == 0, NA))
+# if no allowances are given whatsoever, change total allowances to NA
+df <- df %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees"), ~replace(., total_fees == 0, NA))
 
 var_label(df$fee_entry) <- "Initiation"
 var_label(df$fee_formation) <- "Training"
@@ -592,15 +625,15 @@ var_label(df$total_fees) <- "Total"
 
 # app-level fees
 
-a_fees <- ys %>% select(c(IDYouth, YS4.15, YS4.17, YS4.19, YS4.21, YS4.23, YS4.24)) %>% 
-  rename(a_fee_entry = YS4.15,
+df <- df %>%
+  mutate(a_fee_entry = YS4.15,
          a_fee_formation = YS4.21,
          a_fee_liberation = YS4.24,
          a_fee_materials = YS4.17,
          a_fee_contract = YS4.19,
          a_fee_application = YS4.23)
 
-a_fees <- a_fees %>% 
+df <- df %>% 
   mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation"), recode,
           `1` = 5000,
           `2` = 15000,
@@ -612,9 +645,10 @@ a_fees <- a_fees %>%
           `8` = 212500,
           `9` = 300000,
           `10` = 425000) %>% 
-  mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation"), na_if, 99)
+  mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation"), na_if, 99) %>% 
+  mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation"), ~replace(., is.na(.), 0)) #replace NA with 0
 
-a_fees <- a_fees %>% 
+df <- df %>% 
   mutate_at(c("a_fee_materials", "a_fee_contract", "a_fee_application"), recode,
             `1` = 1500,
             `2` = 4000,
@@ -626,16 +660,14 @@ a_fees <- a_fees %>%
             `8` = 52500,
             `9` = 82500,
             `10` = 125000) %>% 
-  mutate_at(c("a_fee_materials", "a_fee_contract", "a_fee_application"), na_if, 99)
+  mutate_at(c("a_fee_materials", "a_fee_contract", "a_fee_application"), na_if, 99) %>% 
+  mutate_at(c("a_fee_materials", "a_fee_contract", "a_fee_application"), ~replace(., is.na(.), 0)) #replace NA with 0
 
-a_fees$a_total_fees <- a_fees %>% select(c("a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application")) %>% 
+df$a_total_fees <- df %>% select(c("a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application")) %>% 
   rowSums(., na.rm = T)
 
-a_fees <- a_fees %>% filter(a_total_fees != 0) %>% replace(is.na(.), 0)
-
-df <- left_join(df, a_fees, by = c('IDYouth'))
-
-df <- df %>% mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application"), ~replace(., a_total_fees == 0, NA))
+# if no allowances are given whatsoever, change total allowances to NA
+df <- df %>% mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_total_fees"), ~replace(., a_total_fees == 0, NA))
 
 var_label(df$a_fee_entry) <- "Initiation"
 var_label(df$a_fee_formation) <- "Training"
@@ -652,14 +684,6 @@ df <- df %>% rowwise() %>% mutate(firm_size = sum(c(FS6.1, FS3.5_1, FS3.5_2, FS3
                                   firm_size_sans_app = sum(c(FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)),
                     firm_size_bins = cut(firm_size, breaks = c(1,20,40,60,80,107)),
                     firm_size_bins_reported = cut(FS3.4, breaks = c(1,10,20,30,40,50))) %>% ungroup()
-
-
-# types of apprentices working in firm, roughly deduced from FS6.1 and dossier data (caution! in a few cases inconsistent)
-df <- df %>% mutate(selected = ifelse(dossier_selected<FS6.1, dossier_selected, FS6.1),
-                    not_selected = ifelse(dossier_apps-dossier_selected<FS6.1, dossier_apps-dossier_selected, 
-                                          ifelse(FS6.1-FS6.2-dossier_selected>0, FS6.1-FS6.2-dossier_selected,
-                                                 FS6.1-selected)),
-                    did_not_apply = ifelse(FS6.1-selected-not_selected >= 0, FS6.1-selected-not_selected, FS6.2))
 
 # firm weekly hours (more accurately: number of hours worked by patron)
 
@@ -697,8 +721,6 @@ wages <- rbind(JoinCQPMatch(c('FS5.2')), JoinTradMatch(c('FS5.2'))) %>%
 
 df <- left_join(df, wages, by = c('IDYouth', 'wave'))
 
-a_fees <- a_fees %>% filter(a_total_fees != 0) %>% replace(is.na(.), 0)
-
 # training dummy
 df <- df %>% mutate(ext_training = ifelse(wave == 0, YS4.43, YE3.35)) %>% 
   mutate(ext_training = ifelse(ext_training == 0, 0, 1))
@@ -731,33 +753,38 @@ df <- left_join(df, app_prod, by = c('IDYouth', 'wave'))
 # trainer hourly wage: monthly wage of skilled employee (FS5.2_1_2) / days open last week (FS3.1) / hours open on last day (FS3.2) / 4 weeks
 # number of trainers per apprentice: FS6.8 / FS6.1
 
-df <- df %>% mutate(annual_fees = total_fees/4,
-                    annual_allowances = all_allowances*5*4*FS4.1,
+df <- df %>% mutate(annual_fees = ifelse(is.na(total_fees), a_total_fees/4, total_fees/4),
+                    annual_allowances = ifelse(is.na(all_allowances), a_allow*5*4*FS4.1, all_allowances*5*4*FS4.1),
                     annual_training_costs = total_training_costs*FS4.1/FS6.1, 
-                    annual_foregone_prod = case_when(FS5.2_1_2>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_2/FS3.1/FS3.2/4*FS6.8/FS6.1,
-                                                     FS5.2_1_1>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_1/FS3.1/FS3.2/4*FS6.8/FS6.1,
-                                                     FS5.2_1_3>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_3/FS3.1/FS3.2/4*FS6.8/FS6.1,
-                                                     FS5.2_1_4>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_4/FS3.1/FS3.2/4*FS6.8/FS6.1,
-                                                     FS5.2_1_7>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_7/FS3.1/FS3.2/4*FS6.8/FS6.1))
+                    annual_foregone_prod = case_when(FS5.2_1_2>0 & FS3.1 > 0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_2/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_2>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_2/6/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_1>0 & FS3.1 > 0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_1/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_1>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_1/6/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_3>0 & FS3.1 > 0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_3/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_3>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_3/6/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_4>0 & FS3.1 > 0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_4/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_4>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_4/6/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_7>0 & FS3.1 > 0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_7/FS3.1/FS3.2/4*FS6.8/FS6.1,
+                                                     FS5.2_1_7>0 ~ FS6.9*FS6.10*4*FS4.1*FS5.2_1_7/6/FS3.2/4*FS6.8/FS6.1))
 df <- df %>% 
   rowwise() %>% 
-  mutate(total_benefits = sum(annual_fees, annual_app_prod, na.rm = T),
-         total_costs = sum(annual_allowances, annual_training_costs, annual_foregone_prod, na.rm = T))
+  mutate(total_benefits = sum(annual_fees, annual_app_prod, na.rm = F),
+         total_costs = sum(annual_allowances, annual_training_costs, annual_foregone_prod, na.rm = F))
 
 # model I: fees - allowances
-df <- df %>% rowwise() %>% mutate(cb_I = sum(annual_fees, -annual_allowances, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_I = sum(annual_fees, -annual_allowances, na.rm = F))
 
 # model II: fees - allowances - training costs
-df <- df %>% rowwise() %>% mutate(cb_II = sum(annual_fees, -annual_allowances, -annual_training_costs, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_II = sum(annual_fees, -annual_allowances, -annual_training_costs, na.rm = F))
 
 # model III: fees + productivity - allowances
-df <- df %>% rowwise() %>% mutate(cb_III = sum(annual_fees, annual_app_prod, -annual_allowances, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_III = sum(annual_fees, annual_app_prod, -annual_allowances, na.rm = F))
 
 # model IV: fees + productivity - training_costs - allowances
-df <- df %>% rowwise() %>% mutate(cb_IV = sum(annual_fees, annual_app_prod, -annual_training_costs, -annual_allowances, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_IV = sum(annual_fees, annual_app_prod, -annual_training_costs, -annual_allowances, na.rm = F))
 
 # model V: fees + productivity - training_costs - allowances - foregone trainer productivity
-df <- df %>% rowwise() %>% mutate(cb_V = sum(annual_fees, annual_app_prod, -annual_training_costs, -annual_allowances, -annual_foregone_prod, na.rm = T))
+df <- df %>% rowwise() %>% mutate(cb_V = sum(annual_fees, annual_app_prod, -annual_training_costs, -annual_allowances, -annual_foregone_prod, na.rm = F))
 
 df <- df %>% ungroup()
 
