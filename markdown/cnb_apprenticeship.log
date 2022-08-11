@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  10 AUG 2022 20:51
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  11 AUG 2022 20:35
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1322,7 +1322,11 @@ Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 )
 \cslhangindent=\skip82
 \csllabelwidth=\skip83
-(./cnb_apprenticeship.aux)
+(./cnb_apprenticeship.aux
+
+LaTeX Warning: Label `tab:appreg' multiply defined.
+
+)
 \openout1 = `cnb_apprenticeship.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 163.
@@ -1549,87 +1553,60 @@ LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
 (Font)              scaled to size 7.00075pt on input line 343.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
 (Font)              scaled to size 6.99925pt on input line 343.
-[16] [17] [18]
+[16] [17] [18] [19] [20] [21] (./tables/tbl-cbmodels.tex) [22] [23] [24] [25] [
+26] [27] [28]
 
-LaTeX Warning: Reference `tab:test-j' on page 19 undefined on input line 350.
+LaTeX Warning: Reference `tab:tbl-appreg' on page 29 undefined on input line 51
+9.
 
+[29]
 
-LaTeX Warning: Reference `tab:test-k' on page 19 undefined on input line 352.
-
-[19] [20] [21] (./tables/tbl-cbmodels.tex) [22] [23] [24] [25] [26]
-
-LaTeX Warning: Reference `tab:skills' on page 27 undefined on input line 462.
-
-
-LaTeX Warning: Reference `tab:skills' on page 27 undefined on input line 462.
-
-[27]
-
-LaTeX Warning: Reference `tab:skills' on page 28 undefined on input line 464.
+LaTeX Warning: Reference `tab:tbl-appreg' on page 30 undefined on input line 52
+1.
 
 
-LaTeX Warning: Reference `fig:improvement2' on page 28 undefined on input line 
-464.
+LaTeX Warning: Reference `tab:tbl-appreg2' on page 30 undefined on input line 5
+21.
 
+[30] [31] [32]
 
-LaTeX Warning: Reference `tab:metricsbycqp' on page 28 undefined on input line 
-466.
-
-[28]
-Underfull \hbox (badness 1320) in paragraph at lines 470--471
-[]\TU/texgyrepagella(0)/m/n/10.95 To summarize, satisfaction is generally high 
-and stable among all apprentice
- []
-
-
-Overfull \hbox (4.04239pt too wide) in paragraph at lines 475--509
- [][] 
- []
-
-[29] [30] [31] [32]
-
-LaTeX Warning: Reference `fig:costspie' on page 33 undefined on input line 621.
+LaTeX Warning: Reference `fig:costspie' on page 33 undefined on input line 632.
 
 
 
-LaTeX Warning: Reference `fig:costspie2' on page 33 undefined on input line 621
+LaTeX Warning: Reference `fig:costspie2' on page 33 undefined on input line 632
 .
 
 [33]
 
-LaTeX Warning: Reference `tab:fees2' on page 34 undefined on input line 625.
+LaTeX Warning: Reference `tab:fees2' on page 34 undefined on input line 636.
 
 
-LaTeX Warning: Reference `tab:allowances' on page 34 undefined on input line 62
-5.
+LaTeX Warning: Reference `tab:allowances' on page 34 undefined on input line 63
+6.
 
 
 LaTeX Warning: Reference `tab:netbenefits1' on page 34 undefined on input line 
-625.
+636.
 
 
-LaTeX Warning: Reference `fig-apphist' on page 34 undefined on input line 631.
+LaTeX Warning: Reference `fig-apphist' on page 34 undefined on input line 642.
 
-[34]
+[34] [35]
 
-LaTeX Warning: Reference `fig:hist2' on page 35 undefined on input line 647.
+LaTeX Warning: Reference `fig:hist2' on page 36 undefined on input line 658.
 
-[35] [36] [37] [38] [39] [40] [41] [42] [43
+[36] [37] [38] [39] [40] [41] [42] [43
 
 ] [44] [45] [46] [47]
 File: figures/fig-firmsize-1.pdf Graphic file (type pdf)
 <use figures/fig-firmsize-1.pdf>
-[48] [49]
-Overfull \hbox (35.4264pt too wide) in paragraph at lines 1051--1089
- [][] 
- []
-
-[50] [51]
-Overfull \hbox (43.76637pt too wide) in paragraph at lines 1209--1236
+[48] [49] [50]
+Overfull \hbox (43.76637pt too wide) in paragraph at lines 1185--1212
  [] 
  []
 
-[52] [53]
+[51] [52] [53]
 File: figures/fig-costspie-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie-1.pdf>
 File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
@@ -1638,12 +1615,12 @@ File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
 File: figures/fig-apphist-1.pdf Graphic file (type pdf)
 <use figures/fig-apphist-1.pdf>
 
-LaTeX Warning: Float too large for page by 16.00578pt on input line 1372.
+LaTeX Warning: Float too large for page by 16.00578pt on input line 1348.
 
 File: figures/fig-firmhist-1.pdf Graphic file (type pdf)
 <use figures/fig-firmhist-1.pdf>
 
-LaTeX Warning: Float too large for page by 16.00578pt on input line 1376.
+LaTeX Warning: Float too large for page by 16.00578pt on input line 1352.
 
 [55] [56] [57] [58] [59
 
@@ -1659,7 +1636,7 @@ File: figures/questionnaire/mason3.png Graphic file (type bmp)
 File: figures/questionnaire/mason4.png Graphic file (type bmp)
 <figures/questionnaire/mason4.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1586--1590
+Underfull \hbox (badness 10000) in paragraph at lines 1562--1566
 []
  []
 
@@ -1706,28 +1683,31 @@ File: figures/questionnaire/elec4.png Graphic file (type bmp)
 File: figures/questionnaire/elec5.png Graphic file (type bmp)
 <figures/questionnaire/elec5.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1621--1626
+Underfull \hbox (badness 10000) in paragraph at lines 1597--1602
 []
  []
 
 [78]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1627.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1603.
 [79] [80]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1627.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1603.
 (./cnb_apprenticeship.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1627.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1627.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1603.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1603.
 
 LaTeX Warning: There were undefined references.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1627.
+
+LaTeX Warning: There were multiply-defined labels.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1603.
  ) 
 Here is how much of TeX's memory you used:
- 30993 strings out of 492916
- 565956 string characters out of 6133345
- 835939 words of memory out of 5000000
- 34630 multiletter control sequences out of 15000+600000
- 542811 words of font info for 134 fonts, out of 8000000 for 9000
+ 30997 strings out of 492916
+ 566294 string characters out of 6133345
+ 835861 words of memory out of 5000000
+ 34631 multiletter control sequences out of 15000+600000
+ 542835 words of font info for 137 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  70i,21n,118p,2125b,527s stack positions out of 5000i,500n,10000p,200000b,80000s
 

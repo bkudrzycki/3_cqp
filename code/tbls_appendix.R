@@ -87,73 +87,167 @@ y %>% select(FS1.2, wave, baseline_apps, baseline_sel, baseline_notsel, baseline
                          indent = T,
                          bold = F)
 
-## ---- tbl-cbend --------
+## ---- tbl-skillschangebycqp --------
 
-z <- x %>% filter(wave == "Endline") %>% mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                                                                  labels = c('Selected', 'Not Selected', 'Did Not Apply')))
-tbl_summary(z, by = SELECTED,
-            type = everything() ~ "continuous",
-            statistic = all_continuous() ~ c("{mean} ({sd})"),
-            include = -c(FS1.2, wave),
-            missing = "no",
-            digits = everything() ~ 2) %>% 
-  modify_header(all_stat_cols() ~ "**{level}**") %>%
-  as_kable_extra(caption = "Net Benefits by status, at endline",
+y <- df  %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, SELECTED, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = comp_all_trades_1-comp_all_trades_0, exp_diff = exp_all_trades_1-exp_all_trades_0, skills_diff = skills_all_trades_1-skills_all_trades_0)
+
+tbl1 <- y %>% select(SELECTED, comp_diff, exp_diff) %>%
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
+  tbl_summary(by = SELECTED, missing = "no",
+              digits = list(everything() ~ 3),
+              statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              label = list(comp_diff ~ "Competence¹",
+                           exp_diff ~ "Experience¹")) %>% 
+  add_p(test = everything() ~ "aov") %>% 
+  modify_header(p.value = "**p-value³**",
+                label = "") %>% 
+  modify_footnote(update = everything() ~ NA)
+
+z <- y %>% filter(SELECTED != 3) %>% mutate(SELECTED = factor(SELECTED, levels = c(1, 0),
+                                                          labels = c('CQP Selected', 'CQP Not Selected')))
+
+tbl2 <- z %>% select(SELECTED, comp_diff, exp_diff, skills_diff) %>% 
+  tbl_summary(by = SELECTED, missing = "no",
+              digits = list(everything() ~ 3),
+              statistic = list(all_continuous() ~ "{mean} ({sd})"),
+              label = list(comp_diff ~ "Competence¹",
+                           exp_diff ~ "Experience¹",
+                           skills_diff~ "Knowledge²")) %>% 
+  add_p() %>% 
+  modify_header(p.value = "**p-value³**",
+                label = "") %>% 
+  modify_footnote(update = everything() ~ NA) 
+
+tbl_stack(list(tbl1, tbl2)) %>%  
+  as_kable_extra(caption = "Change in apprentice human capital scores", 
                  booktabs = T,
                  linesep = "",
-                 position = "H") %>%
-  kableExtra::group_rows(start_row = 1,
-                         end_row = 8,
-                         group_label = "Benefits") %>% 
-  kableExtra::group_rows(start_row = 9,
-                         end_row = 21,
-                         group_label = "Costs") %>% 
-  kableExtra::add_indent(c(2:7), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(10:13), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(15:18), level_of_indent = 1) %>% 
-  kableExtra::row_spec(20,bold=T) %>% 
-  kableExtra::row_spec(21,bold=T) %>% 
-  kableExtra::kable_styling(latex_options="scale_down")
+                 position = "H") %>% 
+  kableExtra::kable_styling(latex_options="scale_down") %>% 
+  footnote(general = "Mean (SD). Change in human capital indices between baseline and endline.",
+           number = c("Percent of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade.", "Analysis of variance for three groups, Wilcoxon rank sum test for two groups"),
+           threeparttable = T,
+           escape = F,
+           general_title = "")
 
-## ---- tbl-knowreg --------
 
-# interaction term
-df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
+## ---- tbl-compexp2 --------
 
-x <- df %>% filter(SELECTED != 3)
+x <- df %>% filter(wave == 1, SELECTED != 3) %>% select(IDYouth, contains("comp"), -comp_dna, -a_comp_dna, -comp_all_trades, comp_all_trades) %>% pivot_longer(cols = contains("comp")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, side, name, value)) %>% pivot_wider()
 
-m1 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave), data = df)
-m2 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did, data = df)
-m3 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + as.factor(IDYouth), data = df)
-m4 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + as.factor(IDYouth), data = x)
+x <- x %>% left_join(df %>% filter(wave == 1, SELECTED != 3) %>% select(IDYouth, contains("exp"), -exp_dna, -a_exp_dna, -exp_all_trades, exp_all_trades) %>% pivot_longer(cols = contains("exp")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, side, name, value)) %>% pivot_wider(), by = c("IDYouth", "side")) %>% mutate(ID = row_number())
 
-m5 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration, data = df)
-m6 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1, data = df)
-m7 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1 + FS6.8 + FS6.9 + FS6.10 + ext_training, data = df)
-m8 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1 + FS6.8 + FS6.9 + FS6.10 + ext_training, data = x)
+var_label(x$comp_elec) <- "Electrical Installation"
+var_label(x$comp_macon) <- "Masonry"
+var_label(x$comp_menuis) <- "Carpentry"
+var_label(x$comp_plomb) <- "Plumbing"
+var_label(x$comp_metal) <- "Metalwork"
+var_label(x$comp_cqp) <- "CQP Selected"
+var_label(x$comp_notsel) <- "CQP Not Selected"
+var_label(x$comp_all_trades) <- "Overall"
+var_label(x$exp_elec) <- "Electrical Installation"
+var_label(x$exp_macon) <- "Masonry"
+var_label(x$exp_menuis) <- "Carpentry"
+var_label(x$exp_plomb) <- "Plumbing"
+var_label(x$exp_metal) <- "Metalwork"
+var_label(x$exp_cqp) <- "CQP Selected"
+var_label(x$exp_notsel) <- "CQP Not Selected"
+var_label(x$exp_all_trades) <- "Overall"
 
-stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.sep.width = "0pt",
+comp <- x %>% select(tidyselect::vars_select(names(x), matches("comp")), side, ID) %>% 
+  tbl_summary(by=side,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              digits = all_continuous() ~ 2,
+              missing = "no",
+              include = -ID) %>% 
+  add_stat(
+    fns = everything() ~ add_by_n
+  ) %>% 
+  modify_table_body(
+    ~ .x %>%
+      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
+      dplyr::relocate(add_n_stat_2, .before = stat_2)
+  )  %>%
+  add_p(test = everything() ~ "wilcox.test") %>% 
+  modify_header(stat_by =  "**{level}**",
+                starts_with("add_n_stat") ~ "**N**",
+                p.value = "**p-value³**",
+                label = "**Trade**") %>% 
+  modify_footnote(update = everything() ~ NA)
+
+exp <- x %>% select(tidyselect::vars_select(names(x), matches("exp"), -expenses), side, IDYouth) %>% 
+  tbl_summary(by=side,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              include = -IDYouth) %>% 
+  add_stat(
+    fns = everything() ~ add_by_n
+  ) %>% 
+  modify_table_body(
+    ~ .x %>%
+      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
+      dplyr::relocate(add_n_stat_2, .before = stat_2)
+  ) %>%
+  add_p(test = everything() ~ "wilcox.test") %>% 
+  modify_header(stat_by =  "**{level}**",
+                starts_with("add_n_stat") ~ "**N**",
+                p.value = "**p-value³**",
+                label = "**Trade**") %>% 
+  modify_footnote(update = everything() ~ NA)
+
+tbl_stack(list(comp, exp), group_header = c("Competence", "Experience"), quiet = TRUE) %>% 
+  as_kable_extra(caption = "Competence and experience, MC vs. apprentice assessment", 
+                 booktabs = T,
+                 linesep = "") %>% 
+  kableExtra::row_spec(c(8,16),bold=T) %>% 
+  kableExtra::kable_styling(latex_options="scale_down") %>% 
+  footnote(general = "Mean (SD). Proportion of tasks reported by apprentices and firms at endline. Comparison only possibly at endline as apprentices were not asked to self-assess competence and experience at baseline.",
+           number = c("Percent of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade.", "Wilcoxon rank sum test"),
+           threeparttable = T,
+           escape = F,
+           general_title = "")
+
+## ---- tbl-appreg2 --------
+
+x <- df %>% filter(SELECTED != 3) %>% mutate(total_apps = selected + not_selected + did_not_apply,
+                                             SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
+
+
+m1 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m2 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m3 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+
+
+m5 <- lm(comp_all_trades ~  as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m6 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+
+
+stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.2", font.size= "small", column.sep.width = "-8pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("Omitted CQP category: applied but did not participate."),
+          notes = c("Omitted category: CQP Selected.",
+                    "$^1$Years of training prior to 2019.",
+                    "$^2$Excluding apprentices."),
           notes.align = "r",
           notes.append = TRUE,
-          covariate.labels = c("CQP participant",
+          covariate.labels = c("CQP Not Selected",
                                "Endline",
-                               "CQP x Endline",
-                               "Experience",
-                               "Firm size",
-                               "Total apprentices",
-                               "Total instructors",
-                               "Days trained per week",
-                               "Duration, last training",
-                               "External training"),
-          title = "Knowledge regressions",
+                               "CQP Selected x Endline",
+                               "Baseline experience$^1$",
+                               "Firm size$^2$",
+                               "Total apprentices in firm"),
+          title = "Effects of Training on Human Capital, Excluding CQP Non Applicants",
           omit.stat=c("aic", "bic", "adj.rsq", "ser"),
-          dep.var.labels = "Knowledge",
+          dep.var.labels = c("Experience", "Competence", "Knowledge"),
           model.names = FALSE,
           dep.var.caption = "",
-          label = "tab:knowreg",
-          add.lines = list(c("Individual FE", "NO", "NO", "YES", "YES", "NO", "NO", "NO", "NO")))
+          label = "tab:appreg",
+          add.lines = list(c("Firm FE", "NO", "NO", "YES", "NO", "NO", "YES")))
 
 ## ---- tbl-fees --------
 
@@ -532,193 +626,6 @@ tbl_stack(list(tbl7, tbl8), group_header = c("12 months/year |\n 4 weeks/month",
            fixed_small_size = T,
            general_title = "") %>% 
   kableExtra::kable_styling(latex_options="scale_down")
-
-## ---- tbl-compexp2 --------
-
-x <- df %>% filter(wave == 1, SELECTED != 3) %>% pivot_longer(cols = contains("comp")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, side, name, value)) %>% pivot_wider()
-
-x <- x %>% left_join(df %>% filter(wave == 1, SELECTED != 3) %>% pivot_longer(cols = contains("exp")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, side, name, value)) %>% pivot_wider(), by = c("IDYouth", "side")) %>% mutate(ID = row_number())
-
-var_label(x$comp_elec) <- "Electrical Installation"
-var_label(x$comp_macon) <- "Masonry"
-var_label(x$comp_menuis) <- "Carpentry"
-var_label(x$comp_plomb) <- "Plumbing"
-var_label(x$comp_metal) <- "Metalwork"
-var_label(x$comp_all_trades) <- "Overall"
-var_label(x$exp_elec) <- "Electrical Installation"
-var_label(x$exp_macon) <- "Masonry"
-var_label(x$exp_menuis) <- "Carpentry"
-var_label(x$exp_plomb) <- "Plumbing"
-var_label(x$exp_metal) <- "Metalwork"
-var_label(x$exp_all_trades) <- "Overall"
-
-comp <- x %>% select(tidyselect::vars_select(names(x), matches("comp")), side, ID) %>% 
-  tbl_summary(by=side,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              digits = all_continuous() ~ 2,
-              missing = "no",
-              include = -ID) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Proportion of tasks elicited at endline.")
-
-exp <- x %>% select(tidyselect::vars_select(names(x), matches("exp"), -expenses), side, IDYouth) %>% 
-  tbl_summary(by=side,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2)
-  ) %>%
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Proportion of tasks reported by apprentices and firms at endline.")
-
-tbl_stack(list(comp, exp), group_header = c("Competencies", "Experience"), quiet = TRUE) %>% 
-  as_kable_extra(caption = "Competency and experience, firm rating vs. apprentice self-appraisal", 
-                 booktabs = T,
-                 linesep = "") %>% 
-  footnote(general = "Mean (SD). Proportion of tasks reported by apprentices and firms at endline.",
-           number = c("Percent of trade-specific tasks apprentice is deemed competent in (competency) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade."),
-           threeparttable = T,
-           escape = F,
-           general_title = "") %>% 
-  kableExtra::kable_styling(latex_options="scale_down")
-
-## ---- tbl-metricsbycqp --------
-
-y <- df  %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, SELECTED, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = comp_all_trades_1-comp_all_trades_0, exp_diff = exp_all_trades_1-exp_all_trades_0, skills_diff = skills_all_trades_1-skills_all_trades_0)
-
-y %>% select(SELECTED, comp_diff, exp_diff, skills_diff) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by = SELECTED, missing = "no",
-              digits = list(everything() ~ 3),
-              statistic = list(all_continuous() ~ "{mean} ({sd})"),
-              label = list(comp_diff ~ "Competence",
-                           exp_diff ~ "Experience",
-                           skills_diff~ "Knowledge")) %>% 
-  modify_footnote(update = everything() ~ NA) %>%  
-  as_kable_extra(caption = "Change in apprentice human capital scores", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H") %>% 
-  kableExtra::kable_styling(latex_options="scale_down")
-
-## ---- tbl-skillsbycqp --------
-
-comp <- df %>% select(contains("comp"), -contains("a_"), SELECTED, IDYouth) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2) %>% 
-      dplyr::relocate(add_n_stat_3, .before = stat_3)
-  ) %>%
-  add_p() %>% 
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(update = everything() ~ NA)
-
-exp <- df %>% select(contains("exp"), -contains("a_"), -expenses, SELECTED, IDYouth) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2) %>% 
-      dplyr::relocate(add_n_stat_3, .before = stat_3)
-  ) %>%
-  add_p() %>%  
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(update = everything() ~ NA)
-
-skills <- df %>% select(contains("skills"), SELECTED, IDYouth) %>%
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              include = -IDYouth) %>% 
-  add_stat(
-    fns = everything() ~ add_by_n
-  ) %>% 
-  modify_table_body(
-    ~ .x %>%
-      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
-      dplyr::relocate(add_n_stat_2, .before = stat_2) %>% 
-      dplyr::relocate(add_n_stat_3, .before = stat_3)
-  ) %>%
-  add_p() %>% 
-  modify_header(stat_by =  "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**") %>% 
-  modify_footnote(update = everything() ~ NA) %>% 
-  modify_table_body(~.x %>% 
-                      dplyr::mutate(stat_3 = "-",
-                                    add_n_stat_3 = "-"))
-
-tbl_stack(list(comp, exp, skills), quiet = TRUE) %>% 
-  as_kable_extra(caption = "Change in apprentice human capital by CQP participation status", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H") %>% 
-  kableExtra::group_rows(start_row = 1,
-                         end_row = 6,
-                         group_label = "Competencies¹") %>% 
-  kableExtra::group_rows(start_row = 7,
-                         end_row = 12,
-                         group_label = "Experience¹") %>% 
-  kableExtra::group_rows(start_row = 13,
-                         end_row = 18,
-                         group_label = "Knowledge²") %>% 
-  kableExtra::row_spec(c(6,12,18),bold=T) %>% 
-  kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD).",
-           number = c("Percent of trade-specific tasks apprentice is deemed competent in (competency) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade."),
-           threeparttable = T,
-           escape = F,
-           general_title = "")
 
 ## ---- tbl-wages --------
 

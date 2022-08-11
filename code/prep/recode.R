@@ -69,8 +69,13 @@ df <- df %>% mutate(SELECTED = as.factor(recode(SELECTED, "Oui"= 1,
 # subtract 1 from miscoded questions
 df <- df %>% mutate(across(c(FS3.1, FS4.1, YE3.35, FS3.3, FS6.8, FS6.9, contains("FS3.5")), ~(.x-1)))
 
-# remove FS6.1 for firms with over 50 apprentices, because (i) real number unknown, (ii) probably licées and not firms
+# remove FS6.1 for firms with over 50 apprentices, because (i) real number unknown, (ii) probably lycées and not firms
 df <- df %>% mutate(FS6.1 = replace(FS6.1, FS6.1>50, NA))
+
+# dummy if cqp participant at baseline
+df <- df %>% mutate(cqp = ifelse(SELECTED == 1, 1, 0),
+                    cqp2 = ifelse(SELECTED == 1, 1,
+                                  ifelse(SELECTED == 0, 0, NA)))
 
 # code number of cqp apprentices by status who were actually interviewed per firm
 interviewed <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED) %>% 
@@ -197,6 +202,214 @@ grads <- grads %>% mutate(grad = factor(grad, levels = c(1:4), labels = c("Still
 grads <- grads %>% mutate(grad_but_cqp = ifelse(YE3.3 %in% 1 & YE3.29 %in% 2, 1, 0)) %>% select(IDYouth, grad, grad_but_cqp)
 
 df <- left_join(df, grads, by = "IDYouth")
+
+# skills 
+
+# wrangle to get survey wave as a separate column, replace in df
+skills <- ys %>% 
+  select(c('YS1.3', matches(c('YS5', 'YE4')))) %>% 
+  pivot_longer(cols = -c("YS1.3")) %>% 
+  mutate(wave = ifelse(substr(name, 1, 2) == "YS", 0, 1),
+         name = paste0("YS5", substr(name,4,nchar(name)))) %>% 
+  pivot_wider(names_from = name, values_from = value) %>% rename('IDYouth' = 'YS1.3')
+
+df <- df %>% select(-matches(c('YS5', 'YE4'))) %>% left_join(., skills, by = c('IDYouth', 'wave'))
+
+# code correct answers
+df <- df %>% 
+  code_answers(YS5.1, 2) %>% 
+  code_answers(YS5.2, 1) %>% 
+  code_answers(YS5.3, 3) %>% 
+  code_answers(YS5.4, 1) %>% 
+  code_answers(YS5.5, 2) %>% 
+  code_answers(YS5.6, 2) %>% 
+  code_answers(YS5.7, 1) %>% 
+  code_answers(YS5.8, 2) %>% 
+  code_answers(YS5.9, 2) %>% 
+  code_answers(YS5.10, 3) %>% 
+  code_answers(YS5.11, 1) %>% 
+  code_answers(YS5.12, 4) %>% 
+  code_answers(YS5.13, 1) %>% 
+  code_answers(YS5.14, 4) %>% 
+  code_answers(YS5.15, 1) %>% 
+  code_answers(YS5.16, 2) %>% 
+  code_answers(YS5.18, 2) %>% 
+  code_answers(YS5.19, 2) %>% 
+  code_answers(YS5.20, 3) %>% 
+  code_answers(YS5.21, 2) %>% 
+  code_answers(YS5.22, 1) %>% 
+  code_answers(YS5.23, 1)
+
+df$skills_elec <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.19', 'correct_YS5.20', 'correct_YS5.21', 'correct_YS5.22', 'correct_YS5.23')))) %>% 
+  rowMeans(., na.rm = T)
+
+df$skills_macon <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.14', 'correct_YS5.15', 'correct_YS5.16', 'correct_YS5.18')))) %>% 
+  rowMeans(., na.rm = T)
+
+df$skills_menuis<- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.10', 'correct_YS5.11', 'correct_YS5.12', 'correct_YS5.13')))) %>% 
+  rowMeans(., na.rm = T)
+
+df$skills_plomb <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.6', 'correct_YS5.7', 'correct_YS5.8', 'correct_YS5.9')))) %>% 
+  rowMeans(., na.rm = T)
+
+df$skills_metal <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.1', 'correct_YS5.2', 'correct_YS5.3', 'correct_YS5_4', 'correct_YS5.5')))) %>% 
+  rowMeans(., na.rm = T)
+
+df$skills_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches('correct'))) %>% rowMeans(., na.rm = T)
+
+df <- df %>% mutate(skills_cqp = case_when(SELECTED == 1 ~ skills_all_trades),
+                    skills_notsel = case_when(SELECTED == 0 ~ skills_all_trades))
+
+var_label(df$skills_elec) <- "Electrical Installation"
+var_label(df$skills_macon) <- "Masonry"
+var_label(df$skills_menuis) <- "Carpentry"
+var_label(df$skills_plomb) <- "Plumbing"
+var_label(df$skills_metal) <- "Metalwork"
+var_label(df$skills_cqp) <- "CQP Selected"
+var_label(df$skills_notsel) <- "CQP Not Selected"
+var_label(df$skills_all_trades) <- "Overall"
+
+# competencies
+
+comp <- rbind(JoinCQPMatch(c('FS9.12', 'FS9.13', 'FS9.14', 'FS9.15', 'FS9.16')), JoinTradMatch(c('FS7.14', 'FS7.15', 'FS7.16', 'FS7.17', 'FS7.18')) %>% setNames(names(JoinCQPMatch(c('FS9.12', 'FS9.13', 'FS9.14', 'FS9.15', 'FS9.16'))))) %>% mutate_all(recode, `2` = 0)
+
+df <- left_join(df, comp, by = c('IDYouth', 'wave'))
+
+# pooled firm-level competency scores
+df$comp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.12_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$comp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.13_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$comp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('FS9.14_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$comp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.15_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$comp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.16_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$comp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('FS9.12_1', 'FS9.13_1', 'FS9.14_1', 'FS9.15_1', 'FS9.16_1')))) %>% rowMeans(., na.rm = T)
+
+df <- df %>% mutate(comp_cqp = case_when(SELECTED == 1 ~ comp_all_trades),
+                    comp_notsel = case_when(SELECTED == 0 ~ comp_all_trades),
+                    comp_dna = case_when(SELECTED == 3 ~ comp_all_trades))
+
+var_label(df$comp_elec) <- "Electrical Installation"
+var_label(df$comp_macon) <- "Masonry"
+var_label(df$comp_menuis) <- "Carpentry"
+var_label(df$comp_plomb) <- "Plumbing"
+var_label(df$comp_metal) <- "Metalwork"
+var_label(df$comp_cqp) <- "CQP Selected"
+var_label(df$comp_notsel) <- "CQP Not Selected"
+var_label(df$comp_dna) <- "Did Not Apply"
+var_label(df$comp_all_trades) <- "Overall"
+
+# pooled apprentice-level self-reported competency scores (endline only)
+df$a_comp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.1_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_comp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.2_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_comp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('YE5.3_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_comp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.4_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_comp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.5_1'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_comp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('YE5.1_1', 'YE5.2_1', 'YE5.3_1', 'YE5.4_1', 'YE5.5_1')))) %>% rowMeans(., na.rm = T)
+
+df <- df %>% mutate(a_comp_cqp = case_when(SELECTED == 1 ~ a_comp_all_trades),
+                    a_comp_notsel = case_when(SELECTED == 0 ~ a_comp_all_trades),
+                    a_comp_dna = case_when(SELECTED == 3 ~ a_comp_all_trades))
+
+var_label(df$a_comp_elec) <- "Electrical Installation"
+var_label(df$a_comp_macon) <- "Masonry"
+var_label(df$a_comp_menuis) <- "Carpentry"
+var_label(df$a_comp_plomb) <- "Plumbing"
+var_label(df$a_comp_metal) <- "Metalwork"
+var_label(df$a_comp_cqp) <- "CQP Selected"
+var_label(df$a_comp_notsel) <- "CQP Not Selected"
+var_label(df$a_comp_dna) <- "Did Not Apply"
+var_label(df$a_comp_all_trades) <- "Overall"
+
+# experience
+
+# pooled firm-level experience scores
+df$exp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.12_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$exp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.13_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$exp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('FS9.14_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$exp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.15_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$exp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.16_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$exp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('FS9.12_2', 'FS9.13_2', 'FS9.14_2', 'FS9.15_2', 'FS9.16_2')))) %>% rowMeans(., na.rm = T)
+
+df <- df %>% mutate(exp_cqp = case_when(SELECTED == 1 ~ exp_all_trades),
+                    exp_notsel = case_when(SELECTED == 0 ~ exp_all_trades),
+                    exp_dna = case_when(SELECTED == 3 ~ exp_all_trades))
+
+var_label(df$exp_elec) <- "Electrical Installation"
+var_label(df$exp_macon) <- "Masonry"
+var_label(df$exp_menuis) <- "Carpentry"
+var_label(df$exp_plomb) <- "Plumbing"
+var_label(df$exp_metal) <- "Metalwork"
+var_label(df$exp_cqp) <- "CQP Selected"
+var_label(df$exp_notsel) <- "CQP Not Selected"
+var_label(df$exp_dna) <- "Did Not Apply"
+var_label(df$exp_all_trades) <- "Overall"
+
+# pooled apprentice-level self-reported experience scores (endline only)
+df$a_exp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.1_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_exp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.2_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_exp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('YE5.3_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_exp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.4_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_exp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.5_2'))) %>% 
+  rowMeans(., na.rm = T)
+
+df$a_exp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('YE5.1_2', 'YE5.2_2', 'YE5.3_2', 'YE5.4_2', 'YE5.5_2')))) %>% rowMeans(., na.rm = T)
+
+df <- df %>% mutate(a_exp_cqp = case_when(SELECTED == 1 ~ a_exp_all_trades),
+                    a_exp_notsel = case_when(SELECTED == 0 ~ a_exp_all_trades),
+                    a_exp_dna = case_when(SELECTED == 3 ~ a_exp_all_trades))
+
+var_label(df$a_exp_elec) <- "Electrical Installation"
+var_label(df$a_exp_macon) <- "Masonry"
+var_label(df$a_exp_menuis) <- "Carpentry"
+var_label(df$a_exp_plomb) <- "Plumbing"
+var_label(df$a_exp_metal) <- "Metalwork"
+var_label(df$a_exp_cqp) <- "CQP Selected"
+var_label(df$a_exp_notsel) <- "CQP Not Selected"
+var_label(df$a_exp_dna) <- "Did Not Apply"
+var_label(df$a_exp_all_trades) <- "Overall"
+
+# pca
+
+pca_fit <- prcomp(~comp_all_trades+exp_all_trades, data=df, center = TRUE, scale = TRUE, na.action = na.omit)
+
+pca_fit2 <- prcomp(~comp_all_trades+exp_all_trades+skills_all_trades, data=df, center = TRUE, scale = TRUE, na.action = na.omit)
 
 # recode revenues, costs, wages, and profits 
 
@@ -363,175 +576,6 @@ df$YE3.22 <- zap_labels(df$YE3.22)
 df$a_allow <- coalesce(df$YS4.38, df$YE3.22)
 
 df <- df %>% rowwise() %>% mutate(allow_avg = mean(c(all_allowances, a_allow), na.rm = T)) %>% ungroup()
-
-# skills 
-
-# wrangle to get survey wave as a separate column, replace in df
-skills <- ys %>% 
-  select(c('YS1.3', matches(c('YS5', 'YE4')))) %>% 
-  pivot_longer(cols = -c("YS1.3")) %>% 
-  mutate(wave = ifelse(substr(name, 1, 2) == "YS", 0, 1),
-         name = paste0("YS5", substr(name,4,nchar(name)))) %>% 
-  pivot_wider(names_from = name, values_from = value) %>% rename('IDYouth' = 'YS1.3')
-
-df <- df %>% select(-matches(c('YS5', 'YE4'))) %>% left_join(., skills, by = c('IDYouth', 'wave'))
-
-# code correct answers
-df <- df %>% 
-  code_answers(YS5.1, 2) %>% 
-  code_answers(YS5.2, 1) %>% 
-  code_answers(YS5.3, 3) %>% 
-  code_answers(YS5.4, 1) %>% 
-  code_answers(YS5.5, 2) %>% 
-  code_answers(YS5.6, 2) %>% 
-  code_answers(YS5.7, 1) %>% 
-  code_answers(YS5.8, 2) %>% 
-  code_answers(YS5.9, 2) %>% 
-  code_answers(YS5.10, 3) %>% 
-  code_answers(YS5.11, 1) %>% 
-  code_answers(YS5.12, 4) %>% 
-  code_answers(YS5.13, 1) %>% 
-  code_answers(YS5.14, 4) %>% 
-  code_answers(YS5.15, 1) %>% 
-  code_answers(YS5.16, 2) %>% 
-  code_answers(YS5.18, 2) %>% 
-  code_answers(YS5.19, 2) %>% 
-  code_answers(YS5.20, 3) %>% 
-  code_answers(YS5.21, 2) %>% 
-  code_answers(YS5.22, 1) %>% 
-  code_answers(YS5.23, 1)
-
-df$skills_elec <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.19', 'correct_YS5.20', 'correct_YS5.21', 'correct_YS5.22', 'correct_YS5.23')))) %>% 
-  rowMeans(., na.rm = T)
-
-df$skills_macon <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.14', 'correct_YS5.15', 'correct_YS5.16', 'correct_YS5.18')))) %>% 
-  rowMeans(., na.rm = T)
-
-df$skills_menuis<- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.10', 'correct_YS5.11', 'correct_YS5.12', 'correct_YS5.13')))) %>% 
-  rowMeans(., na.rm = T)
-
-df$skills_plomb <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.6', 'correct_YS5.7', 'correct_YS5.8', 'correct_YS5.9')))) %>% 
-  rowMeans(., na.rm = T)
-
-df$skills_metal <- df %>% select(tidyselect::vars_select(names(df), matches(c('correct_YS5.1', 'correct_YS5.2', 'correct_YS5.3', 'correct_YS5_4', 'correct_YS5.5')))) %>% 
-  rowMeans(., na.rm = T)
-
-df$skills_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches('correct'))) %>% rowMeans(., na.rm = T)
-
-var_label(df$skills_elec) <- "Electrical Installation"
-var_label(df$skills_macon) <- "Masonry"
-var_label(df$skills_menuis) <- "Carpentry"
-var_label(df$skills_plomb) <- "Plumbing"
-var_label(df$skills_metal) <- "Metalwork"
-var_label(df$skills_all_trades) <- "Overall"
-
-# competencies
-
-comp <- rbind(JoinCQPMatch(c('FS9.12', 'FS9.13', 'FS9.14', 'FS9.15', 'FS9.16')), JoinTradMatch(c('FS7.14', 'FS7.15', 'FS7.16', 'FS7.17', 'FS7.18')) %>% setNames(names(JoinCQPMatch(c('FS9.12', 'FS9.13', 'FS9.14', 'FS9.15', 'FS9.16'))))) %>% mutate_all(recode, `2` = 0)
-
-df <- left_join(df, comp, by = c('IDYouth', 'wave'))
-
-# pooled firm-level competency scores
-df$comp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.12_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$comp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.13_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$comp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('FS9.14_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$comp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.15_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$comp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.16_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$comp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('FS9.12_1', 'FS9.13_1', 'FS9.14_1', 'FS9.15_1', 'FS9.16_1')))) %>% rowMeans(., na.rm = T)
-
-var_label(df$comp_elec) <- "Electrical Installation"
-var_label(df$comp_macon) <- "Masonry"
-var_label(df$comp_menuis) <- "Carpentry"
-var_label(df$comp_plomb) <- "Plumbing"
-var_label(df$comp_metal) <- "Metalwork"
-var_label(df$comp_all_trades) <- "Overall"
-
-# pooled apprentice-level self-reported competency scores (endline only)
-df$a_comp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.1_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_comp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.2_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_comp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('YE5.3_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_comp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.4_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_comp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.5_1'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_comp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('YE5.1_1', 'YE5.2_1', 'YE5.3_1', 'YE5.4_1', 'YE5.5_1')))) %>% rowMeans(., na.rm = T)
-
-var_label(df$a_comp_elec) <- "Electrical Installation"
-var_label(df$a_comp_macon) <- "Masonry"
-var_label(df$a_comp_menuis) <- "Carpentry"
-var_label(df$a_comp_plomb) <- "Plumbing"
-var_label(df$a_comp_metal) <- "Metalwork"
-var_label(df$a_comp_all_trades) <- "Overall"
-
-# experience
-
-# pooled firm-level experience scores
-df$exp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.12_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$exp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.13_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$exp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('FS9.14_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$exp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.15_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$exp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('FS9.16_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$exp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('FS9.12_2', 'FS9.13_2', 'FS9.14_2', 'FS9.15_2', 'FS9.16_2')))) %>% rowMeans(., na.rm = T)
-
-var_label(df$exp_elec) <- "Electrical Installation"
-var_label(df$exp_macon) <- "Masonry"
-var_label(df$exp_menuis) <- "Carpentry"
-var_label(df$exp_plomb) <- "Plumbing"
-var_label(df$exp_metal) <- "Metalwork"
-var_label(df$exp_all_trades) <- "Overall"
-
-# pooled apprentice-level self-reported experience scores (endline only)
-df$a_exp_elec <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.1_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_exp_macon <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.2_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_exp_menuis<- df %>% select(tidyselect::vars_select(names(df), matches('YE5.3_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_exp_plomb <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.4_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_exp_metal <- df %>% select(tidyselect::vars_select(names(df), matches('YE5.5_2'))) %>% 
-  rowMeans(., na.rm = T)
-
-df$a_exp_all_trades <- df %>% select(tidyselect::vars_select(names(df), matches(c('YE5.1_2', 'YE5.2_2', 'YE5.3_2', 'YE5.4_2', 'YE5.5_2')))) %>% rowMeans(., na.rm = T)
-
-var_label(df$a_exp_elec) <- "Electrical Installation"
-var_label(df$a_exp_macon) <- "Masonry"
-var_label(df$a_exp_menuis) <- "Carpentry"
-var_label(df$a_exp_plomb) <- "Plumbing"
-var_label(df$a_exp_metal) <- "Metalwork"
-var_label(df$a_exp_all_trades) <- "Overall"
 
 # master ratings of apprentices
 

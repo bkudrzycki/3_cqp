@@ -239,3 +239,42 @@ stargazer(m1, m2, m3, m4, m5,
 # firm level -> revenues, profits, etc...
 # firm fixed effects -> number of cqps on revenues etc. -> control for firm fixed effects
 # absolute number of CQPs, control 
+
+## ---- tbl-knowreg --------
+# interaction term
+df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
+
+x <- df %>% filter(SELECTED != 3)
+
+m1 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave), data = df)
+m2 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did, data = df)
+m3 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + as.factor(IDYouth), data = df)
+m4 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + as.factor(IDYouth), data = x)
+
+m5 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration, data = df)
+m6 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1, data = df)
+m7 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1 + FS6.8 + FS6.9 + FS6.10 + ext_training, data = df)
+m8 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + FS6.1 + FS6.8 + FS6.9 + FS6.10 + ext_training, data = x)
+
+stargazer(m1, m2, m3, m4, m5, m6, m7, m8, df = FALSE, omit = "IDYouth", column.sep.width = "0pt",
+          no.space = TRUE, digits = 2, header = F, table.placement = "H",
+          notes = c("Omitted CQP category: applied but did not participate."),
+          notes.align = "r",
+          notes.append = TRUE,
+          covariate.labels = c("CQP participant",
+                               "Endline",
+                               "CQP x Endline",
+                               "Experience",
+                               "Firm size",
+                               "Total apprentices",
+                               "Total instructors",
+                               "Days trained per week",
+                               "Duration, last training",
+                               "External training"),
+          title = "Knowledge regressions",
+          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
+          dep.var.labels = "Knowledge",
+          model.names = FALSE,
+          dep.var.caption = "",
+          label = "tab:knowreg",
+          add.lines = list(c("Individual FE", "NO", "NO", "YES", "YES", "NO", "NO", "NO", "NO")))
