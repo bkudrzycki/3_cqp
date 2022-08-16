@@ -23,7 +23,9 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-packages <- c("lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "kableExtra", "stargazer", "tidyverse")
+packages <- c("tinytex", "lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "kableExtra", "stargazer", "tidyverse")
+
+options(repos = c(CRAN = "http://cran.rstudio.com"))
 
 # install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
