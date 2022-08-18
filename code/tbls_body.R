@@ -22,7 +22,8 @@ apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, grad, sc
                            grad ~ "Status at endline")) %>% 
   modify_header(all_stat_cols() ~ "**{level}**") %>% 
   modify_table_body(~.x %>% 
-                      dplyr::mutate(stat_1 = ifelse(stat_1 == "NA%", "-", stat_1)))
+                      dplyr::mutate(stat_1 = ifelse(stat_1 == "NA%", "-", stat_1))) %>% 
+  modify_footnote(update = everything() ~ NA)
 
 workshops <- df %>% mutate(N_firms = 1) %>% mutate(apps = FS6.1,
                                                    FS1.11 = as.numeric(FS1.11)) %>% 
@@ -40,7 +41,7 @@ workshops <- df %>% mutate(N_firms = 1) %>% mutate(apps = FS6.1,
               digits = list(firm_size ~ c(1, 1),
                             starts_with("FS3.5") ~ c(2, 1)),
               label = list(FS3.4 ~ "Total (reported)",
-                           firm_size ~ "Total (calculated)",
+                           firm_size ~ "Total (calculated)¹",
                            selected ~ "Selected",
                            not_selected ~ "Not Selected",
                            did_not_apply ~ "Did Not Apply",
@@ -53,7 +54,8 @@ workshops <- df %>% mutate(N_firms = 1) %>% mutate(apps = FS6.1,
                            FS1.11 ~ "Trade",
                            N_firms ~ "N"),
               include = -c(FS1.2, FS3.5_1)) %>% 
-  modify_header(all_stat_cols() ~ "**{level}**", label = "")
+  modify_header(all_stat_cols() ~ "**{level}**", label = "") %>% 
+  modify_footnote(update = everything() ~ NA)
 
 x <- tbl_stack(list(apps, workshops), quiet = T) 
 
@@ -76,7 +78,8 @@ y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED
                            duration ~ "Years in training",
                            schooling ~ "Education",
                            grad ~ "Status at endline")) %>% 
-  modify_header(all_stat_cols() ~ "**{level}**")
+  modify_header(all_stat_cols() ~ "**{level}**") %>% 
+  modify_footnote(update = everything() ~ NA)
 
 tbl_merge(list(x, y), tab_spanner = c("Overall", "By baseline status")) %>% 
   as_kable_extra(caption = "Descriptive Statistics",
@@ -102,7 +105,13 @@ tbl_merge(list(x, y), tab_spanner = c("Overall", "By baseline status")) %>%
                          escape = F,
                          indent = T,
                          bold = F) %>% 
-kableExtra::kable_styling(latex_options="scale_down")
+  footnote(general = "N; Mean (SD); %",
+           number = "Calculated by author by summing number of partners, permanent employees, paid and unpaid family workers, occasional workers, and apprentices reported to be working for MC (total firm size reported separately).",
+           threeparttable = T,
+           escape = F,
+           fixed_small_size = T,
+           general_title = "") %>% 
+  kableExtra::kable_styling(latex_options="scale_down")
 
 ## ---- tbl-skills --------
 
@@ -126,7 +135,7 @@ comp <- df %>% select(contains("comp"), -comp_all_trades, comp_all_trades, -cont
   modify_column_hide(ci) %>%
   modify_header(stat_by =  "**{level}**",
                 starts_with("add_n_stat") ~ "**N**",
-                label = "**Trade**",
+                label = "",
                 p.value = "**p-value³**") %>% 
   modify_footnote(update = everything() ~ NA)
 
@@ -230,12 +239,11 @@ m12 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + base
 
 stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.2", font.size= "scriptsize", column.sep.width = "-8pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("Omitted category: CQP Selected.",
-                    "$^1$Years of training prior to baseline survey.",
+          notes = c("$^1$Years of training prior to baseline survey",
                     "$^2$Excluding apprentices."),
           notes.align = "r",
           notes.append = TRUE,
-          covariate.labels = c("CQP Not Selected",
+          covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
                                "CQP Did Not Apply",
                                "Endline",
                                "CQP Selected x Endline",
@@ -293,7 +301,7 @@ tbl_summary(x, by = SELECTED,
             digits = everything() ~ 2) %>% 
   add_overall() %>% 
   add_p(test = list(c("total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "all_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "net_benefits") ~ "aov",
-                    c("a_total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_allow", "a_net_benefits") ~ "wilcox.test")) %>% 
+                    c("a_total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_allow", "a_net_benefits") ~ "t.test")) %>% 
   modify_footnote(update = everything() ~ NA) %>% 
   modify_header(update = list(all_stat_cols(FALSE) ~ "**{level}**",
                               stat_0 ~ "**Overall**",
@@ -316,7 +324,7 @@ tbl_summary(x, by = SELECTED,
   kableExtra::row_spec(c(9,22), bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
   footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey. Annual fees assume apprenticeship duration of four years.",
-           number = c("Apprentices were only asked about total allowances received.", "Rows missing all allowance or all fee data were excluded from net benefit calculation. Mean net benefit may deviate from difference in mean allowances and mean fees as a result.", "Wilcoxon rank sum test for apprentice survey, analysis of variance for firm data"),
+           number = c("Apprentices were only asked about total allowances received.", "Rows missing all allowance or all fee data were excluded from net benefit calculation. Mean net benefit may deviate from difference in mean allowances and mean fees as a result.", "Student's t-test for apprentice survey data, analysis of variance for firm survey data"),
            threeparttable = T,
            escape = F,
            fixed_small_size = T,
@@ -329,8 +337,6 @@ x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate_at(c("fee_entry", "fee_fo
   select("FS1.2", "SELECTED", "annual_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_app_prod", "total_benefits", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_training_costs", contains("FE5.1"), "annual_foregone_prod", "total_costs", contains("cb")) %>%
   mutate_at(c("annual_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_app_prod", "total_benefits", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_training_costs", "FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4", "annual_foregone_prod", "total_costs", "cb_I", "cb_II", "cb_III", "cb_IV", "cb_V"), ~./605) %>% ungroup() %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
-
-#x <- x %>% replace(is.na(.), 0)
 
 var_label(x$annual_fees) <- "Fees¹"
 var_label(x$fee_entry) <- "Entry"
@@ -365,11 +371,13 @@ tbl_summary(x, by = SELECTED,
             include = -c(FS1.2, SELECTED),
             missing = "no",
             digits = everything() ~ 2) %>% 
+  add_p(test = everything() ~ "aov") %>% 
   add_overall() %>% 
-  add_p() %>% 
+  add_n() %>% 
   modify_footnote(update = everything() ~ NA) %>% 
   modify_header(update = list(all_stat_cols(FALSE) ~ "**{level}**",
-                              stat_0 ~ "**Overall**")) %>% 
+                              stat_0 ~ "**Overall**",
+                              p.value = "**p-value²**")) %>% 
   as_kable_extra(caption = "Annual costs and benefits per apprentice accruing to firm",
                  booktabs = T,
                  linesep = "",
@@ -389,7 +397,7 @@ tbl_summary(x, by = SELECTED,
   kableExtra::row_spec(c(9,21),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
   footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
-           number = "Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume 20-day apprentice workweek.",
+           number = c("Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.", "Analysis of variance"),
            threeparttable = T,
            escape = F,
            fixed_small_size = T,
@@ -434,7 +442,7 @@ x %>% select(firm_size_bins, annual_revenues, annual_wage_bill, annual_non_wage_
                            annual_non_wage_exp ~ "Non-wage expenses",
                            annual_expenses ~ "Total expenses",
                            annual_rep_profits ~ "Profits (reported)",
-                           annual_profits ~ "Profits (calculated²)",
+                           annual_profits ~ "Profits² (calculated²)",
                            annual_fees_extrap ~ "Fees",
                            apprentice_prod_extrap ~ "Apprentice prod.",
                            total_benefits_extrap ~ "Total",
@@ -459,19 +467,58 @@ x %>% select(firm_size_bins, annual_revenues, annual_wage_bill, annual_non_wage_
                          end_row = 6,
                          group_label = "Firm Accounts") %>% 
   kableExtra::group_rows(start_row = 7,
-                         end_row = 10,
+                         end_row = 9,
                          group_label = "Projected benefits") %>% 
-  kableExtra::group_rows(start_row = 11,
+  kableExtra::group_rows(start_row = 10,
                          end_row = 13,
                          group_label = "Projected costs") %>% 
   kableExtra::group_rows(start_row = 14,
                          end_row = 18,
                          group_label = "Net benefits") %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Density on y-axis. Amounts in \\\\$US.",
+  footnote(general = "Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
            number = c("Firms size calculated by author as sum of all reported workers in firm, including apprentices and occasional and family workers.",
                       "Profits recalculated by author as difference between reported revenues (first row) and reported expenses (second row)."),
            threeparttable = T,
            escape = F,
            fixed_small_size = T,
            general_title = "")
+
+## ---- tbl-firmregs --------
+
+x <- df %>% select(FS1.2, FS4.7, wave, firm_size_sans_app, selected, not_selected, did_not_apply, profits) %>% rowwise() %>% 
+  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
+         revenues = FS4.7/605*12,
+         profits = profits/605*12,
+         apps_sans_cqp = sum(not_selected, did_not_apply, na.rm = T),
+         total_apps = sum(selected, not_selected, did_not_apply, na.rm = T)) %>%
+  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>%
+  mutate(revenues = ifelse(revenues > 0, log(revenues), NA),
+         profits = ifelse(profits > 0, log(profits), NA),
+         firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA))
+
+
+m1 <- lm(revenues ~ apps_sans_cqp + selected + as.factor(wave) + firm_size_sans_app, data = x)
+m2 <- lm(revenues ~ total_apps + firm_size_sans_app + as.factor(wave), data = x)
+m3 <- lm(profits ~ apps_sans_cqp + selected + as.factor(wave) + firm_size_sans_app, data = x)
+m4 <- lm(profits ~ total_apps + as.factor(wave) + firm_size_sans_app , data = x)
+m5 <- lm(firm_size_sans_app ~ apps_sans_cqp + selected + as.factor(wave), data = x)
+m6 <- lm(firm_size_sans_app ~ total_apps + as.factor(wave), data = x)
+
+stargazer(m1, m2, m3, m4, m5, m6, df = FALSE, omit = "FS1.2",
+          no.space = TRUE, digits = 2, header = F, table.placement = "H",
+          notes = c("$^1$Excluding apprentices."),
+          notes.align = "r",
+          notes.append = TRUE,
+          covariate.labels = c("Non-CQP apprentices",
+                               "CQP selected",
+                               "Total apprentices",
+                               "Endline",
+                               "log Firm size$^1$"),
+          title = "Firm-level regressions",
+          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
+          model.names = FALSE,
+          dep.var.caption = "",
+          dep.var.labels = c("log revenues (USD)", "log profits (USD)", "log Firm size$^1$"),
+          add.lines = list(c("Firm FE", "NO", "NO", "NO", "NO", "NO", "NO")),
+          label = "tab:firmregs")

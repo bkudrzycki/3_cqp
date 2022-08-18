@@ -88,7 +88,7 @@ While abundant and flexible, training in the informal economy is subject to litt
 
 Another proposed reform is the introduction of a classroom component to traditional apprenticeship, producing a hybrid "dual system" comparable to the Swiss and German variety [@walther2011]. Dual systems promise to increase training quality by introducing a state-regulated classroom component, while also improving the signalling ability of apprentices upon graduation by offering official certification. In SSA, dual apprenticeship schemes were first introduced in Bénin and Togo in the 1980s by the Hans Seidel Foundation, a German NGO, and apprenticeship reforms based on the dual system have since been introduced in Mali, Ivory Coast, Senegal, Tanzania, Togo, and Niger [@walther2011, @ilo2020a]. Many of these schemes have struggled with funding issues and integration into the existing national TVET and regulatory frameworks. With their potential to simultaneously harness the abundance of training firms in the informal sector and the growing demand among parents and youth for formal education, dual system apprenticeship certification schemes seem to remain an underutilized approach in the field of TVET reform.
 
-In this paper, we employ apprentice-firm survey data collected in Bénin in two waves (2019 and 2021) for 427 apprentices training in 197 firms to analyze the impact of a national dual system training program on participating apprentices and firms. The program offered youth in select trades the opportunity to attend classroom training at a local training center once a week while continuing with their traditional in-firm apprenticeship training with an MC. Youth and firms were interviewed before the onset of training and after three years (somewhat shorter than the typical duration of an apprenticeship). We use a sector-specific skills test to compare the learning outcomes of dual system apprentices to unsuccessful program applicants and non-applicants (with both comparison groups pursuing traditional apprenticeships at the same firms as dual-system participants). We also estimate the marginal effect of apprentice participation in dual system training on firm size and profits.
+In this paper, we employ apprentice-firm survey data collected in Bénin in two waves (baseline in 2019 and endline in 2021) for 427 apprentices training in 197 firms to analyze the impact of a national dual system training program on participating apprentices and firms. The program offered youth in select trades the opportunity to attend classroom training at a local training center once a week while continuing with their traditional in-firm apprenticeship training with an MC. Youth and firms were interviewed before the onset of training and after three years (somewhat shorter than the typical duration of an apprenticeship). We use a sector-specific skills test to compare the learning outcomes of dual system apprentices to unsuccessful program applicants and non-applicants (with both comparison groups pursuing traditional apprenticeships at the same firms as dual-system participants). We also estimate the marginal effect of apprentice participation in dual system training on firm size and profits.
 
 Vocational training interventions combining on-the-job and classroom teaching in LICs have suffered from low take-up, high dropout, and low efficacy (see @blattman2015; @tripney2013; @ghisletta2021 for an overview). Unlike the dual system program studied in this paper, however, these programs are generally short in duration (under a year in total) and exist outside the national education framework. To our knowledge, @crepon2019 is the only study of a dual system apprenticeship program in SSA. The authors study a program in Côte d'Ivoire that offered a stipend to youth to participate in a 12-24 month long dual apprenticeship --- also eliminating all training fees. They find that, about two years after graduation, dual apprentices partake in more complex, non-routine tasks than traditional apprentices and have 15% higher earnings. We study a similarly structured program, but one that is about twice as long and does not involve any direct subsidies or eliminate any fees.
 
@@ -172,7 +172,11 @@ The baseline wave for the two surveys was collected in July-August 2019. The app
 ```{r, tbl-desc, echo=FALSE}
 ```
 
+### Apprentices {.unnumbered}
+
 Summary statistics from the baseline survey show the sample to be predominantly male youth who, though of average age for an apprenticeship at `r mean(baseline$age, na.rm = T)` years [@ilo2022], are significantly more educated than is typical for traditional apprentices, with over half having completed at least some secondary schooling. Apprentices selected for participation in the CQP are more educated than those not selected. Though all applicants applied to the same cohort of the CQP program, they came in having more experience than the required six months: the average apprentice had `r mean((df %>% filter(SELECTED == 3))$baseline_duration, na.rm = T)` years of experience at the time of application. Non-applicants have the lowest educational attainment and are the least experienced at baseline, suggesting that master craftsmen send most able apprentices to stand for the entrance exam. Finally, it is notable that CQP applicants have over three years of apprenticeship experience on average, though the CQP entrance requirement only stipulates six months. This again suggests a selection mechanism for more experienced/able applicants that may indicate that the CQP is considered more of a continuing education program among craftsmen than an entry-level apprenticeship program.
+
+### Firms {.unnumbered}
 
 The majority of training firms are small workshops comprising the firm owner --- the master trainer --- and several apprentices. Two firm sizes are shown in Table \@ref(tab:tbl-desc): those stated directly by the firm owner in response to the question, "How many people (including you and your apprentices) are currently working in your business?" and those calculated by the author by summing the number of apprentices, partners, paid and unpaid family workers, and occasional workers engaged by the firm owner. Using self-reported size, `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins_reported))[1:3])*100`% of firms employed no more than ten. Using the calculated firm size, `r sum(prop.table(table(baseline$firm_size_bins))[1:2])*100`% of firms employed a total of five or less (including the owner) at baseline and `r sum(prop.table(table(baseline$firm_size_bins))[1:3])*100`% of firms employed no more than ten. Thus, training firms in the sample are small, in line with observations from the informal sector in Ghana [@frazer2006, @velenchikApprenticeshipContractsSmall1995]. Moreover, the workforce of the average firm in the sample is dominated by apprentices: at baseline, the average firm employs about four apprentices for every other type of employee (`r mean((firms %>% filter(wave == 0, firm_size > 1))$FS6.1/((firms %>% filter(wave == 0, firm_size > 1))$firm_size-1), na.rm = T)*100`% of calculated firm size at baseline and `r mean((firms %>% filter(wave == 1, firm_size > 1))$FS6.1/((firms %>% filter(wave == 1, firm_size > 1))$firm_size-1), na.rm = T)*100`% at endline).
 
@@ -180,15 +184,22 @@ The endline survey was conducted in August-September 2021. It is quite common fo
 
 Similarly, of `r (df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[1,2]` firms interviewed at baseline, only `r (df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[2,2]` could be contacted at endline, for an overall firm attrition rate of `r round((1-(df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[2,2]/(df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[1,2])*100, 1)`%. Table \@ref(tab:tbl-attritionfirms) in the Appendix likewise suggests that firm attrition was not correlated with key firm characteristics such as trade or the number of CQP applicants (selected or non-selected).
 
+### Training {.unnumbered}
+
 Though dual training is predicated on classroom teaching about once a week, we found that external training (classes or training that took place outside of their master's workshop) was not limited to CQP participants. At endline, `r mean(as.numeric(endline$YS4.43), na.rm = T)*100`% of apprentices reported participating in such training in the preceding three months. However, only `r mean(as.numeric((endline %>% filter(SELECTED == 1))$YS4.43), na.rm = T)*100`% of CQP participants reported doing so, despite external training being a constituent and necessary component of the CQP program's dual training structure.
 
 The majority  (`r sum(df$YS4.48[!is.na(df$YS4.48)]<4)/length(df$YS4.48[!is.na(df$YS4.48)])*100`%) of apprentices reported that the training center they attended was within one hour of traveling distance. Among apprentices who attended classes or training outside their master's workshop, nearly three quarters <!--`r 64/(64+23)*100`%--> reported that the training took place in a training center (the rest said it took place in another workshop).
 
-Apprentices also explained their motivation for starting an apprenticeship. The most frequently cited motive was interest in the trade, followed by the promise of good earning opportunities and the insistence of the parents. They were also asked why they had chosen the craftsmen they were training with; the majority replied that they were attracted by the patron's reputation, or that their parents had made the choice in their stead. As found in previous studies of informal apprenticeship in SSA, most apprentices express a wish to start their own business after graduation (`r sum(df$YS4.53[!is.na(df$YS4.53)]==2)/length(df$YS4.53[!is.na(df$YS4.53)])*100`%) followed by seeking employment with a different workshop (`r sum(df$YS4.53[!is.na(df$YS4.53)]==1)/length(df$YS4.53[!is.na(df$YS4.53)])*100`%). 
-
 By combining time trained at the time of the survey with the expected graduation date, we find that apprentices expect their training to last `r mean(df$projected_duration, na.rm = T)` years, with a standard deviation of `r sd(df$projected_duration, na.rm = T)` years, in line with our assumption of four-year apprenticeships. Metalworking apprenticeships reportedly last almost a year longer than the other trades in the sample.
 
-Apprentices report working `r round(mean(df$a_weekly_hours, na.rm = T),2)` hours in the previous week, compared to `r round(df %>% group_by(FS1.2) %>% summarise(x = mean(firm_weekly_hours)) %>% select(x) %>% colMeans(na.rm = T),2)` hours reported by the patron.
+### Motivation {.unnumbered}
+
+Apprentices also explained their motivation for starting an apprenticeship. The most frequently cited motive was interest in the trade, followed by the promise of good earning opportunities and the insistence of the parents. They were also asked why they had chosen the craftsmen they were training with; the majority replied that they were attracted by the patron's reputation, or that their parents had made the choice in their stead. As found in previous studies of informal apprenticeship in SSA, most apprentices express a wish to start their own business after graduation (`r sum(df$YS4.53[!is.na(df$YS4.53)]==2)/length(df$YS4.53[!is.na(df$YS4.53)])*100`%) followed by seeking employment with a different workshop (`r sum(df$YS4.53[!is.na(df$YS4.53)]==1)/length(df$YS4.53[!is.na(df$YS4.53)])*100`%). 
+
+### Contract Type {.unnumbered}
+
+
+<!-- Apprentices report working `r round(mean(df$a_weekly_hours, na.rm = T),2)` hours in the previous week, compared to `r round(df %>% group_by(FS1.2) %>% summarise(x = mean(firm_weekly_hours)) %>% select(x) %>% colMeans(na.rm = T),2)` hours reported by the patron. -->
 
 ## Estimating Apprentice Benefits {#appmethod}
 
@@ -225,6 +236,10 @@ The simplest model of net benefits reduces the value of training accruing to the
 \noindent for each apprentice $i$ in firm $j$, where $N_j$ is the total number of apprentices in firm $j$.-->
 
 In a second approach, we keep all components of Model I and add two additional factors. 
+
+Dual "apprenticeship is a form of skill acquisition in the context of production, or on-the-job training. The apprentice, in addition to learning a trade, provides labor services to the firm. The relationship between the apprentice and the firm, therefore, includes two types of transactions, one being the provision of labor services by the apprentice to the firm, the other being the provision of training services by the firm to the apprentice. The two facets of the apprentice-firm relationship give rise to two components of the financial relationship between apprentices and firms. In reality, however, the monetary arrangements surrounding apprenticeship training in Ghanaian manufacturing are more complex. In addition to wage payments, many apprentices receive allowances for food, housing, clothing, or transportation. These payments are made both in cash and in kind but are identified by firms as distinct from wage payments. In larger firms, these allowances are paid to all workers and have been used as a way to generate nontaxable compensation.1 In smaller firms, allowances are often paid to apprentices even when wages are not. Historically, apprentices often lived with their masters during training. Although this practice has largely died out, provision of basic living expenses by the master continues to be a common feature of these contracts." [valenchik1995]
+
+Valenchik observes in Ghana that there are two types of contracts that are more prevalent than others: contracts without fees but with wage-allowance payments and contracts with both fees and wage-allowance payments.
 
 First, we estimate an additional benefit of training to the firm: **apprentices' net productive value** for the firm. In the competitive model of labor markets (with heterogeneous wages), workers are paid the marginal product of their labor. We assume this model and use detailed wage information elicited from each firm to estimate the total productive output of apprentices. Namely, we assume apprentice productivity is equal to that of an untrained employee with no more than a primary education for the first two years of training, and increases to that of trained employee (who had trained at the training firm) for the final two years. Under these assumptions, the annual productive value generated by apprentice work amounts to the average of these two wages\footnote{A popular alternative to this approach involves eliciting specific tasks performed by apprentices and estimating costs savings based on the wages paid to workers who would otherwise be responsible for said tasks [@hauschildt2018]. Our firm-apprentice data did not cover specific tasks and is thus not equipped to carry out such an analysis.}.
 
@@ -291,6 +306,61 @@ According to survey data, about a quarter of respondents say training does not t
 
 ```{r, tbl-netbenefits, echo=FALSE}
 ```
+
+Next we study the net benefits accruing to firms from apprenticeship training, and whether the presence of dual-system apprentices in the firm impacts productivity relative to firms with fewer or no CQP participants. To measure benefits in the accounting sense, we refer to two categories of benefits --- fees and apprentice productivity --- and three categories of costs --- allowances, training costs, and lost trainer productivity --- as measured at baseline and described in detail in Section \@ref(firmmethod). Because productivity and training costs are particularly sensitive to assumptions and prone to non-response issues, these categories are combined in different permutations to give the five "models" referenced in Table \@ref(tab:tbl-cbmodels).
+
+We first analyze net benefits per apprentice. Table \ref@(tab:tbl-netbenefits) estimates the annual costs and benefits per apprentice for each category and subcategory for all sample apprentices in the first column; for successful and unsuccessful applicants to the CQP in the second and third columns, respectively; and for non-applicants in the fourth column. 
+
+Overall, benefits outweight costs.
+
+Assuming a four-year duration of training, annual apprenticeship fees pale in comparison to firm productivity as a benefit arising from training (however, the method for calculating productivity is based on spotty data and lots of assumptions.)
+
+Allowances also outstrip the costs of training and foregone trainer productivity by nearly an order of magnitude.
+
+The estimated net benefit thus hinges on the inclusion of apprenticeship productivity (no in Models I and II; yes in Models III-V).
+
+We observe significant differences between apprentice types for overall fees (driven by higher training fees for dna) and contract fees (higher fees for CQP applicants), but not total benefits. A t-test for differences between the CQP participants and CQP applicants shows that formation fees are significantly higher (but only \$9 difference annually) for unsuccessful CQP applicants; otherwise benefits are not measureably different (though nearly \$400 higher for CQP non-selected, driven by productivity.) We likewise observe signficant differences in the allowances paid to CQP participants and applicants, suggesting older and more experienced apprentices receive higher ersatz-wages. (There is no difference between CQP apprentices and unsuccessful CQP applicants). CQP apprentices train, on average, in firms which pay less for equipment (whether only unsuccessful CQP applicants are all other apprentices are the control group), suggesting that the dual system may be preferred by firms with less access to machinery and capital.
+
+Net costs (negative net benefits) are significantly higher for CQP applicants than non-applicants when productivity is not accounted for. Net benefits are the lowest for dual apprentices and highest for non-applicants regardless of which model is used. When unsuccessful CQP applicants are used as the control group, net benefits differ only for Model V. The difference, however, amounts to nearly \$800 higher net benefits to CQP Not Selected (driven, again )
+
+The ITT results found in Table 10 estimate the effect of the training on hours worked in
+paid labor (which includes any paid employment, including paid labor in agriculture); in selfemployment
+(which includes both work on family-owned land and in self-owned or familyowned
+business); and in skill development (such as school, job or trade training) during and
+after training. Treatment assignment and training participation leads to very large increases
+in time spent on human capital development (i.e. training) during the training period. Being
+assigned to the treatment group leads to 262-351 extra hours of training. Since training in
+most professions lasted over three months (the average training duration was 13-14 weeks),
+this is a reasonable estimate, and suggests that the training kept all trainees quite busy over the
+entire training period (between 14 and 27 hours per week, on average). This is particularly
+true for males, partly due to more regular attendance (see Table 3).
+Investing all this time in training displaced many hours of work in both paid labor and in
+self-employment, but not in a one-to-one fashion. Using the results without baseline controls,
+the hours spent in paid labor and self-employment declined by 26 and 40 hours for females and
+32 and 96 hours for males, respectively. This suggests that a sizable number of the hours in
+training come from displaced paid labor and self-employment hours: 21% for females and 37%
+for males. Notably, this effect is statistically different for men and women. Thus, the
+opportunity cost of attending the training in terms of both time and forgone earnings is
+substantial and affect men and women in slightly different ways.
+Turning our attention to the effects of treatment assignment on time use after the training
+is completed, we find that the most salient consequence of the training program is continued
+investment in human capital for men. Males increase total hours spent on skill development
+(through school or other job training) by 22 hours (29 hours including baseline controls), or 11-
+14.5 hours per month after the training is over. While we do not have the data to test the longrun
+labor market effects of continued investment in human capital, it is possible that increased
+investment in skill development may have significant and lasting implications for labor market
+opportunities in the long run (Attanasio et al. 2015). On the other hand, we observe no such
+effect for women suggesting that men and women react differently to training programs in
+terms of continued human capital investment, even when controlling for occupation. In Table
+3, we shows that trainees in male dominated occupations generally have a better experience
+with the MC (they are more likely to receive food and stipend support, and to find paid work
+from MC), which makes it possible that men have added opportunities to continue skill
+development with their MCs after the actual training period concludes.
+We show in Table 11 that this extra time spent on training comes at a financial cost to the
+trainees, with different consequences by gender. There is no discernible impact of training on
+an economic index we construct (a composite of last week’s total earnings and total monthly
+expenditure) for either gender. However, participation in the training forces women to draw
+
 
 In contrast to the dual training program studies by @crepon2019, the CQP program did not eliminate fees or directly subsidize apprentices. Training fees for both CQP participants and other, traditional apprentices are summarized in Table \@ref(tab:tbl-netbenefits). General training fees represent the largest single fee paid to the firms and account for over half of total fees paid. Other minor fees cover the provision of equipment and materials, application fees (pertinent for the CQP, as the master trainer must submit paperwork in their apprentices' stead), and initiation and graduation fees. In total, apprentices report paying about 175,000 FCFA (280 \$US) in fees for training, while firm owner report around 160,000 FCFA (255 \$US) in fees per apprentice. This indicates a minor increase in the costs of training in Bénin over the past two decades: @walther2007 reports total fees ranging from 50,000 to 150,000 FCFA (96-290 \$US, inflation adjusted). Though generally unregulated, in some cases professional associations and public authorities step in to regulate fees, particularly those levied for initiation and graduation ceremonies.
 
@@ -387,46 +457,10 @@ This implies that for firms that benefits from apprenticeship, apprenticeship fe
 In addition to direct financial benefits associated with training, which are reflected by a positive balance in the net benefit calculations presented above, apprenticeship training may affect firm productivity through a variety of additional channels. For the CQP program in particular, participating apprentices may acquire skills at a faster pace than their traditional counterparts as a direct result of their theoretical training. Moreover, theoretical training may "spill over" to the master trainer and other employees in the workshop, for instance by introducing new technologies or improving knowledge about the operation of existing workshop machinery. Additional apprentices in general may improve firm productivity by encouraging the owner to hire more employees (e.g. as trainers) or through investments in additional machinery. Indeed, evidence from previous studies indicates that small firms in Uganda and Ghana, when randomly assigned apprentices to train, increased profits by up to 15\% per apprentice [@hardy2022; @alfonsi2020]. 
 
 
-``` {r firmregs, results = 'asis'}
-x <- df %>% select(FS1.2, FS4.7, wave, firm_size_sans_app, selected, not_selected, did_not_apply, profits) %>%
-  mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
-         revenues = FS4.7/605*12,
-         profits = profits / 605 * 12,
-         apps_sans_cqp = not_selected + did_not_apply,
-         total_apps = selected + not_selected + did_not_apply) %>% 
-  group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% 
-  mutate(revenues = ifelse(revenues > 0, log(revenues), NA),
-         profits = ifelse(profits > 0, log(profits), NA),
-         firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA))
-
-
-m1 <- lm(revenues ~ apps_sans_cqp + selected + as.factor(wave) + firm_size_sans_app, data = x)
-m2 <- plm(revenues ~ total_apps + firm_size_sans_app + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
-m3 <- lm(profits ~ apps_sans_cqp + selected + as.factor(wave) + firm_size_sans_app, data = x)
-m4 <- plm(profits ~ total_apps + as.factor(wave) + firm_size_sans_app , data = x, index = c("FS1.2", "wave"), model = "within")
-m5 <- lm(firm_size_sans_app ~ apps_sans_cqp + selected + as.factor(wave), data = x)
-m6 <- plm(firm_size_sans_app ~ total_apps + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
-
-stargazer(m1, m2, m3, m4, m5, m6, df = FALSE, omit = "FS1.2",
-          no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("$^†$Excluding apprentices."),
-          notes.align = "r",
-          notes.append = TRUE,
-          covariate.labels = c("Non-CQP apprentices",
-                               "CQP selected",
-                               "Total apprentices",
-                               "Endline",
-                               "log Firm size$^†$"),
-          title = "Firm-level regressions",
-          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
-          model.names = FALSE,
-          dep.var.caption = "",
-          dep.var.labels = c("log revenues (USD)", "log profits (USD)", "log Firm size$^†$"),
-          add.lines = list(c("Firm FE", "NO", "YES", "NO", "YES", "NO", "YES")),
-          label = "tab:firmregs")
+``` {r tbl-firmregs, results = 'asis'}
 ```
 
-Pooled OLS estimation results are shown in Columns 1, 3 and 5 of Table \@ref(tab:firmregs), while firm fixed effects are included in the specification shown in Columns 2, 4, and 6. Reported firm revenues increase by close to 50\% between the two waves, but are offset by rising costs and wages, to the point of eliminating any observed growth in profitability. According to the pooled specifications, additional apprentices are associated with smaller gains in revenue than the hiring of other types of workers, but higher profits (about 92 \$US annual profit per additional apprentice). Specifications including firm fixed effects to control for heterogeneity between firms, on the other hand, suggest that the hiring of non-apprentice employees is associated with both higher revenues and profits, while the number of apprentices is not a significant predictor of either. Regressions (5) and (6) reinforce the notion that firms hire more apprentices than non-apprentice employees: taking into account firm fixed effects, a single additional employee is associated with over three additional apprentice hires, on average. Finally, we note that the number apprentices from the 2019 cohort of the CQP program have no discernible association with firm revenues or profits.
+Pooled OLS estimation results are shown in Columns 1, 3 and 5 of Table \@ref(tab:tbl-firmregs), while firm fixed effects are included in the specification shown in Columns 2, 4, and 6. Reported firm revenues increase by close to 50\% between the two waves, but are offset by rising costs and wages, to the point of eliminating any observed growth in profitability. According to the pooled specifications, additional apprentices are associated with smaller gains in revenue than the hiring of other types of workers, but higher profits (about 92 \$US annual profit per additional apprentice). Specifications including firm fixed effects to control for heterogeneity between firms, on the other hand, suggest that the hiring of non-apprentice employees is associated with both higher revenues and profits, while the number of apprentices is not a significant predictor of either. Regressions (5) and (6) reinforce the notion that firms hire more apprentices than non-apprentice employees: taking into account firm fixed effects, a single additional employee is associated with over three additional apprentice hires, on average. Finally, we note that the number apprentices from the 2019 cohort of the CQP program have no discernible association with firm revenues or profits.
 
 # Conclusion {#conclusion}
 
@@ -517,6 +551,7 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 ```
 
 \renewcommand{\arraystretch}{2}
+
 ```{r, tbl-allowancebounds}
 ```
 
@@ -531,13 +566,7 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 ``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
 ```
 
-<!-- 
-r, tbl-cbend, echo=FALSE}
--->
 ```{r tbl-wages}
-```
-
-```{r tbl-netbenefitsbywave}
 ```
 
 ```{r, fig-apphist, fig.height=9, out.width="100%", fig.cap = "Net benefits of training, per apprentice"}
@@ -546,15 +575,31 @@ r, tbl-cbend, echo=FALSE}
 ```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Net benefits of training, total per firm"}
 ```
 
-\begin{landscape}
-
-```{r, tbl-appnetbenefitsbytrade, echo=FALSE}
+```{r tbl-appnetbenefitsnodna}
 ```
 
-```{r, tbl-firmnetbenefitsbytrade, echo=FALSE}
+```{r tbl-appnetbenefitsbywave}
+```
+
+\begin{landscape}
+
+```{r, tbl-appnetbenefitsbytrade}
 ```
 
 \end{landscape}
+
+```{r, tbl-firmnetbenefitsbywave}
+```
+
+\begin{landscape}
+
+```{r, tbl-firmnetbenefitsbytrade}
+```
+
+\end{landscape}
+
+```{r, tbl-firmregsfe, results = 'asis'}
+```
 
 # Appendix B
 ## Human Capital Questions {#hcqs}
@@ -636,6 +681,8 @@ r, tbl-cbend, echo=FALSE}
 |     Réalisation d'un devis                              | Drawing up an estimate           |
 
 Table: (\#tab:tasks) Tasks used for assessment of competence and experience
+
+<!--
 
 ## Knowledge Questions {#knowqs}
 
