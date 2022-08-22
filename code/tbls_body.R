@@ -251,7 +251,7 @@ stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.2", font
                                "Baseline Experience$^1$",
                                "Firm Size$^2$",
                                "Total Apprentices in Firm"),
-          title = "Effects of Training on Human Capital Development",
+          title = "Effects of training on human capital development",
           omit.stat=c("aic", "bic", "adj.rsq", "ser"),
           dep.var.labels = c("Experience", "Competence", "Knowledge"),
           model.names = FALSE,
@@ -396,7 +396,7 @@ tbl_summary(x, by = SELECTED,
   kableExtra::add_indent(c(16:19), level_of_indent = 1) %>% 
   kableExtra::row_spec(c(9,21),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
+  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year. Calculated using responses from baseline survey, except training costs which were not elicited until endline. Net benefits not computed for rows missing data for any of the categories used included in a given model (some combination of fees, apprentice productivity, allowances, training costs, and lost trainer productivity). Mean net benefit may deviate from sum of means of the relevant categories as a result.",
            number = c("Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.", "Analysis of variance"),
            threeparttable = T,
            escape = F,

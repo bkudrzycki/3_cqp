@@ -2,19 +2,19 @@
 \contentsline {section}{\numberline {2}Data and Methods}{11}{section.2}% 
 \contentsline {subsection}{\numberline {2.1}Country Context}{11}{subsection.2.1}% 
 \contentsline {subsection}{\numberline {2.2}Sampling}{14}{subsection.2.2}% 
-\contentsline {subsubsection}{Apprentices}{22}{section*.7}% 
-\contentsline {subsubsection}{Firms}{22}{section*.8}% 
-\contentsline {subsubsection}{Training}{24}{section*.9}% 
-\contentsline {subsubsection}{Motivation}{24}{section*.10}% 
-\contentsline {subsubsection}{Contract Type}{25}{section*.11}% 
-\contentsline {subsection}{\numberline {2.3}Estimating Apprentice Benefits}{25}{subsection.2.3}% 
-\contentsline {subsection}{\numberline {2.4}Estimating Firm Benefits}{27}{subsection.2.4}% 
-\contentsline {section}{\numberline {3}Results}{31}{section.3}% 
-\contentsline {subsection}{\numberline {3.1}Impact of Informal and Dual Training on Individuals}{31}{subsection.3.1}% 
-\contentsline {subsection}{\numberline {3.2}Impact of Informal and Dual Training on Firms}{36}{subsection.3.2}% 
-\contentsline {section}{\numberline {4}Conclusion}{47}{section.4}% 
-\contentsline {section}{References}{50}{section*.23}% 
-\contentsline {section}{\numberline {A}Appendix A}{54}{appendix.A}% 
-\contentsline {section}{\numberline {B}Appendix B}{70}{appendix.B}% 
-\contentsline {subsection}{\numberline {B.1}Human Capital Questions}{70}{subsection.B.1}% 
-\contentsline {subsection}{\numberline {B.2}Knowledge Questions}{73}{subsection.B.2}% 
+\contentsline {subsubsection}{Apprentices}{18}{section*.7}% 
+\contentsline {subsubsection}{Firms}{18}{section*.8}% 
+\contentsline {subsubsection}{Training}{20}{section*.9}% 
+\contentsline {subsubsection}{Motivation}{20}{section*.10}% 
+\contentsline {subsubsection}{Contract Type}{21}{section*.11}% 
+\contentsline {subsection}{\numberline {2.3}Estimating Apprentice Benefits}{21}{subsection.2.3}% 
+\contentsline {subsection}{\numberline {2.4}Estimating Firm Benefits}{23}{subsection.2.4}% 
+\contentsline {section}{\numberline {3}Results}{27}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Impact of Informal and Dual Training on Individuals}{27}{subsection.3.1}% 
+\contentsline {subsection}{\numberline {3.2}Impact of Informal and Dual Training on Firms}{33}{subsection.3.2}% 
+\contentsline {section}{\numberline {4}Conclusion}{43}{section.4}% 
+\contentsline {section}{References}{46}{section*.23}% 
+\contentsline {section}{\numberline {A}Appendix A}{50}{appendix.A}% 
+\contentsline {section}{\numberline {B}Appendix B}{65}{appendix.B}% 
+\contentsline {subsection}{\numberline {B.1}Human Capital Questions}{65}{subsection.B.1}% 
+\contentsline {subsection}{\numberline {B.2}Knowledge Questions}{68}{subsection.B.2}% 

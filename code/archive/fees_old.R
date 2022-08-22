@@ -169,4 +169,101 @@ tbl_merge(list(fees_tbl, fees_tbl2, fees_tbl3), tab_spanner = c("Selected CQPs",
     locations = gt::cells_row_groups(groups = everything())
   )
 
+## ---- tbl-fees --------
+
+x <- df %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_total_fees"), ~./605) %>% select(-"fees_avg", -"annual_fees") %>% pivot_longer(cols = contains("fee")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, wave, side, name, value)) %>% pivot_wider() 
+
+var_label(x$fee_entry) <- "Initiation"
+var_label(x$fee_formation) <- "Training"
+var_label(x$fee_liberation) <- "Graduation"
+var_label(x$fee_materials) <- "Materials"
+var_label(x$fee_contract) <- "Contract"
+var_label(x$fee_application) <- "Application"
+var_label(x$total_fees) <- "Total"
+
+x %>% filter(wave == 0) %>% 
+  tbl_summary(by=side,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              digits = list(everything() ~ c(2, 2)),
+              include = -c(IDYouth, wave)) %>% 
+  add_stat(
+    fns = everything() ~ add_by_n
+  ) %>% 
+  add_difference(test = everything() ~ "paired.t.test", group = IDYouth) %>% 
+  modify_table_body(
+    ~ .x %>%
+      dplyr::relocate(add_n_stat_1, .before = stat_1) %>%
+      dplyr::relocate(add_n_stat_2, .before = stat_2) %>% 
+      dplyr::mutate(estimate = -1 * estimate)
+  ) %>%
+  modify_column_hide(ci) %>%
+  modify_header(all_stat_cols() ~ "**{level}**",
+                starts_with("add_n_stat") ~ "**N**",
+                label = "**Fee**",
+                p.value = "**p-value¹**") %>% 
+  modify_footnote(update = everything() ~ NA) %>% 
+  as_kable_extra(caption = "Apprenticeship fees, MC vs. apprentice responses",
+                 escape = F,
+                 booktabs = T,
+                 linesep = "",
+                 position = "H",
+                 addtl_fmt = F) %>%
+  kableExtra::row_spec(7,bold=T) %>% 
+  footnote(general = "Mean (SD). Based on responses from baseline survey. All fees are total amounts to be paid over the course of the apprenticeship. Amounts in \\\\$US.",
+           number = "Paired t-test.",
+           threeparttable = T,
+           escape = F,
+           fixed_small_size = T,
+           general_title = "") %>% 
+  kableExtra::kable_styling(latex_options="scale_down")
+
+## ---- tbl-fees2 --------
+
+baseline <- df %>% filter(wave == 0) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
+  mutate(across(contains("fee"), ~./605)) %>% 
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
+  tbl_summary(by=SELECTED,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              digits = all_continuous() ~ 2) %>% 
+  modify_footnote(update = everything() ~ NA)
+
+endline <- df %>% filter(wave == 1) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
+  mutate(across(contains("fee"), ~./605)) %>% 
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
+  tbl_summary(by=SELECTED,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              digits = all_continuous() ~ 2) %>% 
+  modify_footnote(update = everything() ~ NA)
+
+overall <- df %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
+  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
+                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
+  mutate(across(contains("fee"), ~./605)) %>% 
+  tbl_summary(by=SELECTED,
+              type = everything() ~ "continuous",
+              statistic = all_continuous() ~ c("{mean} ({sd})"),
+              missing = "no",
+              digits = all_continuous() ~ 2) %>% 
+  modify_footnote(update = everything() ~ NA)
+
+tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endline", "Overall"), quiet = TRUE) %>% 
+  as_kable_extra(caption = "Fees reported by firm", 
+                 booktabs = T,
+                 linesep = "",
+                 position = "H") %>% 
+  kableExtra::kable_styling(latex_options="scale_down") %>% 
+  footnote(general = "Mean (SD). All fees are total amounts to be paid over the course of the apprenticeship. Amounts in \\\\$US.",
+           threeparttable = T,
+           escape = F,
+           fixed_small_size = T,
+           general_title = "")
+
 

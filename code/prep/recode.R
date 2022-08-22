@@ -462,7 +462,7 @@ df <- df %>% rowwise() %>% mutate(profits = sum(c(FS4.7, -FS5.1, -FS5.3), na.rm 
                                   expenses = sum(c(FS5.1, FS5.3), na.rm = F)) %>% ungroup()
 
 # recode training costs (ENDLINE ONLY!)
-df <- df %>% mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), recode,
+training_costs <- df %>% filter(wave == 1) %>% select(IDYouth, contains("FE5.1")) %>% mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), recode,
                            `1` = 0,
                            `2` = 1500,
                            `3` = 4000,
@@ -476,8 +476,11 @@ df <- df %>% mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), recode,
                            `11` = 125000) %>%
   mutate_at(c("FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4"), na_if, 12)
 
-df$total_training_costs <- df %>% select(contains("FE5.1")) %>% rowMeans(., na.rm = T)
-df$total_training_costs[is.na(df$total_training_costs)]<-NA
+training_costs$total_training_costs <- training_costs %>% select(contains("FE5.1")) %>% rowSums(., na.rm = T)
+training_costs$total_training_costs[is.na(training_costs$total_training_costs)]<-NA
+
+df <- df %>% select(-contains("FE5.1"))
+df <- left_join(df, training_costs, by = c('IDYouth'))
 
 df <- df %>% mutate(costs_per_app = total_training_costs / FS6.1)
 

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  18 AUG 2022 16:22
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  19 AUG 2022 17:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1319,33 +1319,36 @@ Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 \rotheadsize=\dimen265
 \c@nlinenum=\count322
 \TeXr@lab=\toks33
-) (./cnb_apprenticeship.aux
+)
+\cslhangindent=\skip82
+\csllabelwidth=\skip83
+(./cnb_apprenticeship.aux
 
 LaTeX Warning: Label `tab:appreg' multiply defined.
 
 )
 \openout1 = `cnb_apprenticeship.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 144.
-LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 163.
+LaTeX Font Info:    ... okay on input line 163.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: longtable package is loaded.
@@ -1362,7 +1365,7 @@ Package: fr-longtable 2007/11/28 v0.1b (beta) floatrow: additions for longtable
 \flrow@LT@prelastfoot=\box70
 \c@FBLTpage=\count323
 )
-LaTeX Info: Redefining \microtypecontext on input line 144.
+LaTeX Info: Redefining \microtypecontext on input line 163.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: No adjustment of tracking.
@@ -1373,7 +1376,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 \AtBeginShipoutBox=\box71
-Package hyperref Info: Link coloring ON on input line 144.
+Package hyperref Info: Link coloring ON on input line 163.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 (/usr/local/texlive/2019/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
@@ -1381,9 +1384,9 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count324
 )
-LaTeX Info: Redefining \ref on input line 144.
-LaTeX Info: Redefining \pageref on input line 144.
-LaTeX Info: Redefining \nameref on input line 144.
+LaTeX Info: Redefining \ref on input line 163.
+LaTeX Info: Redefining \pageref on input line 163.
+LaTeX Info: Redefining \nameref on input line 163.
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
 *geometry* verbose mode - [ preamble ] result:
@@ -1451,53 +1454,53 @@ LaTeX Info: Redefining \nameref on input line 144.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 17.28183pt on input line 151.
+(Font)              scaled to size 17.28183pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 12.00128pt on input line 151.
+(Font)              scaled to size 12.00128pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00107pt on input line 151.
+(Font)              scaled to size 10.00107pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 17.27815pt on input line 151.
+(Font)              scaled to size 17.27815pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 11.99872pt on input line 151.
+(Font)              scaled to size 11.99872pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 151.
-LaTeX Font Info:    Try loading font information for U+msa on input line 151.
+(Font)              scaled to size 9.99893pt on input line 170.
+LaTeX Font Info:    Try loading font information for U+msa on input line 170.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2019/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 151.
+LaTeX Font Info:    Try loading font information for U+msb on input line 170.
 (/usr/local/texlive/2019/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/local/texlive/2019/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 8.00085pt on input line 151.
+(Font)              scaled to size 8.00085pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.00064pt on input line 151.
+(Font)              scaled to size 6.00064pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 7.99915pt on input line 151.
+(Font)              scaled to size 7.99915pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 5.99936pt on input line 151.
+(Font)              scaled to size 5.99936pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 9.00096pt on input line 151.
+(Font)              scaled to size 9.00096pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00053pt on input line 151.
+(Font)              scaled to size 5.00053pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 8.99904pt on input line 151.
+(Font)              scaled to size 8.99904pt on input line 170.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 151.
+(Font)              scaled to size 4.99947pt on input line 170.
 
-Underfull \hbox (badness 1147) in paragraph at lines 153--183
+Underfull \hbox (badness 1147) in paragraph at lines 172--173
 \TU/texgyrepagella(0)/m/n/10 and competence, are significant, with improvements
  of .73 and .66 standard
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 153--183
+Underfull \hbox (badness 10000) in paragraph at lines 172--173
 
  []
 
@@ -1533,464 +1536,95 @@ LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
 
 [3] [4] [5] [6] [7] [8] [9]
 
-LaTeX Warning: Reference `fig:enrolment' on page 10 undefined on input line 457
+LaTeX Warning: Reference `fig:enrolment' on page 10 undefined on input line 228
 .
 
 [10]
 File: figures/fig-enrolment-1.pdf Graphic file (type pdf)
 <use figures/fig-enrolment-1.pdf>
 [11] [12]
-Overfull \hbox (6.44041pt too wide) in paragraph at lines 531--536
+Overfull \hbox (6.44041pt too wide) in paragraph at lines 244--245
 []\TU/texgyrepagella(0)/m/n/10.95 The financing of dual training comprises thre
 e main budget items: the firm/workshop,
  []
 
-[13] [14]
-Overfull \hbox (5.92604pt too wide) in paragraph at lines 578--580
-\TU/texgyrepagella(2)/m/n/10 Status|  
- []
-
-
-Overfull \hbox (32.50604pt too wide) in paragraph at lines 580--582
-[]|\TU/texgyrepagella(2)/m/n/10 Explanation|  
- []
-
-
-Overfull \hbox (28.80605pt too wide) in paragraph at lines 582--584
-[]|\TU/texgyrepagella(2)/m/n/10 Apprentice 
- []
-
-
-Overfull \hbox (21.13605pt too wide) in paragraph at lines 582--584
-\TU/texgyrepagella(2)/m/n/10 Sampling|  
- []
-
-
-Overfull \hbox (21.13605pt too wide) in paragraph at lines 584--586
-\TU/texgyrepagella(2)/m/n/10 Sampling|  
- []
-
-
-Overfull \hbox (5.92604pt too wide) in paragraph at lines 590--592
-\TU/texgyrepagella(2)/m/n/10 Status|  
- []
-
-
-Overfull \hbox (32.50604pt too wide) in paragraph at lines 592--594
-[]|\TU/texgyrepagella(2)/m/n/10 Explanation|  
- []
-
-
-Overfull \hbox (28.80605pt too wide) in paragraph at lines 594--596
-[]|\TU/texgyrepagella(2)/m/n/10 Apprentice 
- []
-
-
-Overfull \hbox (21.13605pt too wide) in paragraph at lines 594--596
-\TU/texgyrepagella(2)/m/n/10 Sampling|  
- []
-
-
-Overfull \hbox (21.13605pt too wide) in paragraph at lines 596--598
-\TU/texgyrepagella(2)/m/n/10 Sampling|  
- []
-
-
-Overfull \hbox (15.42604pt too wide) in paragraph at lines 601--603
-[]|\TU/texgyrepagella(2)/m/n/10 Selected|  
- []
-
-
-Overfull \hbox (14.90605pt too wide) in paragraph at lines 603--606
-[]|\TU/texgyrepagella(2)/m/n/10 Already 
- []
-
-
-Overfull \hbox (1.31604pt too wide) in paragraph at lines 603--606
-\TU/texgyrepagella(2)/m/n/10 pren- 
- []
-
-
-Overfull \hbox (1.77605pt too wide) in paragraph at lines 603--606
-\TU/texgyrepagella(2)/m/n/10 plied 
- []
-
-
-Overfull \hbox (4.91605pt too wide) in paragraph at lines 603--606
-\TU/texgyrepagella(2)/m/n/10 crafts- 
- []
-
-
-Overfull \hbox (9.10605pt too wide) in paragraph at lines 603--606
-\TU/texgyrepagella(2)/m/n/10 Passed 
- []
-
-
-Overfull \hbox (2.86604pt too wide) in paragraph at lines 603--606
-\TU/texgyrepagella(2)/m/n/10 exam 
- []
-
-
-Overfull \hbox (16.91605pt too wide) in paragraph at lines 603--606
-\TU/texgyrepagella(2)/m/n/10 selected.|  
- []
-
-
-Overfull \hbox (16.98605pt too wide) in paragraph at lines 606--609
-[]|\TU/texgyrepagella(2)/m/n/10 Random 
- []
-
-
-Overfull \hbox (2.25604pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 pling 
- []
-
-
-Overfull \hbox (0.65605pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 from 
- []
-
-
-Overfull \hbox (1.84604pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 cants 
- []
-
-
-Overfull \hbox (6.28604pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 trades 
- []
-
-
-Overfull \hbox (12.73605pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 graphic 
- []
-
-
-Overfull \hbox (10.81604pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 (South- 
- []
-
-
-Overfull \hbox (9.05605pt too wide) in paragraph at lines 606--609
-\TU/texgyrepagella(2)/m/n/10 Bénin)|  
- []
-
-
-Overfull \hbox (2.11604pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 more 
- []
-
-
-Overfull \hbox (1.49605pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 train- 
- []
-
-
-Overfull \hbox (0.72604pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 most 
- []
-
-
-Overfull \hbox (1.31604pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 pren- 
- []
-
-
-Overfull \hbox (7.42604pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 domly 
- []
-
-
-Overfull \hbox (5.38605pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 lected 
- []
-
-
-Overfull \hbox (17.53604pt too wide) in paragraph at lines 609--612
-\TU/texgyrepagella(2)/m/n/10 baseline.|  
- []
-
-
-Overfull \hbox (14.41605pt too wide) in paragraph at lines 618--620
-\TU/texgyrepagella(2)/m/n/10 selected|  
- []
-
-
-Overfull \hbox (14.90605pt too wide) in paragraph at lines 620--623
-[]|\TU/texgyrepagella(2)/m/n/10 Already 
- []
-
-
-Overfull \hbox (1.31604pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 pren- 
- []
-
-
-Overfull \hbox (1.77605pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 plied 
- []
-
-
-Overfull \hbox (4.91605pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 crafts- 
- []
-
-
-Overfull \hbox (5.38605pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 lected 
- []
-
-
-Overfull \hbox (2.86604pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 exam 
- []
-
-
-Overfull \hbox (1.96605pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 score 
- []
-
-
-Overfull \hbox (1.49605pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 train- 
- []
-
-
-Overfull \hbox (8.03604pt too wide) in paragraph at lines 620--623
-\TU/texgyrepagella(2)/m/n/10 center.|  
- []
-
-
-Overfull \hbox (16.98605pt too wide) in paragraph at lines 623--626
-[]|\TU/texgyrepagella(2)/m/n/10 Random 
- []
-
-
-Overfull \hbox (2.25604pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 pling 
- []
-
-
-Overfull \hbox (0.65605pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 from 
- []
-
-
-Overfull \hbox (1.84604pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 cants 
- []
-
-
-Overfull \hbox (6.28604pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 trades 
- []
-
-
-Overfull \hbox (12.73605pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 graphic 
- []
-
-
-Overfull \hbox (10.81604pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 (South- 
- []
-
-
-Overfull \hbox (9.05605pt too wide) in paragraph at lines 623--626
-\TU/texgyrepagella(2)/m/n/10 Bénin)|  
- []
-
-
-Overfull \hbox (2.11604pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 more 
- []
-
-
-Overfull \hbox (1.49605pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 train- 
- []
-
-
-Overfull \hbox (0.72604pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 most 
- []
-
-
-Overfull \hbox (1.31604pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 pren- 
- []
-
-
-Overfull \hbox (7.42604pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 domly 
- []
-
-
-Overfull \hbox (5.38605pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 lected 
- []
-
-
-Overfull \hbox (17.53604pt too wide) in paragraph at lines 626--629
-\TU/texgyrepagella(2)/m/n/10 baseline.|  
- []
-
-
-Overfull \hbox (4.32605pt too wide) in paragraph at lines 635--637
-\TU/texgyrepagella(2)/m/n/10 apply|  
- []
-
-
-Overfull \hbox (12.64604pt too wide) in paragraph at lines 637--639
-\TU/texgyrepagella(2)/m/n/10 Trained 
- []
-
-
-Overfull \hbox (4.40605pt too wide) in paragraph at lines 637--639
-\TU/texgyrepagella(2)/m/n/10 tional 
- []
-
-
-Overfull \hbox (28.52605pt too wide) in paragraph at lines 637--639
-\TU/texgyrepagella(2)/m/n/10 apprentice.|  
- []
-
-
-Overfull \hbox (6.99605pt too wide) in paragraph at lines 641--644
-\TU/texgyrepagella(2)/m/n/10 owner 
- []
-
-
-Overfull \hbox (3.11604pt too wide) in paragraph at lines 641--644
-\TU/texgyrepagella(2)/m/n/10 listed 
- []
-
-
-Overfull \hbox (1.31604pt too wide) in paragraph at lines 641--644
-\TU/texgyrepagella(2)/m/n/10 pren- 
- []
-
-
-Overfull \hbox (7.42604pt too wide) in paragraph at lines 641--644
-\TU/texgyrepagella(2)/m/n/10 domly 
- []
-
-
-Overfull \hbox (5.38605pt too wide) in paragraph at lines 641--644
-\TU/texgyrepagella(2)/m/n/10 lected 
- []
-
-
-Overfull \hbox (17.53604pt too wide) in paragraph at lines 641--644
-\TU/texgyrepagella(2)/m/n/10 baseline.|  
- []
-
-[15] [16] [17] [18] [19]
+[13] [14] [15]
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00075pt on input line 722.
+(Font)              scaled to size 7.00075pt on input line 343.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 722.
+(Font)              scaled to size 6.99925pt on input line 343.
 
-Overfull \hbox (21.04633pt too wide) in paragraph at lines 665--729
+Overfull \hbox (21.04633pt too wide) in paragraph at lines 286--350
  [] 
  []
 
-[20]
+[16]
 Overfull \vbox (31.87798pt too high) has occurred while \output is active []
 
-[21] [22] [23] [24] [25] (./tables/tbl-cbmodels.tex) [26] [27] [28] [29] [30] [
-31] [32]
+[17] [18] [19] [20] [21] (./tables/tbl-cbmodels.tex) [22] [23] [24] [25] [26] [
+27] [28]
 
-LaTeX Warning: Reference `tab:tbl-appreg' on page 33 undefined on input line 11
-96.
+LaTeX Warning: Reference `tab:tbl-appreg' on page 29 undefined on input line 54
+6.
 
-[33]
+[29]
 
-LaTeX Warning: Reference `tab:tbl-appreg' on page 34 undefined on input line 12
-10.
+LaTeX Warning: Reference `tab:tbl-appreg' on page 30 undefined on input line 54
+8.
 
 
-LaTeX Warning: Reference `tab:tbl-appreg2' on page 34 undefined on input line 1
-213.
+LaTeX Warning: Reference `tab:tbl-appreg2' on page 30 undefined on input line 5
+48.
 
-[34] [35]
+[30] [31] [32] [33] [34] [35]
 
-LaTeX Warning: Reference `tab:tbl-cbmodels' on page 36 undefined on input line 
-1354.
-
-[36]
-
-LaTeX Warning: Reference `@' on page 37 undefined on input line 1357.
-
-[37] [38] [39]
-
-LaTeX Warning: Reference `fig:costspie' on page 40 undefined on input line 1481
+LaTeX Warning: Reference `fig:costspie2' on page 36 undefined on input line 676
 .
 
+[36] [37]
 
-LaTeX Warning: Reference `fig:costspie2' on page 40 undefined on input line 148
-9.
+LaTeX Warning: Reference `fig:hist2' on page 38 undefined on input line 700.
 
-[40]
+[38] [39] [40] [41]
 
-LaTeX Warning: Reference `tab:fees2' on page 41 undefined on input line 1505.
+LaTeX Warning: Reference `tab:tbl-firmregs' on page 42 undefined on input line 
+806.
 
+[42] [43] [44] [45] [46
 
-LaTeX Warning: Reference `tab:allowances' on page 41 undefined on input line 15
-07.
-
-
-LaTeX Warning: Reference `tab:netbenefits1' on page 41 undefined on input line 
-1510.
-
-
-LaTeX Warning: Reference `fig-apphist' on page 41 undefined on input line 1529.
-
-
-[41] [42]
-
-LaTeX Warning: Reference `fig:hist2' on page 43 undefined on input line 1581.
-
-[43] [44] [45]
-
-LaTeX Warning: Reference `tab:tbl-firmregs' on page 46 undefined on input line 
-1739.
-
-[46] [47] [48] [49] [50
-
-] [51] [52] [53] [54]
+] [47] [48] [49] [50]
 File: figures/fig-firmsize-1.pdf Graphic file (type pdf)
 <use figures/fig-firmsize-1.pdf>
-[55] [56] [57]
-Overfull \hbox (43.76637pt too wide) in paragraph at lines 2310--2337
+[51]
+Overfull \hbox (43.76637pt too wide) in paragraph at lines 1168--1195
  [] 
  []
 
-[58] [59] [60]
+[52] [53] [54] [55]
 File: figures/fig-costspie-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie-1.pdf>
 File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie2-1.pdf>
-[61]
+[56]
 File: figures/fig-apphist-1.pdf Graphic file (type pdf)
 <use figures/fig-apphist-1.pdf>
 
-LaTeX Warning: Float too large for page by 16.00578pt on input line 2440.
+LaTeX Warning: Float too large for page by 16.00578pt on input line 1298.
 
 File: figures/fig-firmhist-1.pdf Graphic file (type pdf)
 <use figures/fig-firmhist-1.pdf>
 
-LaTeX Warning: Float too large for page by 16.00578pt on input line 2444.
+LaTeX Warning: Float too large for page by 16.00578pt on input line 1302.
 
-[62] [63] [64] [65] [66] [67
+[57] [58] [59] [60] [61] [62
 
-] [68
+] [63
 
-] [69
+] [64
 
-] [70
+] [65
 
-] [71] [72]
+] [66] [67]
 File: figures/questionnaire/mason1.png Graphic file (type bmp)
 <figures/questionnaire/mason1.png>
 File: figures/questionnaire/mason2.png Graphic file (type bmp)
@@ -2000,11 +1634,11 @@ File: figures/questionnaire/mason3.png Graphic file (type bmp)
 File: figures/questionnaire/mason4.png Graphic file (type bmp)
 <figures/questionnaire/mason4.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 3127--3131
+Underfull \hbox (badness 10000) in paragraph at lines 1700--1704
 []
  []
 
-[73] [74] [75]
+[68] [69]
 File: figures/questionnaire/carp1.png Graphic file (type bmp)
 <figures/questionnaire/carp1.png>
 File: figures/questionnaire/carp2.png Graphic file (type bmp)
@@ -2013,7 +1647,7 @@ File: figures/questionnaire/carp3.png Graphic file (type bmp)
 <figures/questionnaire/carp3.png>
 File: figures/questionnaire/carp4.png Graphic file (type bmp)
 <figures/questionnaire/carp4.png>
-[76] [77] [78] [79]
+[70] [71] [72] [73]
 File: figures/questionnaire/plumbing1.png Graphic file (type bmp)
 <figures/questionnaire/plumbing1.png>
 File: figures/questionnaire/plumbing2.png Graphic file (type bmp)
@@ -2024,7 +1658,7 @@ File: figures/questionnaire/plumbing4.png Graphic file (type bmp)
 <figures/questionnaire/plumbing4.png>
 File: figures/questionnaire/plumbing5.png Graphic file (type bmp)
 <figures/questionnaire/plumbing5.png>
-[80] [81] [82] [83]
+[74] [75] [76] [77]
 File: figures/questionnaire/metal1.png Graphic file (type bmp)
 <figures/questionnaire/metal1.png>
 File: figures/questionnaire/metal2.png Graphic file (type bmp)
@@ -2035,7 +1669,7 @@ File: figures/questionnaire/metal4.png Graphic file (type bmp)
 <figures/questionnaire/metal4.png>
 File: figures/questionnaire/metal5.png Graphic file (type bmp)
 <figures/questionnaire/metal5.png>
-[84] [85] [86] [87]
+[78] [79] [80] [81]
 File: figures/questionnaire/elec1.png Graphic file (type bmp)
 <figures/questionnaire/elec1.png>
 File: figures/questionnaire/elec2.png Graphic file (type bmp)
@@ -2047,32 +1681,32 @@ File: figures/questionnaire/elec4.png Graphic file (type bmp)
 File: figures/questionnaire/elec5.png Graphic file (type bmp)
 <figures/questionnaire/elec5.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 3159--3164
+Underfull \hbox (badness 10000) in paragraph at lines 1735--1740
 []
  []
 
-[88]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3165.
-[89] [90]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3165.
+[82]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1741.
+[83] [84]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1741.
 (./cnb_apprenticeship.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 3165.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 3165.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1741.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1741.
 
 LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3165.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1741.
  ) 
 Here is how much of TeX's memory you used:
- 31005 strings out of 492916
- 566400 string characters out of 6133345
- 842273 words of memory out of 5000000
- 34639 multiletter control sequences out of 15000+600000
+ 31004 strings out of 492916
+ 566381 string characters out of 6133345
+ 842248 words of memory out of 5000000
+ 34638 multiletter control sequences out of 15000+600000
  542835 words of font info for 137 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 70i,21n,118p,912b,527s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 70i,21n,118p,2125b,527s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on cnb_apprenticeship.pdf (90 pages).
+Output written on cnb_apprenticeship.pdf (84 pages).

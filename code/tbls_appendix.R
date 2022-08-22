@@ -25,7 +25,7 @@ y %>% select(wave, baseline_age, sex, schooling, baseline_status, baseline_exp, 
               statistic = list(all_continuous() ~ "{mean} ({sd})",
                                all_categorical() ~ "{n} ({p}%)",
                                sex ~ "{p}%")) %>% add_p() %>% 
-  as_kable_extra(caption = "Apprentice Attrition",
+  as_kable_extra(caption = "Apprentice attrition",
                  booktabs = T,
                  linesep = "",
                  position = "H")
@@ -70,7 +70,7 @@ y %>% select(FS1.2, wave, baseline_apps, baseline_sel, baseline_notsel, baseline
                            baseline_trade ~ "Trade"),
               include = -FS1.2) %>% 
   add_p() %>% 
-  as_kable_extra(caption = "Firm Attrition",
+  as_kable_extra(caption = "Firm attrition",
                  booktabs = T,
                  linesep = "",
                  position = "H") %>% 
@@ -241,116 +241,13 @@ stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.2", font.size= "small"
                                "Baseline experience$^1$",
                                "Firm size$^2$",
                                "Total apprentices in firm"),
-          title = "Effects of Training on Human Capital, Excluding CQP Non Applicants",
+          title = "Effects of training on human capital, excluding CQP non-applicants",
           omit.stat=c("aic", "bic", "adj.rsq", "ser"),
           dep.var.labels = c("Experience", "Competence", "Knowledge"),
           model.names = FALSE,
           dep.var.caption = "",
           label = "tab:appreg",
           add.lines = list(c("Firm FE", "NO", "NO", "YES", "NO", "NO", "YES")))
-
-## ---- tbl-fees --------
-
-x <- df %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_total_fees"), ~./605) %>% select(-"fees_avg", -"annual_fees") %>% pivot_longer(cols = contains("fee")) %>% mutate(side = ifelse(grepl("a_", name), "Apprentice", "Firm")) %>% mutate(name = str_remove_all(name, "a_")) %>% select(c(IDYouth, wave, side, name, value)) %>% pivot_wider() 
-
-var_label(x$fee_entry) <- "Initiation"
-var_label(x$fee_formation) <- "Training"
-var_label(x$fee_liberation) <- "Graduation"
-var_label(x$fee_materials) <- "Materials"
-var_label(x$fee_contract) <- "Contract"
-var_label(x$fee_application) <- "Application"
-var_label(x$total_fees) <- "Total"
-
-y <- x %>% filter(wave == 0) %>% 
-  tbl_summary(by=side,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = list(everything() ~ c(2, 2)),
-              include = -c(IDYouth, wave)) %>% 
-  add_p() %>% 
-  modify_header(all_stat_cols() ~ "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Fee Type**",
-                p.value = "**p-value¹**") %>% 
-  modify_footnote(update = everything() ~ NA) 
-
-z <- x %>% filter(wave == 1) %>% 
-  tbl_summary(by=side,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = list(everything() ~ c(2, 2)),
-              include = -c(IDYouth, wave)) %>% 
-  add_p() %>% 
-  modify_header(all_stat_cols() ~ "**{level}**",
-                starts_with("add_n_stat") ~ "**N**",
-                label = "**Fee Type**",
-                p.value = "**p-value¹**") %>% 
-  modify_footnote(update = everything() ~ NA)
-
-tbl_merge(list(y, z), tab_spanner = c("**Baseline**", "**Endline**")) %>%
-  as_kable_extra(caption = "Apprenticeship Fees",
-                 escape = F,
-                 booktabs = T,
-                 linesep = "",
-                 position = "H",
-                 addtl_fmt = F) %>%
-  kableExtra::row_spec(7,bold=T) %>% 
-  kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). All fees are total amounts to be paid over the course of the apprenticeship. Amounts in \\\\$US.",
-           number = "Paired t-test.",
-           threeparttable = T,
-           escape = F,
-           fixed_small_size = T,
-           general_title = "")
-
-## ---- tbl-fees2 --------
-
-baseline <- df %>% filter(wave == 0) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
-  mutate(across(contains("fee"), ~./605)) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  modify_footnote(update = everything() ~ NA)
-
-endline <- df %>% filter(wave == 1) %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
-  mutate(across(contains("fee"), ~./605)) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  modify_footnote(update = everything() ~ NA)
-
-overall <- df %>% select(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "SELECTED")) %>% 
-  mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3),
-                           labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply'))) %>% 
-  mutate(across(contains("fee"), ~./605)) %>% 
-  tbl_summary(by=SELECTED,
-              type = everything() ~ "continuous",
-              statistic = all_continuous() ~ c("{mean} ({sd})"),
-              missing = "no",
-              digits = all_continuous() ~ 2) %>% 
-  modify_footnote(update = everything() ~ NA)
-
-tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endline", "Overall"), quiet = TRUE) %>% 
-  as_kable_extra(caption = "Fees reported by firm", 
-                 booktabs = T,
-                 linesep = "",
-                 position = "H") %>% 
-  kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). All fees are total amounts to be paid over the course of the apprenticeship. Amounts in \\\\$US.",
-           threeparttable = T,
-           escape = F,
-           fixed_small_size = T,
-           general_title = "")
 
 ## ---- tbl-allowances --------
 
