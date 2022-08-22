@@ -14,7 +14,5 @@
 \contentsline {subsection}{\numberline {3.2}Impact of Informal and Dual Training on Firms}{33}{subsection.3.2}% 
 \contentsline {section}{\numberline {4}Conclusion}{43}{section.4}% 
 \contentsline {section}{References}{46}{section*.23}% 
-\contentsline {section}{\numberline {A}Appendix A}{50}{appendix.A}% 
-\contentsline {section}{\numberline {B}Appendix B}{65}{appendix.B}% 
-\contentsline {subsection}{\numberline {B.1}Human Capital Questions}{65}{subsection.B.1}% 
-\contentsline {subsection}{\numberline {B.2}Knowledge Questions}{68}{subsection.B.2}% 
+\contentsline {section}{Appendix A}{50}{section*.24}% 
+\contentsline {section}{Appendix B}{65}{section*.55}% 

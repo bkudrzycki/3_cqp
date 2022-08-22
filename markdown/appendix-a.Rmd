@@ -1,0 +1,76 @@
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+
+```{r, tbl-attritionapps}
+```
+
+```{r, tbl-attritionfirms}
+```
+
+``` {r fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
+```
+
+```{r tbl-skillschangebycqp}
+```
+
+```{r tbl-compexp2}
+```
+
+``` {r tbl-appreg2, results = 'asis', fig.align = 'center'}
+```
+
+```{r tbl-allowances}
+```
+
+\renewcommand{\arraystretch}{2}
+
+```{r, tbl-allowancebounds}
+```
+
+```{r, tbl-allowboundsapp}
+```
+
+\renewcommand{\arraystretch}{1}
+
+``` {r fig-costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice", fig.pos='H'}
+```
+
+``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
+```
+
+```{r tbl-wages}
+```
+
+```{r, fig-apphist, fig.height=9, out.width="100%", fig.cap = "Distribution of net benefits per apprentice"}
+```
+
+```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Distribution of net benefits per firm"}
+```
+
+```{r tbl-appnetbenefitsnodna}
+```
+
+```{r tbl-appnetbenefitsbywave}
+```
+
+\begin{landscape}
+
+```{r, tbl-appnetbenefitsbytrade}
+```
+
+\end{landscape}
+
+```{r, tbl-firmnetbenefitsbywave}
+```
+
+\begin{landscape}
+
+```{r, tbl-firmnetbenefitsbytrade}
+```
+
+\end{landscape}
+
+```{r, tbl-firmregsfe, results = 'asis'}
+```
