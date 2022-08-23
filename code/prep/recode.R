@@ -45,7 +45,7 @@ end_ys <- ys %>% select(tidyselect::vars_select(names(ys), matches(c('IDYouth', 
 
 # SELECT FIRM (FS) VARIABLES OF INTEREST HERE
 #time-invariant from firm survey
-time_inv_fs <- fs %>% select("FS1.2", "FS1.11", "FS6.16", "dossier_apps", "dossier_reserves", "dossier_selected") %>% left_join(fs_end %>% select("FS1.2", contains(c("FE5.1", "FE7.2", "FE9.1"))), by = "FS1.2")
+time_inv_fs <- fs %>% select("FS1.2", "FS1.6", "FS1.11", "FS6.16", "dossier_apps", "dossier_reserves", "dossier_selected") %>% left_join(fs_end %>% select("FS1.2", contains(c("FE5.1", "FE7.2", "FE9.1"))), by = "FS1.2")
 
 df <- rbind(JoinCQP(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS3.5_1','FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS4.1', 'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', matches('FS6.15'), 'FS6.17', 'FS9.3')) %>% rename(status = FS9.3), 
             JoinTrad(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS4.1', 'FS3.5_1', 'FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS3.5_1',  'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', matches('FS6.15'), 'FS6.17', 'FS7.4')) %>% rename(status = FS7.4)) %>%
@@ -67,7 +67,7 @@ df <- df %>% mutate(SELECTED = as.factor(recode(SELECTED, "Oui"= 1,
                                       `3` = 3)))
 
 # subtract 1 from miscoded questions
-df <- df %>% mutate(across(c(FS3.1, FS4.1, YE3.35, FS3.3, FS6.8, FS6.9, contains("FS3.5")), ~(.x-1)))
+df <- df %>% mutate(across(c(FS3.1, FS4.1, YE3.35, FS3.3, YS3.8, FS6.8, FS6.9, contains("FS3.5")), ~(.x-1)))
 
 # remove FS6.1 for firms with over 50 apprentices, because (i) real number unknown, (ii) probably lycées and not firms
 df <- df %>% mutate(FS6.1 = replace(FS6.1, FS6.1>50, NA))
@@ -727,8 +727,8 @@ var_label(df$a_total_fees) <- "Total"
 df <- df %>% rowwise() %>% mutate(fees_avg = mean(c(total_fees, a_total_fees), na.rm = T)) %>% ungroup()
 
 # firm size (calculated by adding up total number of all types of workers), as well as bins
-df <- df %>% rowwise() %>% mutate(firm_size = sum(c(FS6.1, FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)),
-                                  firm_size_sans_app = sum(c(FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5)),
+df <- df %>% rowwise() %>% mutate(firm_size = sum(c(FS6.1, FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5), na.rm = T),
+                                  firm_size_sans_app = sum(c(FS3.5_1, FS3.5_2, FS3.5_3, FS3.5_4, FS3.5_5), na.rm = T),
                     firm_size_bins = cut(firm_size, breaks = c(1,20,40,60,80,107)),
                     firm_size_bins_reported = cut(FS3.4, breaks = c(1,10,20,30,40,50))) %>% ungroup()
 

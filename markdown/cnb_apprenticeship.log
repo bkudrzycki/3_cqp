@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  22 AUG 2022 10:11
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  23 AUG 2022 13:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1599,60 +1599,64 @@ LaTeX Warning: Reference `tab:tbl-firmregs' on page 42 undefined on input line
 
 [42] [43] [44] [45] [46
 
-] [47] [48] [49] [50]
+] [47] [48] [49]
+Overfull \vbox (12.0pt too high) detected at line 1025
+ []
+
+[50] [51] [52]
 File: figures/fig-firmsize-1.pdf Graphic file (type pdf)
 <use figures/fig-firmsize-1.pdf>
-[51]
-Overfull \hbox (43.76637pt too wide) in paragraph at lines 1169--1196
+[53] [54] [55]
+Overfull \hbox (43.76637pt too wide) in paragraph at lines 1173--1200
  [] 
  []
 
-[52] [53] [54] [55]
+[56] [57]
 File: figures/fig-costspie-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie-1.pdf>
 File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie2-1.pdf>
-[56]
+[58]
 File: figures/fig-apphist-1.pdf Graphic file (type pdf)
 <use figures/fig-apphist-1.pdf>
 
-LaTeX Warning: Float too large for page by 16.00578pt on input line 1299.
+LaTeX Warning: Float too large for page by 16.00578pt on input line 1303.
 
 File: figures/fig-firmhist-1.pdf Graphic file (type pdf)
 <use figures/fig-firmhist-1.pdf>
 
-LaTeX Warning: Float too large for page by 16.00578pt on input line 1303.
+LaTeX Warning: Float too large for page by 16.00578pt on input line 1307.
 
-[57] [58] [59] [60] [61] [62
+[59] [60] [61] [62] [63] [64
 
-] [63
+] [65
 
-] [64
-
-]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1607.
-[65
+] [66
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1607.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1611.
+[67
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1611.
 (./cnb_apprenticeship.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1607.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1607.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1611.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 1611.
 
 LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1607.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1611.
  ) 
 Here is how much of TeX's memory you used:
- 30905 strings out of 492916
- 563555 string characters out of 6133345
- 842055 words of memory out of 5000000
- 34564 multiletter control sequences out of 15000+600000
+ 30907 strings out of 492916
+ 563608 string characters out of 6133345
+ 843185 words of memory out of 5000000
+ 34566 multiletter control sequences out of 15000+600000
  542835 words of font info for 137 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 70i,21n,118p,2125b,513s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 70i,21n,118p,2251b,513s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on cnb_apprenticeship.pdf (65 pages).
+Output written on cnb_apprenticeship.pdf (67 pages).

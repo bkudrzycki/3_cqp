@@ -30,15 +30,70 @@ y %>% select(wave, baseline_age, sex, schooling, baseline_status, baseline_exp, 
                  linesep = "",
                  position = "H")
 
+## ---- attritionappsreg --------
+
+attr <- df %>% filter(wave == 1) %>% select(IDYouth) %>% mutate(attr = 0)
+
+apps1 <- df %>% filter(wave == 0) %>% mutate(children = as.numeric(YS3.8),
+                                             yos = as.numeric(YS3.15), 
+                                             exp.finish = ifelse(YS4.7 %in% c('2020', '2021'), "Before 2022", 
+                                                                 ifelse(YS4.7 %in% c('2022', '2023', '2024'), "After 2022", NA)), 
+                                             hhsize = as.numeric(YS6.6),
+                                             total_apps = sum(selected, not_selected, did_not_apply, na.rm = T),
+                                             firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA)) %>% 
+  select(IDYouth, SELECTED, selected, not_selected, did_not_apply, baseline_age, FS1.11, FS3.1, baseline_duration, grad, firm_size_sans_app, children, yos, schooling, exp.finish, hhsize) %>% 
+  left_join(., attr, by = "IDYouth") %>% mutate(attr = coalesce(attr, 1),
+                                                total_apps = selected + not_selected + did_not_apply,
+                                                SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
+
+apps2 <- apps1 %>% filter(SELECTED != "Did Not Apply") %>% mutate(attr2 = attr)
+
+m1 <- glm(attr ~ as.factor(SELECTED), data = apps1, family = "binomial")
+m2 <- glm(attr ~ as.factor(SELECTED) + as.factor(FS1.11) + baseline_duration + firm_size_sans_app + total_apps, data = apps1, family = "binomial")
+m3 <- glm(attr2 ~ as.factor(SELECTED) + as.factor(FS1.11) + baseline_duration + firm_size_sans_app + total_apps, data = apps2, family = "binomial")
+m4 <- glm(attr2 ~ as.factor(SELECTED) + as.factor(FS1.11) + baseline_duration + firm_size_sans_app + total_apps + hhsize + children + yos + exp.finish,data = apps2, family = "binomial")
+
+star <- stargazer(m1, m2, m3, m4, df = FALSE,
+          no.space = TRUE, digits = 2, header = F, table.placement = "H", notes.align = "r",
+          covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
+                               "CQP Did Not Apply",
+                               "Masonry (reference) \\\\ \\\\ Carpentry",
+                               "Plumbing",
+                               "Metalwork",
+                               "Electrical Inst.",
+                               "Baseline Experience$^1$",
+                               "log Firm size$^2$",
+                               "Apprentices in Firm",
+                               "Household Size",
+                               "No. of Children",
+                               "Years of Schooling",
+                               "Expected finish before 2022"),
+          title = "Likelihood of apprentice attrition",
+          dep.var.labels = c("All apprentices", "Excluding non-applicants"),
+          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
+          model.names = FALSE,
+          dep.var.caption = "",
+          label = "tab:tbl-attritionappsreg")
+
+## ---- tbl-attritionappsreg --------
+
+star2 <- c(star[1:44],
+           "\\multicolumn{5}{l}{\\multirow{2}{12cm}{The table reports coefficients from logit regressions where the dependent variable is equal to 1 if the apprentice was not observed in the endline survey and 0 otherwise.}} \\\\ \\\\ \\\\",
+           "\\multicolumn{5}{l}{$^1$Years of training prior to baseline survey} \\\\",
+           "\\multicolumn{5}{l}{$^2$Excluding apprentices} \\\\",
+           star[45:length(star)]) 
+  
+cat(as.character(star2))
+
 ## ---- tbl-attritionfirms --------
 
 x <- df %>% filter(wave == 0) %>% 
   mutate(baseline_size = firm_size,
          baseline_calcsize = FS3.4,
          baseline_apps = FS6.1,
-         baseline_sel = dossier_selected,
-         baseline_notsel = dossier_apps-dossier_selected,
-         baseline_dna = FS6.1-dossier_apps,
+         baseline_sel = selected,
+         baseline_notsel = not_selected,
+         baseline_dna = did_not_apply,
          baseline_wage = FS3.5_2,
          baseline_paid_fam = FS3.5_3,
          baseline_unpaid_fam = FS3.5_4,
@@ -86,6 +141,52 @@ y %>% select(FS1.2, wave, baseline_apps, baseline_sel, baseline_notsel, baseline
                          escape = F,
                          indent = T,
                          bold = F)
+
+## ---- attritionfirmsreg --------
+
+attr <- distinct(df, across(c(FS1.2, wave))) %>% filter(wave == 1) %>% select(FS1.2) %>% mutate(attr = 0)
+
+baseline_firms <- baseline %>% select(FS1.2, FS1.11, profits, FS4.1, FS5.4, selected, not_selected, did_not_apply, firm_size_sans_app) %>% 
+  mutate(FS1.11 = as.numeric(FS1.11)) %>% group_by(FS1.2) %>% summarise_all(mean, na.rm = T) %>% ungroup() %>% left_join(., attr, by = "FS1.2") %>% 
+  mutate(attr = coalesce(attr, 1),            
+         log_annual_profits = ifelse(profits > 0 & FS4.1 > 0, as.numeric(log(profits * FS4.1)), NA),     
+         log_annual_rep_profits = ifelse(FS5.4 > 0 & FS4.1 > 0, as.numeric(log(FS5.4 * FS4.1)), NA),        
+         total_apps = selected + not_selected + did_not_apply,  
+         log_firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA),
+         FS1.11 = factor(FS1.11, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.')))
+
+m1 <- glm(attr ~ total_apps + selected, data = baseline_firms, family = "binomial")
+m2 <- glm(attr ~ selected + not_selected + did_not_apply, data = baseline_firms, family = "binomial")
+m3 <- glm(attr ~ selected + not_selected + did_not_apply + log_annual_rep_profits, data = baseline_firms, family = "binomial")
+m4 <- glm(attr ~ selected + not_selected + did_not_apply + log_firm_size_sans_app, data = baseline_firms, family = "binomial") 
+m5 <- glm(attr ~ selected + not_selected + did_not_apply + as.factor(FS1.11), data = baseline_firms, family = "binomial")
+
+star <- stargazer(m1, m2, m3, m4, m5, df = FALSE,
+                  no.space = TRUE, digits = 2, header = F, table.placement = "H", notes.align = "r",
+                  covariate.labels = c("Total apprentices",
+                                       "No. of CQP Selected",
+                                       "No. of CQP Not Selected",
+                                       "No. of CQP Did Not Apply",
+                                       "log Annual Profits (reported)",
+                                       "log Firm Size$^1$",
+                                       "Masonry (reference) \\\\ \\\\ Carpentry",
+                                       "Plumbing",
+                                       "Metalwork",
+                                       "Electrical Inst."),
+                  title = "Likelihood of firm attrition",
+                  omit.stat=c("aic", "bic", "adj.rsq", "ser"),
+                  model.names = FALSE,
+                  dep.var.caption = "",
+                  label = "tab:tbl-attritionfirmsreg")
+
+## ---- tbl-attritionfirmsreg --------
+
+star2 <- c(star[1:38],
+           "\\multicolumn{6}{l}{\\multirow{2}{14cm}{The table reports coefficients from logit regressions where the dependent variable is equal to 1 if the firm was not observed in the endline survey and 0 otherwise.}} \\\\ \\\\",
+           "\\multicolumn{6}{l}{$^1$Excluding apprentices} \\\\",
+           star[39:length(star)]) 
+
+cat(as.character(star2))
 
 ## ---- tbl-skillschangebycqp --------
 
@@ -232,7 +333,7 @@ stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.2", font.size= "small"
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
           notes = c("Omitted category: CQP Selected.",
                     "$^1$Years of training prior to 2019.",
-                    "$^2$Excluding apprentices."),
+                    "$^2$Excluding apprentices"),
           notes.align = "r",
           notes.append = TRUE,
           covariate.labels = c("CQP Not Selected",
@@ -1004,7 +1105,7 @@ m6 <- plm(firm_size_sans_app ~ total_apps + as.factor(wave), data = x, index = c
 
 stargazer(m1, m2, m3, m4, m5, m6, df = FALSE, omit = "FS1.2",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("$^1$Excluding apprentices."),
+          notes = c("$^1$Excluding apprentices"),
           notes.align = "r",
           notes.append = TRUE,
           covariate.labels = c("Non-CQP apprentices",

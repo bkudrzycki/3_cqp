@@ -218,6 +218,7 @@ df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
 df$did2 <- ifelse(df$SELECTED == 3, (as.numeric(df$SELECTED)-2)*df$wave, 0)
 
 x <- df %>% mutate(total_apps = selected + not_selected + did_not_apply,
+                   firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA),
                    SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
 
 

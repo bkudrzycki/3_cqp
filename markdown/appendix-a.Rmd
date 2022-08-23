@@ -6,7 +6,19 @@
 ```{r, tbl-attritionapps}
 ```
 
+```{r, attritionappsreg, include = F}
+```
+
+```{r, tbl-attritionappsreg, results = 'asis', fig.align = 'center'}
+```
+
 ```{r, tbl-attritionfirms}
+```
+
+```{r, attritionfirmsreg, include = F}
+```
+
+```{r, tbl-attritionfirmsreg, results = 'asis', fig.align = 'center'}
 ```
 
 ``` {r fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
