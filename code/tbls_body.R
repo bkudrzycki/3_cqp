@@ -250,6 +250,7 @@ stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.2", font
                                "CQP Selected x Endline",
                                "CQP Did Not Apply x Endline",
                                "Baseline Experience$^1$",
+                               "Years of Schooling",
                                "Firm Size$^2$",
                                "Total Apprentices in Firm"),
           title = "Effects of training on human capital development",
@@ -406,7 +407,7 @@ tbl_summary(x, by = SELECTED,
 
 ## ---- tbl-cblong --------
 
-x <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED, firm_size_bins, FS3.4, FS4.1, FS4.7, annual_app_prod, FS5.1, FS5.3, FS5.4, FS6.1, FS6.2, firm_size, profits, expenses, annual_fees, total_benefits, annual_allowances, annual_training_costs, annual_foregone_prod, total_costs, contains("cb")) %>%
+x <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED, firm_size_bins, FS3.4, FS4.1, FS4.7, annual_app_prod, FS5.1, FS5.3, FS5.4, FS6.1, FS6.2, firm_size, profits, expenses, annual_fees, total_benefits, annual_allowances, total_training_costs, annual_foregone_prod, total_costs, contains("cb")) %>%
   group_by(FS1.2) %>% 
   summarise_all(mean, na.rm = T) %>% 
   ungroup() %>% 
@@ -415,24 +416,39 @@ x <- df %>% filter(wave == 0) %>% select(FS1.2, SELECTED, firm_size_bins, FS3.4,
          apprentice_prod_extrap = FS6.1*annual_app_prod,
          total_benefits_extrap = FS6.1*total_benefits,
          annual_allowances_extrap = FS6.1*annual_allowances,
-         annual_training_costs_extrap = FS6.1*annual_training_costs,
+         total_training_costs = total_training_costs * FS4.1,
          annual_foregone_prod_extrap = FS6.1*annual_foregone_prod,
          total_costs_extrap = FS6.1*total_costs,
          cb_I_extrap = FS6.1*cb_I,
          cb_II_extrap = FS6.1*cb_II,
          cb_III_extrap = FS6.1*cb_III,
          cb_IV_extrap = FS6.1*cb_IV,
-         cb_V_extrap = FS6.1*cb_V) %>% 
-  mutate(annual_revenues = FS4.7 * FS4.1,
+         cb_V_extrap = FS6.1*cb_V,
+         annual_revenues = FS4.7 * FS4.1,
          annual_wage_bill = FS5.3 * FS4.1,
          annual_non_wage_exp = FS5.1 * FS4.1,
          annual_expenses = expenses * FS4.1,
          annual_rep_profits = FS5.4 * FS4.1,
          annual_profits = profits * FS4.1,
+         # rep_profitsratio_I = ifelse(cb_I >=0 & FS4.1 > 0, cb_I/annual_rep_profits, NA),
+         # rep_profitsratio_II = ifelse(cb_II >=0 & FS4.1 > 0, cb_II/annual_rep_profits, NA),
+         # rep_profitsratio_III = ifelse(cb_III >=0 & FS4.1 > 0, cb_III/annual_rep_profits, NA),
+         # rep_profitsratio_IV = ifelse(cb_IV >=0 & FS4.1 > 0, cb_IV/annual_rep_profits, NA),
+         # rep_profitsratio_V = ifelse(cb_V >=0 & FS4.1 > 0, cb_V/annual_rep_profits, NA),
+         # profitsratio_I = ifelse(cb_I >=0 & FS4.1 > 0, cb_I/annual_profits, NA),
+         # profitsratio_II = ifelse(cb_II >=0 & FS4.1 > 0, cb_II/annual_profits, NA),
+         # profitsratio_III = ifelse(cb_III >=0 & FS4.1 > 0, cb_III/annual_profits, NA),
+         # profitsratio_IV = ifelse(cb_IV >=0 & FS4.1 > 0, cb_IV/annual_profits, NA),
+         # profitsratio_V = ifelse(cb_V >=0 & FS4.1 > 0, cb_V/annual_profits, NA),
+         # expratio_I = ifelse(cb_I <0 & FS5.1>total_training_costs & FS4.1 > 0, -cb_I/(FS5.1*FS4.1-total_training_costs), NA),
+         # expratio_II = ifelse(cb_II <0 & FS5.1>total_training_costs & FS4.1 > 0, -cb_II/(FS5.1*FS4.1-total_training_costs), NA),
+         # expratio_III = ifelse(cb_III <0 & FS5.1>total_training_costs & FS4.1 > 0, -cb_III/(FS5.1*FS4.1-total_training_costs), NA),
+         # expratio_IV = ifelse(cb_IV <0 & FS5.1>total_training_costs & FS4.1 > 0, -cb_IV/(FS5.1*FS4.1-total_training_costs), NA),
+         # expratio_V = ifelse(cb_V <0 & FS5.1>total_training_costs & FS4.1 > 0, -cb_V/(FS5.1*FS4.1-total_training_costs), NA),
          firm_size_bins = cut(firm_size, breaks = c(1,4,6,10,107))) %>% 
-  mutate_at(vars(contains(c('annual', 'extrap'))), ~./605)
+  mutate_at(vars(contains(c('annual', 'extrap')), total_training_costs), ~./605)
 
-x %>% select(firm_size_bins, annual_revenues, annual_wage_bill, annual_non_wage_exp, annual_expenses, annual_rep_profits, annual_profits, annual_fees_extrap, apprentice_prod_extrap, total_benefits_extrap, annual_allowances_extrap, annual_training_costs_extrap, annual_foregone_prod_extrap, total_costs_extrap, contains("extrap")) %>% 
+x %>% select(firm_size_bins, annual_revenues, annual_wage_bill, annual_non_wage_exp, annual_expenses, annual_rep_profits, annual_profits, annual_fees_extrap, apprentice_prod_extrap, total_benefits_extrap, annual_allowances_extrap, total_training_costs, annual_foregone_prod_extrap, total_costs_extrap, contains(c("extrap", 'ratio'))) %>% 
   tbl_summary(by = firm_size_bins,
               type = everything() ~ "continuous",
               statistic = all_continuous() ~ c("{mean} ({sd})"),
@@ -448,7 +464,7 @@ x %>% select(firm_size_bins, annual_revenues, annual_wage_bill, annual_non_wage_
                            apprentice_prod_extrap ~ "Apprentice prod.",
                            total_benefits_extrap ~ "Total",
                            annual_allowances_extrap ~ "Allowances",
-                           annual_training_costs_extrap ~ "Training costs",
+                           total_training_costs ~ "Training costs",
                            annual_foregone_prod_extrap ~ "Lost trainer prod.",
                            total_costs_extrap ~ "Total",
                            cb_I_extrap ~ "Model I",

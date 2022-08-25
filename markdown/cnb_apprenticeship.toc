@@ -1,18 +1,13 @@
 \contentsline {section}{\numberline {1}Introduction}{4}{section.1}% 
-\contentsline {section}{\numberline {2}Data and Methods}{11}{section.2}% 
-\contentsline {subsection}{\numberline {2.1}Country Context}{11}{subsection.2.1}% 
-\contentsline {subsection}{\numberline {2.2}Sampling}{14}{subsection.2.2}% 
-\contentsline {subsubsection}{Apprentices}{18}{section*.7}% 
-\contentsline {subsubsection}{Firms}{18}{section*.8}% 
-\contentsline {subsubsection}{Training}{20}{section*.9}% 
-\contentsline {subsubsection}{Motivation}{20}{section*.10}% 
-\contentsline {subsubsection}{Contract Type}{21}{section*.11}% 
+\contentsline {section}{\numberline {2}Data and Methods}{12}{section.2}% 
+\contentsline {subsection}{\numberline {2.1}Country Context}{12}{subsection.2.1}% 
+\contentsline {subsection}{\numberline {2.2}Sampling}{15}{subsection.2.2}% 
 \contentsline {subsection}{\numberline {2.3}Estimating Apprentice Benefits}{21}{subsection.2.3}% 
-\contentsline {subsection}{\numberline {2.4}Estimating Firm Benefits}{23}{subsection.2.4}% 
-\contentsline {section}{\numberline {3}Results}{27}{section.3}% 
-\contentsline {subsection}{\numberline {3.1}Impact of Informal and Dual Training on Individuals}{27}{subsection.3.1}% 
-\contentsline {subsection}{\numberline {3.2}Impact of Informal and Dual Training on Firms}{33}{subsection.3.2}% 
-\contentsline {section}{\numberline {4}Conclusion}{43}{section.4}% 
-\contentsline {section}{References}{46}{section*.23}% 
-\contentsline {section}{Appendix A}{50}{section*.24}% 
-\contentsline {section}{Appendix B}{67}{section*.57}% 
+\contentsline {subsection}{\numberline {2.4}Estimating Firm Benefits}{24}{subsection.2.4}% 
+\contentsline {section}{\numberline {3}Results}{28}{section.3}% 
+\contentsline {subsection}{\numberline {3.1}Impact of Informal and Dual Training on Individuals}{28}{subsection.3.1}% 
+\contentsline {subsection}{\numberline {3.2}Impact of Informal and Dual Training on Firms}{34}{subsection.3.2}% 
+\contentsline {section}{\numberline {4}Conclusion}{44}{section.4}% 
+\contentsline {section}{References}{47}{section*.18}% 
+\contentsline {section}{Appendix A}{51}{section*.19}% 
+\contentsline {section}{Appendix B}{68}{section*.52}% 
