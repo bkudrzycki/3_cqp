@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  1 SEP 2022 00:23
+This is XeTeX, Version 3.14159265-2.6-0.999991 (TeX Live 2019) (preloaded format=xelatex 2022.5.15)  1 SEP 2022 00:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1319,11 +1319,7 @@ Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 \rotheadsize=\dimen265
 \c@nlinenum=\count322
 \TeXr@lab=\toks33
-) (./cnb_apprenticeship.aux
-
-LaTeX Warning: Label `tab:appreg' multiply defined.
-
-)
+) (./cnb_apprenticeship.aux)
 \openout1 = `cnb_apprenticeship.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 144.
@@ -1538,10 +1534,6 @@ LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
 \openout5 = `cnb_apprenticeship.lot'.
 
 [3] [4] [5] [6] [7] [8] [9]
-
-LaTeX Warning: Reference `fig:enrolment' on page 10 undefined on input line 421
-.
-
 File: figures/fig-enrolment-1.pdf Graphic file (type pdf)
 <use figures/fig-enrolment-1.pdf>
 [10] [11] [12]
@@ -1910,21 +1902,8 @@ LaTeX Warning: Reference `hcqs' on page 24 undefined on input line 828.
 
 LaTeX Warning: Reference `knowqs' on page 24 undefined on input line 840.
 
-[24] (./tables/tbl-cbmodels.tex) [25] [26] [27] [28] [29] [30] [31]
-
-LaTeX Warning: Reference `tab:tbl-appreg' on page 32 undefined on input line 11
-24.
-
-[32]
-
-LaTeX Warning: Reference `tab:tbl-appreg' on page 33 undefined on input line 11
-38.
-
-
-LaTeX Warning: Reference `tab:tbl-appreg2' on page 33 undefined on input line 1
-141.
-
-[33] [34] [35] [36] [37] [38]
+[24] (./tables/tbl-cbmodels.tex) [25] [26] [27] [28] [29] [30] [31] [32] [33] [
+34] [35] [36] [37] [38]
 
 LaTeX Warning: Reference `fig:costspie2' on page 39 undefined on input line 138
 7.
@@ -1995,16 +1974,13 @@ Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 2623.
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2623.
  ) 
 Here is how much of TeX's memory you used:
- 30886 strings out of 492916
- 563272 string characters out of 6133345
- 841916 words of memory out of 5000000
- 34546 multiletter control sequences out of 15000+600000
+ 30884 strings out of 492916
+ 563245 string characters out of 6133345
+ 842957 words of memory out of 5000000
+ 34544 multiletter control sequences out of 15000+600000
  542827 words of font info for 136 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  70i,21n,118p,2251b,523s stack positions out of 5000i,500n,10000p,200000b,80000s

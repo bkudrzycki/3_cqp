@@ -21,19 +21,19 @@
 ```{r, tbl-attritionfirmsreg, results = 'asis', fig.align = 'center'}
 ```
 
-``` {r fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
+``` {r, fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
 ```
 
-```{r tbl-skillschangebycqp}
+```{r, tbl-skillschangebycqp}
 ```
 
-```{r tbl-compexp2}
+```{r, tbl-compexp2}
 ```
 
-``` {r tbl-appreg2, results = 'asis', fig.align = 'center'}
+``` {r, tbl-appreg2, results = 'asis', fig.align = 'center'}
 ```
 
-```{r tbl-allowances}
+```{r, tbl-allowances}
 ```
 
 \renewcommand{\arraystretch}{2}

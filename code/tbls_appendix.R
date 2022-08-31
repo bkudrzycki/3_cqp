@@ -347,7 +347,7 @@ stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.2", font.size= "small"
           dep.var.labels = c("Experience", "Competence", "Knowledge"),
           model.names = FALSE,
           dep.var.caption = "",
-          label = "tab:appreg",
+          label = "tab:tbl-appreg2",
           add.lines = list(c("Firm FE", "NO", "NO", "YES", "NO", "NO", "YES")))
 
 ## ---- tbl-allowances --------
