@@ -16,7 +16,11 @@ invisible(lapply(packages, library, character.only = TRUE))
 rm(packages, installed_packages)
 
 # Set working directory
-setwd("~/polybox/Youth Employment/2 CQP/Paper")
+if(is.na(path)){
+  setwd("~/polybox/Youth Employment/2 CQP/Paper")
+}else{
+  setwd(path)
+}
 
 # load all data
 load("data/base_cqps.rda")

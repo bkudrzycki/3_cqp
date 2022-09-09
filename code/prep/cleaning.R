@@ -2,7 +2,11 @@
 ## Data Cleaning  ##
 ####################
 
-setwd("~/polybox/Youth Employment/2 CQP/Paper")
+if(is.na(path)){
+  setwd("~/polybox/Youth Employment/2 CQP/Paper")
+}else{
+  setwd(path)
+}
 
 ## Dependencies
 
