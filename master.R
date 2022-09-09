@@ -2,7 +2,9 @@
 
 # set user path: e.g. /Volumes/nadel/research/Data/PhDs/Bart 2022/Paper 3 - CQP
 
-setwd("~/polybox/Youth Employment/2 CQP/Paper")
+path <- "~/polybox/Youth Employment/2 CQP/Paper"
+
+setwd(path)
 
 #clean and reshape data
 source("code/prep/cleaning.R") #clean youth survey and firm survey
