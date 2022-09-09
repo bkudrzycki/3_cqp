@@ -1,11 +1,21 @@
 This folder was made to facilitate replication of the results and PDF of the paper "Benefits and Costs of Dual and Informal
-Apprenticeship in Bénin".
+Apprenticeship in Bénin". 
 
-To replicate from raw data,
+# Prerequisites
+Stata, SPSS, and R (preferably RStudio) are necessary to fully reproduce paper.
 
-  1. open .do file "cleaning.do", enter user path and run
-  2. open script "master.R", enter user path and run
+The following default path is used in the various scripts below: 
 
-adhering to this order. Further details about the operations performed are given in the .do file and .R script, respectively.
+"/Volumes/nadel/research/Data/PhDs/Bart 2022/Paper 3 - CQP"
 
-If you have any questions about replicating this paper, please contact the author at bartlomiej.kudrzycki[at]nadel.ethz.ch
+If data is copied into a different directory, path names have to be adjusted where indicated below.
+
+# Replication
+
+The paper can be replicated from raw data in three steps, executed in the following order:
+
+  **1. open Stata do file "cleaning.do", enter user path if needed and run**
+  **2. open SPSS syntax "master.sps", enter user path and run**
+  **3. open R script "master.R", enter user path and run**
+
+If you have any questions about replicating this paper, please see comments in the scripts above or contact the author at bartlomiej.kudrzycki[at]nadel.ethz.ch
