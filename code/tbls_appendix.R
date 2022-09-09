@@ -176,6 +176,7 @@ star <- stargazer(m1, m2, m3, m4, m5, df = FALSE,
                   title = "Likelihood of firm attrition",
                   omit.stat=c("aic", "bic", "adj.rsq", "ser"),
                   model.names = FALSE,
+                  dep.var.labels.include = TRUE,
                   dep.var.caption = "",
                   label = "tab:tbl-attritionfirmsreg")
 
@@ -274,7 +275,7 @@ comp <- x %>% select(tidyselect::vars_select(names(x), matches("comp")), side, I
   add_p(test = everything() ~ "wilcox.test") %>% 
   modify_header(stat_by =  "**{level}**",
                 starts_with("add_n_stat") ~ "**N**",
-                p.value = "**p-value³**",
+                p.value = "**p-value¹**",
                 label = "**Trade**") %>% 
   modify_footnote(update = everything() ~ NA)
 
@@ -295,7 +296,7 @@ exp <- x %>% select(tidyselect::vars_select(names(x), matches("exp"), -expenses)
   add_p(test = everything() ~ "wilcox.test") %>% 
   modify_header(stat_by =  "**{level}**",
                 starts_with("add_n_stat") ~ "**N**",
-                p.value = "**p-value³**",
+                p.value = "**p-value¹**",
                 label = "**Trade**") %>% 
   modify_footnote(update = everything() ~ NA)
 
@@ -305,8 +306,8 @@ tbl_stack(list(comp, exp), group_header = c("Competence", "Experience"), quiet =
                  linesep = "") %>% 
   kableExtra::row_spec(c(8,16),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Proportion of tasks reported by apprentices and firms at endline. Comparison only possibly at endline as apprentices were not asked to self-assess competence and experience at baseline.",
-           number = c("Percent of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade.", "Wilcoxon rank sum test"),
+  footnote(general = "Mean (SD). Proportion of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade. Comparison only possibly at endline as apprentices were not asked to self-assess competence and experience at baseline.",
+           number = "Wilcoxon rank sum test",
            threeparttable = T,
            escape = F,
            general_title = "")

@@ -45,7 +45,7 @@ end_ys <- ys %>% select(tidyselect::vars_select(names(ys), matches(c('IDYouth', 
 
 # SELECT FIRM (FS) VARIABLES OF INTEREST HERE
 #time-invariant from firm survey
-time_inv_fs <- fs %>% select("FS1.2", "FS1.6", "FS1.11", "FS6.16", "dossier_apps", "dossier_reserves", "dossier_selected") %>% left_join(fs_end %>% select("FS1.2", contains(c("FE5.1", "FE7.2", "FE9.1"))), by = "FS1.2")
+time_inv_fs <- fs %>% select("FS1.2", "FS1.6", "FS1.11", contains("FS2"), "FS6.16", "dossier_apps", "dossier_reserves", "dossier_selected") %>% left_join(fs_end %>% select("FS1.2", contains(c("FE5.1", "FE7.2", "FE9.1"))), by = "FS1.2")
 
 df <- rbind(JoinCQP(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS3.5_1','FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS4.1', 'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', matches('FS6.15'), 'FS6.17', 'FS9.3')) %>% rename(status = FS9.3), 
             JoinTrad(c('FS1.2', 'FS3.1', 'FS3.2', 'FS3.3', 'FS3.4', 'FS4.1', 'FS3.5_1', 'FS3.5_2', 'FS3.5_3', 'FS3.5_4', 'FS3.5_5', 'FS3.5_1',  'FS4.7', 'FS5.1', 'FS5.3', 'FS5.4', 'FS6.1', 'FS6.2', 'FS6.8', 'FS6.9', 'FS6.10', 'FS6.13', 'FS6.14', matches('FS6.15'), 'FS6.17', 'FS7.4')) %>% rename(status = FS7.4)) %>%
