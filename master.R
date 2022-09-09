@@ -1,5 +1,7 @@
 ## Master Script ##
 
+# set user path: e.g. /Volumes/nadel/research/Data/PhDs/Bart 2022/Paper 3 - CQP
+
 setwd("~/polybox/Youth Employment/2 CQP/Paper")
 
 #clean and reshape data
