@@ -19,6 +19,6 @@ The paper can be replicated from raw data in three steps, executed in the follow
   2. **open SPSS syntax "master.sps", enter user path if needed and run**
   3. **open R script "master.R", enter user path if needed and run**
 
-The final step generates a PDF in the "markdown" folder.
+The final step generates a PDF called "cnb_apprenticeship.pdf" in the "markdown" folder. This is the replicated paper.
 
 If you have any questions about replicating this paper, please see comments in the scripts above or contact the author at bartlomiej.kudrzycki[at]nadel.ethz.ch
