@@ -3,8 +3,8 @@ Apprenticeship in Bénin".
 
 To replicate from raw data,
 
-  1. run the Stata script "cleaning.do"
-  2. run the R script "master.R"
+  1. open .do file "cleaning.do", enter user path and run
+  2. open script "master.R", enter user path and run
 
 adhering to this order. Further details about the operations performed are given in the .do file and .R script, respectively.
 
