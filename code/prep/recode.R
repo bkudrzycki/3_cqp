@@ -23,15 +23,15 @@ if(is.na(path)){
 }
 
 # load all data
-load("data/base_cqps.rda")
-load("data/base_trad.rda")
-load("data/end_cqps.rda")
-load("data/end_trad.rda")
+load("data/R/base_cqps.rda")
+load("data/R/base_trad.rda")
+load("data/R/end_cqps.rda")
+load("data/R/end_trad.rda")
 
-load("data/fs.rda")
-load("data/fs_end.rda")
+load("data/R/fs.rda")
+load("data/R/fs_end.rda")
 
-load("data/ys.rda")
+load("data/R/ys.rda")
 
 # load functions
 source("functions/join_cqp_trad.R")

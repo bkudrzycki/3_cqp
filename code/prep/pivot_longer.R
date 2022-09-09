@@ -23,8 +23,8 @@ if(is.na(path)){
   setwd(path)
 }
 
-load("data/fs.rda")
-load("data/fs_end.rda")
+load("data/R/fs.rda")
+load("data/R/fs_end.rda")
 
 # Functions
 source("functions/strip_tags.R")
@@ -214,10 +214,10 @@ end_cqps <- end_cqps %>% zap_labels()
 end_trad <- end_trad %>% zap_labels()
 
 # save data
-save(base_cqps, file = "data/base_cqps.rda")
-save(base_trad, file = "data/base_trad.rda")
-save(end_cqps, file = "data/end_cqps.rda")
-save(end_trad, file = "data/end_trad.rda")
+save(base_cqps, file = "data/R/base_cqps.rda")
+save(base_trad, file = "data/R/base_trad.rda")
+save(end_cqps, file = "data/R/end_cqps.rda")
+save(end_trad, file = "data/R/end_trad.rda")
 
 rm(list=setdiff(ls(), "path"))
 

@@ -17,7 +17,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 rm(packages, installed_packages)
 
 # Set working directory
-if(is.na(path)){
+if(!exists("path")){
   setwd("~/polybox/Youth Employment/2 CQP/Paper")
 }else{
   setwd(path)
@@ -120,9 +120,9 @@ selected <- read_excel("data/selected_new.xls") %>%
 fs <- fs %>% left_join(selected, by = c("FS1.2" = "IDPatron"))
 
 # save cleaned data
-save(fs, file = "data/fs.rda")
-save(fs_end, file = "data/fs_end.rda")
-save(ys, file = "data/ys.rda")
+save(fs, file = "data/R/fs.rda")
+save(fs_end, file = "data/R/fs_end.rda")
+save(ys, file = "data/R/ys.rda")
 
 rm(list=setdiff(ls(), "path"))
 
