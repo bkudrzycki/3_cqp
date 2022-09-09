@@ -2,14 +2,6 @@
 ## Data Cleaning  ##
 ####################
 
-if(is.na(path)){
-  setwd("~/polybox/Youth Employment/2 CQP/Paper")
-}else{
-  setwd(path)
-}
-
-## Dependencies
-
 # Package names
 packages <- c("haven", "tidyverse", "labelled", "readxl")
 
@@ -23,6 +15,13 @@ if (any(installed_packages == FALSE)) {
 invisible(lapply(packages, library, character.only = TRUE))
 
 rm(packages, installed_packages)
+
+# Set working directory
+if(is.na(path)){
+  setwd("~/polybox/Youth Employment/2 CQP/Paper")
+}else{
+  setwd(path)
+}
 
 # Functions
 source("functions/coalesce_join.R")
@@ -125,7 +124,7 @@ save(fs, file = "data/fs.rda")
 save(fs_end, file = "data/fs_end.rda")
 save(ys, file = "data/ys.rda")
 
-rm(list = ls())
+rm(list=setdiff(ls(), "path"))
 
 
 

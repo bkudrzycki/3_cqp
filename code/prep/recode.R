@@ -843,4 +843,4 @@ df <- unlabelled(df)
 
 save(df, file = "data/df.rda")
 
-rm(list = ls())
+rm(list=setdiff(ls(), "path"))

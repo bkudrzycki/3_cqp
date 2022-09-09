@@ -11,7 +11,8 @@ source("code/prep/cleaning.R") #clean youth survey and firm survey
     # inputs:
         # - Stata-cleaned youth survey data ("data/youth_survey_merged.sav")
         # - Raw firm survey baseline data ("data/source/Enquête+auprès+des+patrons_February+10,+2020_13.28.sav")
-        # - Raw firm survey endline data ("data/source/Enquête+auprès+des+patrons+-+endline_October+6,+2021_12.12.sav")
+        # - Raw firm survey endline data and supplement ("data/source/Enquête+auprès+des+patrons+-+endline_October+6,+2021_12.12.sav", "data/source/Enquête+des+jeunes+-+endline+-+supplementaire_November+18,+2021_22.23.sav")
+        # - Dossier data: CQP applications and admission ("data/selected_new.xls")
     # outputs:
         # - Cleaned youth data ("data/ys.rda")
         # - Cleaned firm data ("data/fs.rda" and "data/fs_end.rda")

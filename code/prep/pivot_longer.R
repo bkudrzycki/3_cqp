@@ -2,8 +2,6 @@
 ## Reshape data: 1 row, 1 apprentice  ##
 ########################################
 
-## 0 - Load libraries, packages and data
-
 # Package names
 packages <- c("haven", "tidyverse", "labelled")
 
@@ -31,7 +29,7 @@ load("data/fs_end.rda")
 # Functions
 source("functions/strip_tags.R")
 
-## 1 - Reshape data for CQP applicants
+# reshape data for CQP applicants
 
 # strip prefix identifying loop and combine data for apprentices (up to 3 per master)
 df1 <- strip_tags("FS1.8_1", "A1_FS9", fs) %>% rename_all(~stringr::str_replace(., "^A1_", "")) %>% rename(IDYouth = FS1.8_1) %>% 
@@ -79,7 +77,7 @@ end_cqps <- end_cqps %>% filter(!(IDYouth == 392 & FS1.2 == 94)) %>%
 rm(df1, df2, df3, df4, df5, df6)
 
 
-# 3 - Match apprentices who didn't apply for CQP (i.e. non-CQPs or traditional apprentices)
+# match apprentices who didn't apply for CQP (i.e. non-CQPs or traditional apprentices)
 
 # slightly modified function that subsets data for one apprentice at a time
 ToNumeric <- function(x) (as.numeric(as.character(x)))
@@ -215,11 +213,12 @@ base_trad <- base_trad %>% zap_labels()
 end_cqps <- end_cqps %>% zap_labels()
 end_trad <- end_trad %>% zap_labels()
 
+# save data
 save(base_cqps, file = "data/base_cqps.rda")
 save(base_trad, file = "data/base_trad.rda")
 save(end_cqps, file = "data/end_cqps.rda")
 save(end_trad, file = "data/end_trad.rda")
 
-rm(list = ls())
+rm(list=setdiff(ls(), "path"))
 
 
