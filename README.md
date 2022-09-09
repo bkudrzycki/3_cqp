@@ -4,7 +4,7 @@ Apprenticeship in Bénin".
 # Prerequisites
 Stata, SPSS, and R (preferably RStudio) are necessary to fully reproduce paper.
 
-The following default path is used in the various scripts below: 
+The following default path is used in the scripts below: 
 
 "/Volumes/nadel/research/Data/PhDs/Bart 2022/Paper 3 - CQP"
 
