@@ -15,7 +15,7 @@ If data is copied into a different directory, path names have to be adjusted whe
 
 The paper can be replicated from raw data in three steps, executed in the following order:
 
-  1. **open Stata do file "cleaning.do", enter user path if needed and run**
+  1. **open Stata do file "master.do", enter user path if needed and run**
   2. **open SPSS syntax "master.sps", enter user path if needed and run**
   3. **open R script "master.R", enter user path if needed and run**
 
