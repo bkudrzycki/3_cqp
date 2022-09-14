@@ -1,4 +1,3 @@
-
 ## ---- fig-enrollment --------
 
 x <- read_csv("../data/API_SE.SEC.ENRR_DS2_en_csv_v2_4029558.csv", show_col_types = FALSE) %>% as.data.frame() %>% mutate(Indicator = "Enrolment ratio")
