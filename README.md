@@ -1,5 +1,5 @@
 # README
-This folder was made to facilitate replication of the results and PDF of the paper "Benefits and Costs of Dual and Informal
+This repo facilitates the replication of PhD Paper titled "Benefits and Costs of Dual and Informal
 Apprenticeship in Bénin". 
 
 # Prerequisites
