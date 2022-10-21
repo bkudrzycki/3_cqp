@@ -312,45 +312,6 @@ tbl_stack(list(comp, exp), group_header = c("Competence", "Experience"), quiet =
            escape = F,
            general_title = "")
 
-## ---- tbl-appreg2 --------
-
-x <- df %>% filter(SELECTED != 3) %>% mutate(total_apps = selected + not_selected + did_not_apply,
-                                             SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
-
-
-m1 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m2 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
-m3 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
-
-
-m5 <- lm(comp_all_trades ~  as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m6 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
-m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
-
-
-stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.2", font.size= "small", column.sep.width = "-8pt",
-          no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("Omitted category: CQP Selected.",
-                    "$^1$Years of training prior to 2019.",
-                    "$^2$Excluding apprentices"),
-          notes.align = "r",
-          notes.append = TRUE,
-          covariate.labels = c("CQP Not Selected",
-                               "Endline",
-                               "CQP Selected x Endline",
-                               "Baseline experience$^1$",
-                               "Firm size$^2$",
-                               "Total apprentices in firm"),
-          title = "Effects of training on human capital, excluding CQP non-applicants",
-          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
-          dep.var.labels = c("Experience", "Competence", "Knowledge"),
-          model.names = FALSE,
-          dep.var.caption = "",
-          label = "tab:tbl-appreg2",
-          add.lines = list(c("Firm FE", "NO", "NO", "YES", "NO", "NO", "YES")))
-
 ## ---- tbl-allowances --------
 
 baseline <- df %>% filter(wave == 0) %>% select(SELECTED, "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "all_allowances") %>% 

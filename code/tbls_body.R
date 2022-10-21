@@ -1,6 +1,6 @@
 ## ---- tbl-desc --------
 
-apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, grad, schooling, wave) %>%
+apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, schooling, grad, wave) %>%
   mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
          schooling = factor(schooling, levels = c('None', '<Primary', 'Primary', 'Secondary', 'Technical', 'Tertiary')),
          sex = factor(sex, levels = 0:1, labels = c("Female", "Male")),
@@ -60,7 +60,7 @@ workshops <- df %>% mutate(N_firms = 1) %>% mutate(apps = FS6.1,
 
 x <- tbl_stack(list(apps, workshops), quiet = T) 
 
-y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED, FS1.11, duration, grad, schooling) %>%
+y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED, FS1.11, duration, schooling, grad) %>%
   mutate(schooling = factor(schooling, levels = c('None', '<Primary', 'Primary', 'Secondary', 'Technical', 'Tertiary')),
          SELECTED = factor(SELECTED, levels = c(1, 0, 3),
                            labels = c('Selected', 'Not Selected', 'Did Not Apply')),
@@ -80,6 +80,7 @@ y <- df %>% mutate(N = 1) %>% filter(wave == 0) %>% select(N, age, sex, SELECTED
                            duration ~ "Years in training",
                            schooling ~ "Education",
                            grad ~ "Status at endline")) %>% 
+  add_p() %>% 
   modify_header(all_stat_cols() ~ "**{level}**") %>% 
   modify_footnote(update = everything() ~ NA)
 
@@ -220,39 +221,37 @@ df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
 df$did2 <- ifelse(df$SELECTED == 3, (as.numeric(df$SELECTED)-2)*df$wave, 0)
 
 x <- df %>% mutate(total_apps = selected + not_selected + did_not_apply,
-                   firm_size_sans_app = ifelse(firm_size_sans_app > 1, log(firm_size_sans_app), NA),
                    SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
 
 
 m1 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
 m2 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
 m3 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + did2 + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + did2 + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + did2 + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.11), data = x)
 
 
 m5 <- lm(comp_all_trades ~  as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
 m6 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
 m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + did2 + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + did2 + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + did2 + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.11), data = x)
 
 m9 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
 m10 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
 m11 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
-m12 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m12 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.11), data = x)
 
-stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.2", font.size= "scriptsize", column.sep.width = "-8pt",
+stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.11", font.size= "scriptsize", column.sep.width = "-8pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("$^1$Years of training prior to baseline survey",
+          notes = c("$^1$Prior to baseline survey",
                     "$^2$Excluding apprentices."),
           notes.align = "r",
           notes.append = TRUE,
           covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
                                "CQP Did Not Apply",
                                "Endline",
-                               "CQP Selected x Endline",
+                               "CQP Not Selected x Endline (reference) \\\\ \\\\ CQP Selected x Endline",
                                "CQP Did Not Apply x Endline",
-                               "Baseline Experience$^1$",
-                               "Years of Schooling",
+                               "Baseline years of training$^1$",
                                "Firm Size$^2$",
                                "Total Apprentices in Firm"),
           title = "Effects of training on human capital development",
@@ -261,21 +260,61 @@ stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.2", font
           model.names = FALSE,
           dep.var.caption = "",
           label = "tab:tbl-appreg",
-          add.lines = list(c("Firm FE", "NO", "NO", "YES", "NO", "NO", "YES", "NO", "NO", "YES")))
+          add.lines = list(c("Trade FE", "NO", "NO", "YES", "NO", "NO", "YES", "NO", "NO", "YES")))
+
+## ---- tbl-appreg2 --------
+
+x <- df %>% filter(SELECTED != 3) %>% mutate(total_apps = selected + not_selected + did_not_apply,
+                                             SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
+
+
+m1 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m2 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m3 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m4 <- lm(exp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.11), data = x)
+
+
+m5 <- lm(comp_all_trades ~  as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m6 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.2), data = x)
+m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps, data = x)
+m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.11), data = x)
+
+
+stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.11", font.size= "small", column.sep.width = "-8pt",
+          no.space = TRUE, digits = 2, header = F, table.placement = "H",
+          notes = c("Omitted category: CQP Selected.",
+                    "$^1$Prior to 2019.",
+                    "$^2$Excluding apprentices"),
+          notes.align = "r",
+          notes.append = TRUE,
+          covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
+                               "Endline",
+                               "CQP Not Selected x Endline (reference) \\\\ \\\\ CQP Selected x Endline",
+                               "Baseline years of training$^1$",
+                               "Firm size$^2$",
+                               "Total apprentices in firm"),
+          title = "Effects of training on human capital, excluding CQP non-applicants",
+          omit.stat=c("aic", "bic", "adj.rsq", "ser"),
+          dep.var.labels = c("Experience", "Competence", "Knowledge"),
+          model.names = FALSE,
+          dep.var.caption = "",
+          label = "tab:tbl-appreg2",
+          add.lines = list(c("Trade FE", "NO", "NO", "YES", "NO", "NO", "YES")))
 
 ## ---- tbl-netappbenefits --------
 
 x <- df %>% filter(wave == 0) %>% 
-  rowwise() %>% mutate_at(c("a_total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application"), ~./4/605) %>%
-  mutate_at(vars(contains("allow")), ~.*5*4*FS4.1/605) %>% mutate("a_allow" = a_allow / 5) %>%
+  mutate_at(c("a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "a_total_fees"), ~./4/605) %>%
+  mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other", "a_allow"), ~.*5*4*FS4.1/605) %>% mutate("a_allow" = a_allow/5) %>% mutate("annual_allowances" = annual_allowances/605) %>% 
+  rowwise() %>% 
   mutate(a_net_benefits = sum(a_allow, -a_total_fees, na.rm = F),
-         net_benefits = sum(all_allowances, -total_fees, na.rm = F)) %>% ungroup() %>% 
-  select("SELECTED",  "a_total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_allow", "a_net_benefits", "total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "all_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "net_benefits") %>% 
+         net_benefits = sum(annual_allowances, -total_fees, na.rm = F)) %>% ungroup() %>% 
+  select("SELECTED",  "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_total_fees", "a_allow", "a_net_benefits", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "total_fees", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_allowances", "net_benefits") %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
 
 #x <- x %>% replace(is.na(.), 0)
 
-var_label(x$a_total_fees) <- "Total Fees"
+var_label(x$a_total_fees) <- "Total"
 var_label(x$a_fee_entry) <- "Entry"
 var_label(x$a_fee_formation) <- "Formation"
 var_label(x$a_fee_liberation) <- "Liberation"
@@ -284,14 +323,14 @@ var_label(x$a_fee_contract) <- "Contract"
 var_label(x$a_fee_application) <- "Application"
 var_label(x$a_allow) <- "Allowances¹"
 var_label(x$a_net_benefits) <- "Allowances net fees²"
-var_label(x$total_fees) <- "Total Fees"
+var_label(x$total_fees) <- "Total"
 var_label(x$fee_entry) <- "Entry"
 var_label(x$fee_formation) <- "Formation"
 var_label(x$fee_liberation) <- "Liberation"
 var_label(x$fee_materials) <- "Materials"
 var_label(x$fee_contract) <- "Contract"
 var_label(x$fee_application) <- "Application"
-var_label(x$all_allowances) <- "Allowances"
+var_label(x$annual_allowances) <- "Total"
 var_label(x$allow_food) <- "Food"
 var_label(x$allow_transport) <- "Transport"
 var_label(x$allow_pocket_money) <- "Pocket money"
@@ -304,7 +343,7 @@ tbl_summary(x, by = SELECTED,
             missing = "no",
             digits = everything() ~ 2) %>% 
   add_overall() %>% 
-  add_p(test = list(c("total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "all_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "net_benefits") ~ "aov",
+  add_p(test = list(c("total_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "net_benefits") ~ "aov",
                     c("a_total_fees", "a_fee_entry", "a_fee_formation", "a_fee_liberation", "a_fee_materials", "a_fee_contract", "a_fee_application", "a_allow", "a_net_benefits") ~ "t.test")) %>% 
   modify_footnote(update = everything() ~ NA) %>% 
   modify_header(update = list(all_stat_cols(FALSE) ~ "**{level}**",
@@ -316,15 +355,28 @@ tbl_summary(x, by = SELECTED,
                  booktabs = T,
                  linesep = "",
                  position = "H") %>% 
-  kableExtra::add_indent(c(2:7), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(11:16), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(18:21), level_of_indent = 1) %>% 
   kableExtra::group_rows(start_row = 1,
                          end_row = 9,
                          group_label = "Apprentice survey:") %>% 
+  kableExtra::group_rows(start_row = 1,
+                         end_row = 7,
+                         group_label = "\\\\hspace{1em} Fees",
+                         bold = F,
+                         escape = F) %>%
   kableExtra::group_rows(start_row = 10,
                          end_row = 22,
-                         group_label = "Firm survey:") %>% 
+                         group_label = "Firm survey:",
+                         hline_before = T) %>% 
+  kableExtra::group_rows(start_row = 10,
+                         end_row = 16,
+                         group_label = "\\\\hspace{1em} Fees",
+                         bold = F,
+                         escape = F) %>%
+  kableExtra::group_rows(start_row = 17,
+                         end_row = 21,
+                         group_label = "\\\\hspace{1em} Allowances",
+                         bold = F,
+                         escape = F) %>%
   kableExtra::row_spec(c(9,22), bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
   footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey. Annual fees assume apprenticeship duration of four years.",
@@ -336,27 +388,21 @@ tbl_summary(x, by = SELECTED,
 
 ## ---- tbl-netbenefits --------
 
-x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate_at(c("fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application"), ~./4) %>% mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), ~.*5*4*FS4.1) %>% 
+x <- df %>% filter(wave == 0) %>% rowwise() %>% mutate_at(c("allow_food", "allow_transport", "allow_pocket_money", "allow_other"), ~.*5*4*FS4.1) %>% 
   mutate_at(c(vars(contains("FE5.1"))), ~.*FS4.1/FS6.1) %>% 
-  select("FS1.2", "SELECTED", "annual_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_app_prod", "total_benefits", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_training_costs", contains("FE5.1"), "annual_foregone_prod", "total_costs", contains("cb")) %>%
-  mutate_at(c("annual_fees", "fee_entry", "fee_formation", "fee_liberation", "fee_materials", "fee_contract", "fee_application", "annual_app_prod", "total_benefits", "annual_allowances", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_training_costs", "FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4", "annual_foregone_prod", "total_costs", "cb_I", "cb_II", "cb_III", "cb_IV", "cb_V"), ~./605) %>% ungroup() %>% 
+  select("FS1.2", "SELECTED", "annual_fees", "annual_app_prod", "total_benefits", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_allowances", contains("FE5.1"), "annual_training_costs", "annual_foregone_prod", "total_costs", contains("cb")) %>%
+  mutate_at(c("annual_fees", "annual_app_prod", "total_benefits", "allow_food", "allow_transport", "allow_pocket_money", "allow_other", "annual_allowances", "FE5.1_1", "FE5.1_2", "FE5.1_3", "FE5.1_4", "annual_training_costs", "annual_foregone_prod", "total_costs", "cb_I", "cb_II", "cb_III", "cb_IV", "cb_V"), ~./605) %>% ungroup() %>% 
   mutate(SELECTED = factor(SELECTED, levels = c(1, 0, 3), labels = c('CQP Selected', 'CQP Not Selected', 'Did Not Apply')))
 
 var_label(x$annual_fees) <- "Fees¹"
-var_label(x$fee_entry) <- "Entry"
-var_label(x$fee_formation) <- "Formation"
-var_label(x$fee_liberation) <- "Liberation"
-var_label(x$fee_materials) <- "Materials"
-var_label(x$fee_contract) <- "Contract"
-var_label(x$fee_application) <- "Application"
 var_label(x$annual_app_prod) <- "Apprentice prod."
 var_label(x$total_benefits) <- "Total"
-var_label(x$annual_allowances) <- "Allowances¹"
+var_label(x$annual_allowances) <- "Total¹"
 var_label(x$allow_food) <- "Food"
 var_label(x$allow_transport) <- "Transport"
 var_label(x$allow_pocket_money) <- "Pocket money"
 var_label(x$allow_other) <- "Other"
-var_label(x$annual_training_costs) <- "Training costs"
+var_label(x$annual_training_costs) <- "Total"
 var_label(x$FE5.1_1) <- "Rent"
 var_label(x$FE5.1_2) <- "Equipment"
 var_label(x$FE5.1_3) <- "Books"
@@ -387,18 +433,28 @@ tbl_summary(x, by = SELECTED,
                  linesep = "",
                  position = "H") %>%
   kableExtra::group_rows(start_row = 1,
-                         end_row = 9,
+                         end_row = 3,
                          group_label = "Benefits") %>% 
-  kableExtra::group_rows(start_row = 10,
-                         end_row = 21,
-                         group_label = "Costs") %>% 
-  kableExtra::group_rows(start_row = 22,
-                         end_row = 26,
-                         group_label = "Net Benefits") %>% 
-  kableExtra::add_indent(c(2:7), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(11:14), level_of_indent = 1) %>% 
-  kableExtra::add_indent(c(16:19), level_of_indent = 1) %>% 
-  kableExtra::row_spec(c(9,21),bold=T) %>% 
+  kableExtra::group_rows(start_row = 4,
+                         end_row = 15,
+                         group_label = "Costs",
+                         hline_before = T) %>% 
+  kableExtra::group_rows(start_row = 4,
+                         end_row = 8,
+                         group_label = "\\\\hspace{1em} Allowances",
+                         bold = F,
+                         escape = F) %>% 
+  kableExtra::group_rows(start_row = 9,
+                         end_row = 13,
+                         group_label = "\\\\hspace{1em} Training costs",
+                         bold = F,
+                         escape = F) %>% 
+  kableExtra::group_rows(start_row = 16,
+                         end_row = 20,
+                         group_label = "Net Benefits",
+                         hline_before = T) %>% 
+  kableExtra::row_spec(c(3,15),bold=T) %>%
+
   kableExtra::kable_styling(latex_options="scale_down") %>% 
   footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year. Calculated using responses from baseline survey, except training costs which were not elicited until endline. Net benefits are not computed for rows with missing data for any categories included in a given model. Mean net benefit estimates may deviate from sums of the relevant categories as a result.",
            number = c("Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.", "Analysis of variance"),

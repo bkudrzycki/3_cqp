@@ -30,9 +30,6 @@
 ```{r, tbl-compexp2}
 ```
 
-``` {r, tbl-appreg2, results = 'asis', fig.align = 'center'}
-```
-
 ```{r, tbl-allowances}
 ```
 

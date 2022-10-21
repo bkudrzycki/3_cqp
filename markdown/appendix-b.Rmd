@@ -73,7 +73,7 @@
 
 Table: (\#tab:tasks) Tasks used for assessment of competence and experience
 
-## Knowledge Questions {#knowqs}
+## Knowledge Questions {#knowqs .unlisted .unnumbered}
 
 **Masonry**
 
