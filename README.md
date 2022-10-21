@@ -15,9 +15,9 @@ If data is copied into a different directory, path names have to be adjusted whe
 
 The paper can be replicated from raw data in three steps, executed in the following order:
 
-  1. **open Stata do file "master.do" in the root folder, enter user path if needed and run**
-  2. **open SPSS syntax "master.sps" in the root folder, enter user path if needed and run**
-  3. **open R script "master.R" in the root folder, enter user path if needed and run**
+  1. **open Stata do file "master.do" in the root folder, enter new user path if needed and run**
+  2. **open SPSS syntax "master.sps" in the root folder, enter new user path if needed and run**
+  3. **open R script "master.R" in the root folder, enter new user path if needed and run**
 
 The final step generates a PDF called "cnb_apprenticeship.pdf" in the "markdown" folder. This is the replicated paper.
 
