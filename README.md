@@ -1,5 +1,5 @@
 # README
-This repo facilitates the replication of PhD Paper titled "Benefits and Costs of Dual and Informal
+This repo facilitates the replication of my paper titled "Benefits and Costs of Dual and Informal
 Apprenticeship in Bénin". 
 
 # Prerequisites
