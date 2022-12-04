@@ -442,9 +442,6 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 
 # Appendix B {-#appendix-b}
 
-\setcounter{figure}{0}
-\renewcommand{\thefigure}{B\arabic{section}.\arabic{figure}}
-
 ```{r child = "appendix-b.Rmd"}
 ``` 
 
