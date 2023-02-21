@@ -1,4 +1,5 @@
 _cache
+latex_cache
 .DS_Store
 .Rhistory
 .RData
