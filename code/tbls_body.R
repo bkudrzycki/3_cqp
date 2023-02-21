@@ -1,4 +1,4 @@
-## ---- tbl-desc --------
+## ---- tbl-cqpdesc --------
 
 apps <- df %>% mutate(N = 1) %>%  select(N, age, sex, FS1.11, duration, schooling, grad, wave) %>%
   mutate(wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline')),
