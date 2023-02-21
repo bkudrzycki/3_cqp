@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.9.15)  4 DEC 2022 14:51
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.9.15)  21 FEB 2023 13:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1308,8 +1308,11 @@ Overfull \hbox (67.28633pt too wide) in paragraph at lines 292--356
  [] 
  []
 
-[15] [16] [17] [18] [19] (./tables/tbl-cbmodels.tex) [20] [21] [22] [23] [24] [
-25] [26]
+[15] [16] [17] [18]
+
+LaTeX Warning: Reference `knowqs' on page 19 undefined on input line 371.
+
+[19] (./tables/tbl-cbmodels.tex) [20] [21] [22] [23] [24] [25] [26]
 Overfull \hbox (25.10635pt too wide) in paragraph at lines 479--514
  [][] 
  []
@@ -1322,14 +1325,14 @@ Overfull \hbox (34.60631pt too wide) in paragraph at lines 752--793
 [36] [37] [38] [39] [40] [41] [42
 
 ] [43] [44] [45] [46]
-Overfull \vbox (12.0pt too high) detected at line 1035
+Overfull \vbox (12.0pt too high) detected at line 1031
  []
 
 [47] [48] [49]
 File: figures/fig-firmsize-1.pdf Graphic file (type pdf)
 <use figures/fig-firmsize-1.pdf>
 [50]
-Overfull \hbox (43.76637pt too wide) in paragraph at lines 1143--1170
+Overfull \hbox (43.76637pt too wide) in paragraph at lines 1139--1166
  [] 
  []
 
@@ -1342,12 +1345,12 @@ File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
 File: figures/fig-apphist-1.pdf Graphic file (type pdf)
 <use figures/fig-apphist-1.pdf>
 
-LaTeX Warning: Float too large for page by 18.38318pt on input line 1273.
+LaTeX Warning: Float too large for page by 18.38318pt on input line 1269.
 
 File: figures/fig-firmhist-1.pdf Graphic file (type pdf)
 <use figures/fig-firmhist-1.pdf>
 
-LaTeX Warning: Float too large for page by 20.20972pt on input line 1277.
+LaTeX Warning: Float too large for page by 20.20972pt on input line 1273.
 
 [56] [57] [58] [59] [60] [61
 
@@ -1358,74 +1361,34 @@ LaTeX Warning: Float too large for page by 20.20972pt on input line 1277.
 ] [64
 
 ] [65] [66]
-File: figures/questionnaire/mason1.png Graphic file (type bmp)
-<figures/questionnaire/mason1.png>
-File: figures/questionnaire/mason2.png Graphic file (type bmp)
-<figures/questionnaire/mason2.png>
-File: figures/questionnaire/mason3.png Graphic file (type bmp)
-<figures/questionnaire/mason3.png>
-File: figures/questionnaire/mason4.png Graphic file (type bmp)
-<figures/questionnaire/mason4.png>
+File: figures/questionnaire/metalworking.pdf Graphic file (type pdf)
+<use figures/questionnaire/metalworking.pdf>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1679--1683
-[]
- []
+LaTeX Warning: Float too large for page by 23.59871pt on input line 1674.
 
-[67] [68]
-File: figures/questionnaire/carp1.png Graphic file (type bmp)
-<figures/questionnaire/carp1.png>
-File: figures/questionnaire/carp2.png Graphic file (type bmp)
-<figures/questionnaire/carp2.png>
-File: figures/questionnaire/carp3.png Graphic file (type bmp)
-<figures/questionnaire/carp3.png>
-File: figures/questionnaire/carp4.png Graphic file (type bmp)
-<figures/questionnaire/carp4.png>
-[69] [70] [71] [72]
-File: figures/questionnaire/plumbing1.png Graphic file (type bmp)
-<figures/questionnaire/plumbing1.png>
-File: figures/questionnaire/plumbing2.png Graphic file (type bmp)
-<figures/questionnaire/plumbing2.png>
-File: figures/questionnaire/plumbing3.png Graphic file (type bmp)
-<figures/questionnaire/plumbing3.png>
-File: figures/questionnaire/plumbing4.png Graphic file (type bmp)
-<figures/questionnaire/plumbing4.png>
-File: figures/questionnaire/plumbing5.png Graphic file (type bmp)
-<figures/questionnaire/plumbing5.png>
-[73] [74] [75] [76]
-File: figures/questionnaire/metal1.png Graphic file (type bmp)
-<figures/questionnaire/metal1.png>
-File: figures/questionnaire/metal2.png Graphic file (type bmp)
-<figures/questionnaire/metal2.png>
-File: figures/questionnaire/metal3.png Graphic file (type bmp)
-<figures/questionnaire/metal3.png>
-File: figures/questionnaire/metal4.png Graphic file (type bmp)
-<figures/questionnaire/metal4.png>
-File: figures/questionnaire/metal5.png Graphic file (type bmp)
-<figures/questionnaire/metal5.png>
-[77] [78] [79] [80]
-File: figures/questionnaire/elec1.png Graphic file (type bmp)
-<figures/questionnaire/elec1.png>
-File: figures/questionnaire/elec2.png Graphic file (type bmp)
-<figures/questionnaire/elec2.png>
-File: figures/questionnaire/elec3.png Graphic file (type bmp)
-<figures/questionnaire/elec3.png>
-File: figures/questionnaire/elec4.png Graphic file (type bmp)
-<figures/questionnaire/elec4.png>
-File: figures/questionnaire/elec5.png Graphic file (type bmp)
-<figures/questionnaire/elec5.png>
+File: figures/questionnaire/plumbing.pdf Graphic file (type pdf)
+<use figures/questionnaire/plumbing.pdf>
+File: figures/questionnaire/carpentry.pdf Graphic file (type pdf)
+<use figures/questionnaire/carpentry.pdf>
+File: figures/questionnaire/masonry.pdf Graphic file (type pdf)
+<use figures/questionnaire/masonry.pdf>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1714--1719
-[]
- []
+LaTeX Warning: Float too large for page by 23.61151pt on input line 1686.
 
-[81] [82] [83] (./cnb_apprenticeship.aux) ) 
+File: figures/questionnaire/electricians.pdf Graphic file (type pdf)
+<use figures/questionnaire/electricians.pdf>
+[67] [68] [69] [70] [71] [72] (./cnb_apprenticeship.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
 Here is how much of TeX's memory you used:
- 22947 strings out of 476179
- 433763 string characters out of 5809544
- 954792 words of memory out of 5000000
- 43266 multiletter control sequences out of 15000+600000
+ 22822 strings out of 476179
+ 429664 string characters out of 5809544
+ 955323 words of memory out of 5000000
+ 43160 multiletter control sequences out of 15000+600000
  479829 words of font info for 143 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  86i,21n,123p,2246b,541s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on cnb_apprenticeship.pdf (83 pages).
+Output written on cnb_apprenticeship.pdf (72 pages).

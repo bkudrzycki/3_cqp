@@ -22,6 +22,7 @@ output:
     latex_engine: xelatex
     template: template.tex
     extra_dependencies: ["flafter", "placeins"]
+    fig_caption: yes
 ---
 
 ```{r cqp_setup, include=FALSE}
@@ -433,16 +434,193 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 
 <div id="refs"></div>
 
-# (APPENDIX) Appendix {-} 
-
 # Appendix A {-#appendix-a}
 
-```{r child = "appendix-a.Rmd"}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+
+```{r, tbl-attritionapps}
+```
+
+```{r, attritionappsreg, include = F}
+```
+
+```{r, tbl-attritionappsreg, results = 'asis', fig.align = 'center'}
+```
+
+```{r, tbl-attritionfirms}
+```
+
+```{r, attritionfirmsreg, include = F}
+```
+
+```{r, tbl-attritionfirmsreg, results = 'asis', fig.align = 'center'}
+```
+
+``` {r, fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
+```
+
+```{r, tbl-compexp2}
+```
+
+```{r, tbl-skillschangebycqp}
+```
+
+```{r, tbl-allowances}
+```
+
+\renewcommand{\arraystretch}{2}
+
+```{r, tbl-allowancebounds}
+```
+
+```{r, tbl-allowboundsapp}
+```
+
+\renewcommand{\arraystretch}{1}
+
+``` {r fig-costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice", fig.pos='H'}
+```
+
+``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
+```
+
+```{r tbl-wages}
+```
+
+```{r, fig-apphist, fig.height=9, out.width="100%", fig.cap = "Distribution of net benefits per apprentice"}
+```
+
+```{r, fig-firmhist, fig.height=9, out.width="100%", fig.cap = "Distribution of net benefits per firm"}
+```
+
+```{r tbl-appnetbenefitsnodna}
+```
+
+```{r tbl-appnetbenefitsbywave}
+```
+
+\begin{landscape}
+
+```{r, tbl-appnetbenefitsbytrade}
+```
+
+\end{landscape}
+
+```{r, tbl-firmnetbenefitsbywave}
+```
+
+\begin{landscape}
+
+```{r, tbl-firmnetbenefitsbytrade}
+```
+
+\end{landscape}
+
+```{r, tbl-firmregsfe, results = 'asis'}
 ```
 
 # Appendix B {-#appendix-b}
 
-```{r child = "appendix-b.Rmd"}
-``` 
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{B\arabic{figure}}
+\setcounter{table}{0}
+\renewcommand{\thetable}{B\arabic{table}}
 
+|French |English |
+|---------------------------------------------------------|---------------------------------------------------------|
+| **Masonry** | |
+| Lecture d'un plan de construction | Reading a building plan |
+| Identification des différents types de briques | Identifying different types of bricks |
+| Composition du béton de fondation | Composition of foundation concrete |
+| Composition du béton de la dalle | Composition of slab concrete |
+| Élévation | Drafting an elevation |
+| Chaînage bas | Low trussing |
+| Chaînage haut | High trussing |
+| Réalisation des pentes | Pouring out inclined surface |
+| Pose des hourdis | Laying down slabs |
+| Réalisation des poutres | Installing beams |
+| Réalisation des feuillures | Installing rabbets |
+| Cimentage du plafond | Cementing a ceiling |
+| Cimentage du sol | Cementing a floor |
+| Pose des chapes | Laying the floorboards |
+| Réalisation d'un devis pour une construction | Drawing up an estimate |
+|-----------------------------------------------------------|---------------------------------------------------------|
+| **Carpentry** | |
+| Prise de mesure des portes et fenêtres | Measurement of doors and windows |
+| Prise de mesure des tables et chaises | Measurement of tables and chairs |
+| Pointage du bois | Scoring of wood |
+| Rabotage | Planing |
+| Ponçage | Sanding |
+| Savoir faire le mastic | Knowing ho to make sealant |
+| Assemblage pour la construction d'une chaise | Chair assembly |
+| Assemblage pour la construction d'une table | Table assembly |
+| Identification des différents bois utilisés | Identification of different woods used |
+| Identification des différentes coupures de bois | Identification of different wood cuts |
+| Réalisation de devis pour un produit | Drawing up an estimate for a product |
+|-----------------------------------------------------------|---------------------------------------------------------|
+| **Plumbing** | |
+| Lecture d'un plan de plomberie | Reading a plumbing plan |
+| Grattage de tuyau | Pipe scraping |
+| Collage des raccords | Attachment of fittings |
+| Pose des tuyaux | Laying of pipes |
+| Réservation des attentes aux poteaux | Securing pipes at the posts |
+| Canalisation des tuyaux dans les fausses septiques et puisards | Piping in septic tanks and sumps |
+| Canalisation d'un bâtiment | Piping a building |
+| Canalisation pour l'alimentation en eau froide | Piping for cold water supply |
+| Réalisation d'un devis | Drawing up an estimate |
+| Pose apparente des appareils sanitaires | Installation of exposed sanitary appliances |
+|-----------------------------------------------------------|---------------------------------------------------------|
+| **Metalworking** | |
+| Lecture du plan de construction de l'ouvrage | Reading a construction plan |
+| Identification des types de feuilles de tôles | Identifying different types of sheet metal |
+| Identification des types de barres de fer | Identifying the different types of iron bars |
+| Prise de mesure des feuilles de tôles | Measuring the sheet metal |
+| Découpage des feuilles de tôles pour la formation de la charpente | Cutting of sheet metal for the frame |
+| Prise de mesure pour la formation des fenêtres | Window measurements |
+| Prise de mesure pour la formation des portails | Gate measurements |
+| Prise de mesure pour la formation des charpentes | Frame measurement |
+| Réalisation des cadres pour les fenêtres | Making the frames for the windows |
+| Réalisation des cadres pour les portails | Making the frames for the gates |
+| Pose des serrures | Fitting the locks |
+| Assemblage des feuilles de tôles pour la formation des fenêtres | Assembly of sheet metal for windows |
+| Assemblage des feuilles de tôles pour la formation des portails | Assembly of sheet metal for gates |
+| Assemblage des feuilles de tôles pour la réalisation des charpentes | Assembly of sheet metal for joining of frames |
+| Réalisation d'un devis pour un ouvrage | Drawing up an estimate |
+|---------------------------------------------------------|---------------------------------------------------------|
+|**Electrical Inst.** | |
+| Lecture d'un plan d'électricité | Reading an electrical plan |
+| Conception d'un plan d'électricité | Designing an electrical plan |
+| Installation du barrage de terre | Installing an earth barrier |
+| Tubage du sol | Soil casing |
+| Tubage de la dalle | Tubing the floor slab |
+| Serrage des boîtiers et coffrets | Clamping of boxes and cabinets |
+| Pose des lampes | Installation of lamps |
+| Pose des prises | Installation of sockets |
+| Installation des disjoncteurs dans les coffrets | Installation of circuit breakers |
+| Réalisation d'un devis | Drawing up an estimate |
+
+Table: (\#tab:tasks) Tasks used for assessment of competence and experience
+
+```{r, fig.cap="\\label{fig:metalworkers}Questions for metal workers"}
+knitr::include_graphics("figures/questionnaire/metalworking.pdf")
+```
+
+```{r, fig.cap="\\label{fig:qs_plumbers}Questions for plumbers"}
+knitr::include_graphics("figures/questionnaire/plumbing.pdf")
+```
+
+```{r, fig.cap="\\label{fig:qs_carpenters}Questions for carpenters"}
+knitr::include_graphics("figures/questionnaire/carpentry.pdf")
+```
+
+```{r, fig.cap="\\label{fig:qs_masons}Questions for masons"}
+knitr::include_graphics("figures/questionnaire/masonry.pdf")
+```
+
+```{r, fig.cap="\\label{fig:qs_electricians}Questions for electricians"}
+knitr::include_graphics("figures/questionnaire/electricians.pdf")
+```
 
