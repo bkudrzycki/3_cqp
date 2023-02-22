@@ -39,10 +39,11 @@ if (any(installed_packages == FALSE)) {
 # load packages
 invisible(lapply(packages, library, character.only = TRUE))
 
-rm(packages, installed_packages)
+rm(installed_packages)
 
 # load functions
 source("../functions/add_by_n.R")
+source("../functions/detach_packages.R")
 
 # load data
 # source("../code/master.R") # to rerun all code periodically
@@ -624,3 +625,4 @@ knitr::include_graphics("figures/questionnaire/masonry.pdf")
 knitr::include_graphics("figures/questionnaire/electricians.pdf")
 ```
 
+`r detach_packages(packages)`
