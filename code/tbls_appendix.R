@@ -9,8 +9,7 @@ x <- df %>% filter(wave == 0) %>%
 y <- df %>% left_join(x, by = "IDYouth")
 
 y %>% select(wave, baseline_age, sex, schooling, baseline_status, baseline_exp, baseline_trade) %>%
-  mutate(baseline_trade = factor(baseline_trade, levels = 1:5, labels = c('Masonry', 'Carpentry', 'Plumbing', 'Metalworking', 'Electrical Inst.')),
-         baseline_status = factor(baseline_status, levels = c(1, 0, 3),
+  mutate(baseline_status = factor(baseline_status, levels = c(1, 0, 3),
                                   labels = c('Selected', 'Not Selected', 'Did Not Apply')),
          wave = factor(wave, levels = 0:1, labels = c('Baseline', 'Endline'))) %>% 
   tbl_summary(by = wave,
@@ -24,11 +23,18 @@ y %>% select(wave, baseline_age, sex, schooling, baseline_status, baseline_exp, 
                            baseline_exp ~ "Training experience, years"),
               statistic = list(all_continuous() ~ "{mean} ({sd})",
                                all_categorical() ~ "{n} ({p}%)",
-                               sex ~ "{p}%")) %>% add_p() %>% 
+                               sex ~ "{p}%")) %>% 
+  add_p() %>% 
+  modify_footnote(update = everything() ~ NA) %>% 
   as_kable_extra(caption = "Apprentice attrition",
                  booktabs = T,
                  linesep = "",
-                 position = "H")
+                 position = "H") %>% 
+  kable_styling(font_size = 9) %>% 
+  kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD); \\\\%; n (\\\\%)",
+                       threeparttable = T,
+                       escape = F,
+                       general_title = "")
 
 ## ---- attritionappsreg --------
 
@@ -53,10 +59,11 @@ m2 <- glm(attr ~ as.factor(SELECTED) + as.factor(FS1.11) + baseline_duration + f
 m3 <- glm(attr2 ~ as.factor(SELECTED) + as.factor(FS1.11) + baseline_duration + firm_size_sans_app + total_apps, data = apps2, family = "binomial")
 m4 <- glm(attr2 ~ as.factor(SELECTED) + as.factor(FS1.11) + baseline_duration + firm_size_sans_app + total_apps + hhsize + children + yos + exp.finish,data = apps2, family = "binomial")
 
-star <- stargazer(m1, m2, m3, m4, df = FALSE,
-          no.space = TRUE, digits = 2, header = F, table.placement = "H", notes.align = "r",
-          covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
-                               "CQP Did Not Apply",
+star <- stargazer(m1, m2, m3, m4, df = FALSE, font.size= "footnotesize", column.sep.width = "7pt",
+          no.space = TRUE, digits = 2, header = F, table.placement = "H",
+          omit.table.layout = "n",
+          covariate.labels = c("CQP Selected (reference) \\\\ \\\\ \\quad CQP Not Selected",
+                               "\\quad CQP Did Not Apply",
                                "Masonry (reference) \\\\ \\\\ Carpentry",
                                "Plumbing",
                                "Metalwork",
@@ -78,7 +85,8 @@ star <- stargazer(m1, m2, m3, m4, df = FALSE,
 ## ---- tbl-attritionappsreg --------
 
 star2 <- c(star[1:44],
-           "\\multicolumn{5}{l}{\\multirow{2}{12cm}{The table reports coefficients from logit regressions where the dependent variable is equal to 1 if the apprentice was not observed in the endline survey and 0 otherwise.}} \\\\ \\\\ \\\\",
+           "\\multicolumn{5}{l}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\\\",
+           "\\multicolumn{5}{l}{\\multirow{2}{14cm}{\\textit{Notes:} The table reports coefficients from logit regressions where the dependent variable is equal to 1 if the apprentice was not observed in the endline survey and 0 otherwise.}} \\\\ \\\\",
            "\\multicolumn{5}{l}{$^1$Years of training prior to baseline survey} \\\\",
            "\\multicolumn{5}{l}{$^2$Excluding apprentices} \\\\",
            star[45:length(star)]) 
@@ -125,6 +133,7 @@ y %>% select(FS1.2, wave, baseline_apps, baseline_sel, baseline_notsel, baseline
                            baseline_trade ~ "Trade"),
               include = -FS1.2) %>% 
   add_p() %>% 
+  modify_footnote(update = everything() ~ NA) %>% 
   as_kable_extra(caption = "Firm attrition",
                  booktabs = T,
                  linesep = "",
@@ -140,7 +149,10 @@ y %>% select(FS1.2, wave, baseline_apps, baseline_sel, baseline_notsel, baseline
                          group_label = "Firm size",
                          escape = F,
                          indent = T,
-                         bold = F)
+                         bold = F) %>% 
+  kable_styling(font_size = 10) %>% 
+  kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD); n (%)",
+                       general_title = "")
 
 ## ---- attritionfirmsreg --------
 
@@ -161,31 +173,33 @@ m3 <- glm(attr ~ selected + not_selected + did_not_apply + log_annual_rep_profit
 m4 <- glm(attr ~ selected + not_selected + did_not_apply + log_firm_size_sans_app, data = baseline_firms, family = "binomial") 
 m5 <- glm(attr ~ selected + not_selected + did_not_apply + as.factor(FS1.11), data = baseline_firms, family = "binomial")
 
-star <- stargazer(m1, m2, m3, m4, m5, df = FALSE,
-                  no.space = TRUE, digits = 2, header = F, table.placement = "H", notes.align = "r",
+star <- stargazer(m1, m2, m3, m4, m5, df = FALSE, font.size = "footnotesize",
+                  no.space = TRUE, digits = 2, header = F, table.placement = "H",
+                  omit.table.layout = "n",
                   covariate.labels = c("Total apprentices",
                                        "No. of CQP Selected",
                                        "No. of CQP Not Selected",
                                        "No. of CQP Did Not Apply",
                                        "log Annual Profits (reported)",
                                        "log Firm Size$^1$",
-                                       "Masonry (reference) \\\\ \\\\ Carpentry",
-                                       "Plumbing",
-                                       "Metalwork",
-                                       "Electrical Inst."),
+                                       "Masonry (reference) \\\\ \\\\ \\quad Carpentry",
+                                       "\\quad Plumbing",
+                                       "\\quad Metalwork",
+                                       "\\quad Electrical Inst."),
                   title = "Likelihood of firm attrition",
                   omit.stat=c("aic", "bic", "adj.rsq", "ser"),
                   model.names = FALSE,
-                  dep.var.labels.include = TRUE,
+                  dep.var.labels.include = FALSE,
                   dep.var.caption = "",
                   label = "tab:tbl-attritionfirmsreg")
 
 ## ---- tbl-attritionfirmsreg --------
 
-star2 <- c(star[1:38],
-           "\\multicolumn{6}{l}{\\multirow{2}{14cm}{The table reports coefficients from logit regressions where the dependent variable is equal to 1 if the firm was not observed in the endline survey and 0 otherwise.}} \\\\ \\\\",
+star2 <- c(star[1:37],
+           "\\multicolumn{6}{l}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\\\",
+           "\\multicolumn{6}{l}{\\multirow{2}{14cm}{\\textit{Notes:} The table reports coefficients from logit regressions where the dependent variable is equal to 1 if the firm was not observed in the endline survey and 0 otherwise.}} \\\\ \\\\",
            "\\multicolumn{6}{l}{$^1$Excluding apprentices} \\\\",
-           star[39:length(star)]) 
+           star[38:length(star)]) 
 
 cat(as.character(star2))
 
@@ -227,7 +241,7 @@ tbl_stack(list(tbl1, tbl2)) %>%
                  linesep = "",
                  position = "H") %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Change in human capital indices between baseline and endline.",
+  kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD). Change in human capital indices between baseline and endline.",
            number = c("Percent of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade.", "Analysis of variance for three groups, Wilcoxon rank sum test for two groups"),
            threeparttable = T,
            escape = F,
@@ -306,7 +320,8 @@ tbl_stack(list(comp, exp), group_header = c("Competence", "Experience"), quiet =
                  linesep = "") %>% 
   kableExtra::row_spec(c(8,16),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Proportion of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade. Comparison only possibly at endline as apprentices were not asked to self-assess competence and experience at baseline.",
+  kable_styling(font_size = 9) %>% 
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Proportion of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade. Comparison only possibly at endline as apprentices were not asked to self-assess competence and experience at baseline.",
            number = "Wilcoxon rank sum test",
            threeparttable = T,
            escape = F,
@@ -357,13 +372,12 @@ tbl_stack(list(baseline, endline, overall), group_header = c("Baseline", "Endlin
   as_kable_extra(caption = "Monthly allowances", 
                  booktabs = T,
                  linesep = "",
-                 position = "H") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US.",
+                 position = "H") %>%
+  kableExtra::kable_styling(latex_options="scale_down") %>% 
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Amounts in \\\\$US.",
            threeparttable = T,
            escape = F,
-           fixed_small_size = T,
-           general_title = "") %>% 
-  kableExtra::kable_styling(latex_options="scale_down")
+           general_title = "") 
 
 ## ---- tbl-allowancebounds --------
 # code upper and lower bounds
@@ -544,7 +558,8 @@ tbl_stack(list(tbl1, tbl2, tbl3, tbl4, tbl5, tbl6), group_header = c("12 months/
                  booktabs = T,
                  linesep = "",
                  position = "H") %>% #cost per apprentice per year
-  footnote(general = "Mean (Median). (F): reported by firm; (A): reported by apprentices. Amounts in \\\\$US.",
+  kable_styling(font_size = 9) %>% 
+  footnote(general = "\\\\textit{Notes:} Mean (Median). (F): reported by firm; (A): reported by apprentices. Amounts in \\\\$US.",
            threeparttable = T,
            escape = F,
            fixed_small_size = T,
@@ -563,7 +578,8 @@ tbl7 <- x %>% select(wave, contains("a_allow")) %>% mutate(across(contains("a_al
               digits = all_continuous() ~ 2,
               missing = "no") %>%
   modify_header(label = "Bound") %>%
-  add_overall()
+  add_overall() %>% 
+  modify_footnote(update = everything() ~ NA)
 
 tbl8 <- x %>% select(wave, contains("a_allow"), FS4.1) %>% mutate(across(contains("a_allow"), ~(.x*4*FS4.1/605))) %>%
   tbl_summary(by = wave,
@@ -572,7 +588,8 @@ tbl8 <- x %>% select(wave, contains("a_allow"), FS4.1) %>% mutate(across(contain
               include = -FS4.1,
               missing = "no") %>%
   modify_header(label = "Bound") %>%
-  add_overall()
+  add_overall() %>% 
+  modify_footnote(update = everything() ~ NA)
 
 tbl_stack(list(tbl7, tbl8), group_header = c("12 months/year |\n 4 weeks/month", "(F) months/year |\n 4 weeks/month")) %>%
   modify_header(groupname_col = "Assumption") %>% 
@@ -580,7 +597,8 @@ tbl_stack(list(tbl7, tbl8), group_header = c("12 months/year |\n 4 weeks/month",
                  booktabs = T,
                  linesep = "",
                  position = "H") %>% 
-  footnote(general = "Mean (Median). (F): reported by firm; (A): reported by apprentices. Amounts in \\\\$US.",
+  kable_styling(font_size = 9) %>% 
+  footnote(general = "\\\\textit{Notes:} Mean (Median). (F): reported by firm; (A): reported by apprentices. Amounts in \\\\$US.",
            threeparttable = T,
            escape = F,
            fixed_small_size = T,
@@ -621,12 +639,15 @@ df %>% select(contains("FS5.2"), wave, FS1.2) %>%
   modify_header(stat_by =  "**{level}**",
                 starts_with("add_n_stat") ~ "**N**",
                 label = "") %>% 
-  modify_footnote(
-    all_stat_cols() ~ "Mean (SD). Monthly wages in \\\\$US."
-  ) %>% 
+  modify_footnote(update = everything() ~ NA) %>% 
   as_kable_extra(caption = "Monthly wages", 
                  booktabs = T,
-                 linesep = "")
+                 linesep = "") %>% 
+  kable_styling(font_size = 9) %>% 
+  kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD). Monthly wages in \\\\$US.",
+                       threeparttable = T,
+                       escape = F,
+                       general_title = "")
 
 ## ---- tbl-appnetbenefitsnodna --------
 
@@ -702,7 +723,7 @@ tbl_summary(x, by = SELECTED,
   kableExtra::add_indent(c(16:19), level_of_indent = 1) %>% 
   kableExtra::row_spec(c(9,21),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
            number = "Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.",
            threeparttable = T,
            escape = F,
@@ -785,7 +806,7 @@ tbl_summary(x, by = wave,
   kableExtra::add_indent(c(16:19), level_of_indent = 1) %>% 
   kableExtra::row_spec(c(9,21),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
            number = "Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.",
            threeparttable = T,
            escape = F,
@@ -858,7 +879,7 @@ tbl_summary(x, by = FS1.11,
   kableExtra::add_indent(c(16:19), level_of_indent = 1) %>% 
   kableExtra::row_spec(c(9,21),bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey.",
            number = "Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.",
            threeparttable = T,
            escape = F,
@@ -951,7 +972,7 @@ x %>% select(wave, annual_revenues, annual_wage_bill, annual_non_wage_exp, annua
                          end_row = 18,
                          group_label = "Net benefits") %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
            number = c("Firms size calculated by author as sum of all reported workers in firm, including apprentices and occasional and family workers.",
                       "Profits recalculated by author as difference between reported revenues (first row) and reported expenses (second row)."),
            threeparttable = T,
@@ -1036,7 +1057,7 @@ x %>% select(FS1.11, annual_revenues, annual_wage_bill, annual_non_wage_exp, ann
                          end_row = 18,
                          group_label = "Net benefits") %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
            number = c("Firms size calculated by author as sum of all reported workers in firm, including apprentices and occasional and family workers.",
                       "Profits recalculated by author as difference between reported revenues (first row) and reported expenses (second row)."),
            threeparttable = T,
@@ -1065,11 +1086,13 @@ m4 <- plm(profits ~ total_apps + as.factor(wave) + firm_size_sans_app , data = x
 m5 <- plm(firm_size_sans_app ~ apps_sans_cqp + selected + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
 m6 <- plm(firm_size_sans_app ~ total_apps + as.factor(wave), data = x, index = c("FS1.2", "wave"), model = "within")
 
-stargazer(m1, m2, m3, m4, m5, m6, df = FALSE, omit = "FS1.2",
+stargazer(m1, m2, m3, m4, m5, m6, df = FALSE, omit = "FS1.2", font.size = "footnotesize",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("$^1$Excluding apprentices"),
-          notes.align = "r",
-          notes.append = TRUE,
+          notes = c("$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01",
+                    "\\textit{Notes:} $^1$Excluding apprentices"),
+          notes.label = "", 
+          notes.align = "l", 
+          notes.append = F,
           covariate.labels = c("Non-CQP apprentices",
                                "CQP Selected",
                                "Total apprentices",

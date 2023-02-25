@@ -108,13 +108,13 @@ tbl_merge(list(x, y), tab_spanner = c("Overall", "By baseline status")) %>%
                          escape = F,
                          indent = T,
                          bold = F) %>% 
-  footnote(general = "N; Mean (SD); %",
-           number = "Calculated by author by summing number of partners, permanent employees, paid and unpaid family workers, occasional workers, and apprentices reported to be working for MC (total firm size reported separately).",
-           threeparttable = T,
-           escape = F,
-           fixed_small_size = T,
-           general_title = "") %>% 
-  kableExtra::kable_styling(latex_options="scale_down")
+  kableExtra::kable_styling(latex_options="scale_down") %>% 
+  kableExtra::footnote(general = "\\\\textit{Notes:} N; Mean (SD); %",
+                       number = "Calculated by author by summing number of partners, permanent employees, paid and unpaid family workers, occasional workers, and apprentices reported to be working for MC (total firm size reported separately).",
+                       threeparttable = T,
+                       escape = F,
+                       fixed_small_size = T,
+                       general_title = "")
 
 ## ---- tbl-skills --------
 
@@ -205,9 +205,10 @@ tbl_stack(list(comp, exp, skills), quiet = TRUE) %>%
                          end_row = 26,
                          group_label = "Knowledge²") %>% 
   kableExtra::row_spec(c(9,18,26),bold=T) %>% 
+  kable_styling(font_size = 10) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>%
-  footnote(general = "Mean (SD).",
-           number = c("Percent of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade. Not available for apprentices who did not apply to the CQP, as they were not interviewed personally.", "Paired t-test"),
+  kableExtra::footnote(general = "\\\\scriptsize \\\\textit{Notes:} Mean (SD).",
+           number = c("\\\\scriptsize Percent of trade-specific tasks apprentice is deemed competent in (competence) or has already successfully attempted (experience), as reported by MC. Total of 10-15 tasks, depending on trade.", "\\\\footnotesize Percent of trade-specific knowledge questions answered correctly by apprentice. Total of 4 or 5 questions, depending on trade. Not available for apprentices who did not apply to the CQP, as they were not interviewed personally.", "\\\\footnotesize Paired t-test."),
            threeparttable = T,
            escape = F,
            fixed_small_size = T,
@@ -242,10 +243,12 @@ m12 <- lm(skills_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + base
 
 stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.11", font.size= "scriptsize", column.sep.width = "-8pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("$^1$Prior to baseline survey",
+          notes = c("$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01",
+                    "\\textit{Notes:} $^1$Prior to baseline survey.",
                     "$^2$Excluding apprentices."),
-          notes.align = "r",
-          notes.append = TRUE,
+          notes.label = "", 
+          notes.align = "l", 
+          notes.append = F,
           covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
                                "CQP Did Not Apply",
                                "Endline",
@@ -280,13 +283,15 @@ m7 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baselin
 m8 <- lm(comp_all_trades ~ as.factor(SELECTED) + as.factor(wave) + did + baseline_duration + firm_size_sans_app + total_apps + as.factor(FS1.11), data = x)
 
 
-stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.11", font.size= "small", column.sep.width = "-8pt",
+stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.11", font.size= "scriptsize", column.sep.width = "-4pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("Omitted category: CQP Selected.",
+          notes = c("$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01",
+                    "\\textit{Notes:} Omitted category: CQP Selected.",
                     "$^1$Prior to 2019.",
-                    "$^2$Excluding apprentices"),
-          notes.align = "r",
-          notes.append = TRUE,
+                    "$^2$Excluding apprentices."),
+          notes.label = "", 
+          notes.align = "l", 
+          notes.append = F,
           covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
                                "Endline",
                                "CQP Not Selected x Endline (reference) \\\\ \\\\ CQP Selected x Endline",
@@ -379,7 +384,7 @@ tbl_summary(x, by = SELECTED,
                          escape = F) %>%
   kableExtra::row_spec(c(9,22), bold=T) %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey. Annual fees assume apprenticeship duration of four years.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Amounts in \\\\$US per apprentice per year, calculated using responses from baseline survey. Annual fees assume apprenticeship duration of four years.",
            number = c("Apprentices were only asked about total allowances received.", "Rows missing all allowance or all fee data were excluded from net benefit calculation. Mean net benefit may deviate from difference in mean allowances and mean fees as a result.", "Student's t-test for apprentice survey data, analysis of variance for firm survey data"),
            threeparttable = T,
            escape = F,
@@ -456,7 +461,7 @@ tbl_summary(x, by = SELECTED,
   kableExtra::row_spec(c(3,15),bold=T) %>%
 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Amounts in \\\\$US per apprentice per year. Calculated using responses from baseline survey, except training costs which were not elicited until endline. Net benefits are not computed for rows with missing data for any categories included in a given model. Mean net benefit estimates may deviate from sums of the relevant categories as a result.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Amounts in \\\\$US per apprentice per year. Calculated using responses from baseline survey, except training costs which were not elicited until endline. Net benefits are not computed for rows with missing data for any categories included in a given model. Mean net benefit estimates may deviate from sums of the relevant categories as a result.",
            number = c("Fees and allowances reported by firm owner. Annual fees assume apprenticeship duration of four years, annual allowances assume apprentices work 20 days a month.", "Analysis of variance"),
            threeparttable = T,
            escape = F,
@@ -551,7 +556,7 @@ x %>% select(firm_size_bins, annual_revenues, annual_wage_bill, annual_non_wage_
                          end_row = 18,
                          group_label = "Net benefits") %>% 
   kableExtra::kable_styling(latex_options="scale_down") %>% 
-  footnote(general = "Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
+  footnote(general = "\\\\textit{Notes:} Mean (SD). Net benefits per firm estimated using baseline data. \nProjected costs, benefits, and net benefits calculated as mean values for all observed apprentices in \nfirm times reported number of apprentices trained. Amounts in \\\\$US.",
            number = c("Firms size calculated by author as sum of all reported workers in firm, including apprentices and occasional and family workers.",
                       "Profits recalculated by author as difference between reported revenues (first row) and reported expenses (second row)."),
            threeparttable = T,
@@ -598,24 +603,25 @@ m11 <- lm(firm_size_sans_app ~ selected + apps_sans_cqp + as.factor(wave) + did 
            
 stargazer(m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, df = FALSE, omit = c("FS1.2", "trade)"), font.size= "scriptsize", column.sep.width = "-8pt",
           no.space = TRUE, digits = 2, header = F, table.placement = "H",
-          notes = c("$^1$Excluding apprentices.", "$^2$Registered with the Benin Chamber of Commerce and Industry (CCIB).", "$^3$Days firm stops all activities to train, per week."),
-          notes.align = "r",
-          notes.append = TRUE,
-          covariate.labels = c("No. of Apprentices: \\\\ \\\\
-                               log CQP Selected",
-                               "log CQP Not Selected/Did Not Apply",
+          notes = c("$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01", "\\textit{Notes:} $^1$Did not apply.", "$^2$Excluding apprentices.", "$^3$Registered with the Benin Chamber of Commerce and Industry (CCIB).", "$^4$Days firm stops all activities to train, per week."),
+          notes.label = "", 
+          notes.align = "l", 
+          notes.append = F,
+          covariate.labels = c("log No. of Apprentices: \\\\ \\\\
+                               \\quad CQP Selected",
+                               "\\quad CQP Not Selected/D.N.A.$^1$",
                                "Endline",
-                               "log Firm Size$^1$",
+                               "log Firm Size$^2$",
                                "log CQP Selected x Endline",
                                "MC Age",
                                "MC Years of Schooling",
-                               "Registered Firm$^2$",
+                               "Registered Firm$^3$",
                                "Trade Association",
-                               "Training Frequency$^3$"),
+                               "Training Frequency$^4$"),
           title = "Firm-level regressions",
           omit.stat=c("aic", "bic", "adj.rsq", "ser"),
           model.names = FALSE,
           dep.var.caption = "",
-          dep.var.labels = c("log Revenues", "log profits", "log Firm size$^1$"),
+          dep.var.labels = c("log Revenues", "log Profits", "log Firm size$^1$"),
           label = "tab:tbl-firmregs",
           add.lines = list(c("Trade FE", "NO", "NO", "NO", "YES", "NO", "NO", "NO", "YES", "NO", "NO", "YES")))
