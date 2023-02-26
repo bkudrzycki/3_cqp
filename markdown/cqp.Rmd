@@ -72,8 +72,6 @@ knitr::opts_chunk$set(message=FALSE,
 ```
 
 
-\onehalfspacing
-
 # Introduction {#intro}
 
 ``` {r df1, include = FALSE}
@@ -156,7 +154,7 @@ Criticisms of the CQP include the lack of certified and accredited trainers at t
 
 The data for this study was collected in two separate surveys. The first consisted of interviews with apprentices who had applied to the 2019 cohort of the CQP program, who took the entrance exam on the 5th of November, 2018. The second survey was conducted with the firm owners, or master craftsmen, of the apprentices' respective training firms. To allow for trade-level controls and to reduce travel distances for interviews, apprentices were randomly selected from a subsample of all CQP applicants: those training in electrical installation, carpentry, masonry, metalwork or plumbing workshops, and training in the southernmost regions of Bénin.
 
-\singlespacing
+\begin{singlespacing}
 
 | CQP Status | Explanation | Apprentice Survey | Firm Survey |
 |-----------------|-----------------|-----------------|-----------------|
@@ -168,18 +166,16 @@ The data for this study was collected in two separate surveys. The first consist
 
 Table: (\#tab:sampling) Apprentice Sampling
 
-\onehalfspacing
+\end{singlespacing}
 
  In addition to questions regarding training practices and firm performance, master craftsmen were asked to assess specific apprentices training at their firm. Up to two CQP applicants per firm\footnote{Only CQP applicants who had participated in the apprentice survey could be assessed individually by MCs.} were selected for this exercise. In addition, a single apprentice who had not applied to the CQP was assessed by the craftsman in a similar manner, if there was such an apprentice training in the firm\footnote{As the apprentice survey consisted only of applicants to the program, the only data on non-applicants comes from master craftsmen.}. The sampling procedure for choosing the apprentices for these personal assessments is summarized in Table \@ref(tab:sampling) above.
 
 The baseline wave for the two surveys was collected in July-August 2019. The apprentice survey included questions on training characteristics, employment outcomes, their own skills and competences, and the perceived quality of their training, while the firm survey included questions on worker characteristics, wages, and firm expenses and revenues. We additionally surveyed all MCs about the firm's training practices and expenses, as well as their perception of up to three individual apprentices’ skills, experience, diligence, efficiency, learning ability, and so on (sampling procedure detailed above). Data on `r (df %>% group_by(wave) %>% summarise(n_distinct(IDYouth)))[1,2]` apprentices working for `r (df %>% group_by(wave) %>% summarise(n_distinct(FS1.2)))[1,2]` unique firms was collected at baseline. Descriptive statistics for apprentices and firms are shown in Table \@ref(tab:tbl-cqpdesc) below. 
 
-\singlespacing
-
+\begin{singlespacing}
 ```{r, tbl-cqpdesc, echo=FALSE}
 ```
-
-\onehalfspacing
+\end{singlespacing}
 
  Summary statistics from the baseline survey show the sample to be predominantly male youth who, though of average age for an apprenticeship at `r round(mean(baseline$age, na.rm = T), 1)` years [@ilo2022], are significantly more educated than is typical for traditional apprentices, with over half having completed at least some secondary schooling. Successful applicants to the CQP have higher education attainment than unsuccessful applicants; all applicants have higher attainment than non-applicants. Applicants also have more experience coming into the CQP than the required six months, with the average applicant having trained for `r mean((df %>% filter(SELECTED == 3))$baseline_duration, na.rm = T)` years at the time of application. Non-applicants are younger, less educated, and less experienced than applicants at baseline, suggesting that master craftsmen send their most able and veteran apprentices to stand for the dual training entrance exam. This may indicate that the CQP is perceived by MCs as something more akin to a continuing education rather than an entry-level apprenticeship program.
 
@@ -223,9 +219,9 @@ Finally, we assess the material benefits of training accruing to the apprentice,
 <!-- Fees are typically paid by the parents directly to the MC at the beginning and end of an apprenticeship. Allowances are transfers from the MC to the apprentices and cover general expenses, in which case they are often referred to as "pocket money" or "chop money", as well as specific expenses such as meals or transportation costs.  -->
 
 ## Estimating Firm Benefits {#firmmethod}
-\singlespacing
+\begin{singlespacing}
 \input{tables/tbl-cbmodels}
-\onehalfspacing
+\end{singlespacing}
 
 Firm benefits were calculated using the accounting approach [@gambin2013; @muhlemann2014], which relies on survey data from training firms to identify and quantify the costs and benefits arising from training provision. It has only recently started being applied in lower-middle income countries [@renold2018; @bolli2020; @bolli2021]. The accounting approach subtracts the costs of training from its benefits and is a simple way of estimating the value that training apprentices generates for the training firm. In a second step, we use regression analysis to assess the impact of hiring additional apprentices, both traditional and CQP dual trainees, on firm outcomes.
 
@@ -269,10 +265,10 @@ where $y_{it}$ is the outcome of interest, $CQP_i$ is the number of CQP applican
 changes <- df  %>% select(IDYouth, comp_all_trades, exp_all_trades, skills_all_trades, wave) %>% pivot_wider(names_from = wave, values_from = c(comp_all_trades, exp_all_trades, skills_all_trades)) %>% mutate(comp_diff = comp_all_trades_1-comp_all_trades_0, exp_diff = exp_all_trades_1-exp_all_trades_0, skills_diff = skills_all_trades_1-skills_all_trades_0)
 ```
 
-\singlespacing
+\begin{singlespacing}
 ```{r tbl-skills}
 ```
-\onehalfspacing
+\end{singlespacing}
 
 First, we investigate whether dual training was successful in realizing its primary objective --- increasing the human capital stock of apprentices. To do so, we study the changes in the three human capital indices described in Section \@ref(appmethod) over the observed training period of three years. The changes in the human capital index scores presented in Table \@ref(tab:tbl-skills) indicate that informal apprenticeship training is successful in improving sector-specific human capital of the youth in our sample, both for dual training participants and traditional apprentices: overall competence scores increased by `r mean(changes$comp_diff, na.rm = T)/sd(baseline$comp_all_trades, na.rm = T)` SDs, experience scores by `r mean(changes$exp_diff, na.rm = T)/sd(baseline$exp_all_trades, na.rm = T)` SDs, and knowledge by `r mean(changes$skills_diff, na.rm = T)/sd(baseline$skills_all_trades, na.rm = T)` SDs. Significant improvements in competence and experience are observed for apprentices who participated in, unsuccessfully applied to, and did not apply to the CQP alike, though apprentices who did not apply to the CQP show the largest gains in competence and experience as assessed by their MC. This result is in line with the observation that MCs appear to send youth who are already relatively experienced (and educated) to apply for dual training. 
 
@@ -284,13 +280,13 @@ Although mean human capital accumulation is higher for participating CQP apprent
 
 <!-- To summarize, satisfaction is generally high and stable among all apprentice throughout their training period, though apprentices not participating in the CQP report a sharp increase in working hours towards the tail end of their training. -->
 
-\singlespacing
+\begin{singlespacing}
 ``` {r, tbl-appreg, results = 'asis', fig.align = 'center'}
 ```
 
 ``` {r, tbl-appreg2, results = 'asis', fig.align = 'center'}
 ```
-\onehalfspacing
+\end{singlespacing}
 
  The estimated effects of training presented in Table \@ref(tab:tbl-appreg) confirm that apprentice human capital, as measured by the three indices, increases after three years, and that apprentices who do not apply to the CQP program score somewhat lower on the competence index. Higher baseline experience and competence scores for CQP applicants suggest that trainers send their more able apprentices to apply for dual training. The selection process for the program itself, however, does not favor more experienced apprentices according to our metrics (i.e. is as good as random).
 
@@ -448,7 +444,7 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 \setcounter{table}{0}
 \renewcommand{\thetable}{A4.\arabic{table}}
 
-\singlespacing
+\begin{singlespacing}
 ```{r, tbl-attritionapps}
 ```
 
@@ -478,16 +474,15 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 
 ```{r, tbl-allowances}
 ```
+\end{singlespacing}
 
-\renewcommand{\arraystretch}{2}
-
+\begin{doublespacing}
 ```{r, tbl-allowancebounds}
 ```
 
 ```{r, tbl-allowboundsapp}
 ```
-
-\renewcommand{\arraystretch}{1}
+\end{doublespacing}
 
 ``` {r fig-costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice", fig.pos='H'}
 ```
@@ -495,6 +490,7 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 ``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
 ```
 
+\begin{singlespacing}
 ```{r tbl-wages}
 ```
 
@@ -529,7 +525,7 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 
 ```{r, tbl-firmregsfe, results = 'asis'}
 ```
-
+\end{singlespacing}
 \clearpage
 
 # Appendix B4 {-#cqp-appendix-b}
@@ -539,6 +535,8 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 \renewcommand{\thefigure}{B4.\arabic{figure}}
 \setcounter{table}{0}
 \renewcommand{\thetable}{B4.\arabic{table}}
+
+\begin{singlespacing}
 
 |French |English |
 |---------------------------------------------------------|---------------------------------------------------------|
@@ -634,3 +632,4 @@ knitr::include_graphics("figures/questionnaire/masonry.pdf")
 ```{r, fig.cap="\\label{fig:qs_electricians}Questions for electricians"}
 knitr::include_graphics("figures/questionnaire/electricians.pdf")
 ```
+\end{singlespacing}

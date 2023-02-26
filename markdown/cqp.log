@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.9.15)  26 FEB 2023 01:22
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.9.15)  26 FEB 2023 02:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1375,79 +1375,97 @@ ut line 3.
 \tf@lot=\write5
 \openout5 = `cqp.lot'.
 
-[3] [4] [5] [6] [7] [8]
+[3] [4] [5] [6] [7]
 File: figures/fig-enrollment-1.pdf Graphic file (type pdf)
 <use figures/fig-enrollment-1.pdf>
-[9] [10] [11] [12] [13]
+[8] [9] [10] [11]
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.95116pt on input line 388.
+(Font)              scaled to size 10.95116pt on input line 357.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 8.00085pt on input line 388.
+(Font)              scaled to size 8.00085pt on input line 357.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.00064pt on input line 388.
+(Font)              scaled to size 6.00064pt on input line 357.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 10.94882pt on input line 388.
+(Font)              scaled to size 10.94882pt on input line 357.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 7.99915pt on input line 388.
+(Font)              scaled to size 7.99915pt on input line 357.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 5.99936pt on input line 388.
-[14]
+(Font)              scaled to size 5.99936pt on input line 357.
+[12]
 Overfull \vbox (11.51904pt too high) has occurred while \output is active []
 
-[15] [16] [17] [18] (./tables/tbl-cbmodels.tex) [19] [20] [21] [22] [23]
-Overfull \vbox (6.0586pt too high) has occurred while \output is active []
+[13] [14] [15] (./tables/tbl-cbmodels.tex) [16] [17] [18] [19] [20] [21]
+Overfull \vbox (23.4543pt too high) has occurred while \output is active []
 
-[24] [25]
-Overfull \hbox (16.56868pt too wide) in paragraph at lines 519--554
+[22]
+Overfull \hbox (16.56868pt too wide) in paragraph at lines 487--522
  [][] 
  []
 
-[26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37] [38] [39] [40
+[23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37
 
-] [41] [42] [43]
+] [38] [39] [40]
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(2)/m/n' will be
-(Font)              scaled to size 9.00096pt on input line 1047.
+(Font)              scaled to size 9.00096pt on input line 1016.
 LaTeX Font Info:    Font shape `TU/texgyrepagella-math.otf(3)/m/n' will be
-(Font)              scaled to size 8.99904pt on input line 1047.
-[44
+(Font)              scaled to size 8.99904pt on input line 1016.
+[41
 
-] [45] [46]
+] [42] [43]
 File: figures/fig-firmsize-1.pdf Graphic file (type pdf)
 <use figures/fig-firmsize-1.pdf>
-[47] [48] [49] [50] [51]
+[44] [45] [46] [47]
+Overfull \vbox (0.90456pt too high) has occurred while \output is active []
+
+[48]
 File: figures/fig-costspie-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie-1.pdf>
 File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
 <use figures/fig-costspie2-1.pdf>
-[52]
+[49]
 File: figures/fig-apphist-1.pdf Graphic file (type pdf)
 <use figures/fig-apphist-1.pdf>
 
-LaTeX Warning: Float too large for page by 24.5241pt on input line 1323.
+LaTeX Warning: Float too large for page by 24.5241pt on input line 1296.
 
 File: figures/fig-firmhist-1.pdf Graphic file (type pdf)
 <use figures/fig-firmhist-1.pdf>
 
-LaTeX Warning: Float too large for page by 24.53235pt on input line 1327.
+LaTeX Warning: Float too large for page by 24.53235pt on input line 1300.
 
-[53] [54] [55]
+[50] [51] [52]
 Overfull \vbox (2.45187pt too high) has occurred while \output is active []
 
-[56] [57] [58
+[53] [54] [55
 
-] [59
+] [56
 
-] [60
+] [57
 
-] [61
+] [58
 
-] [62
+]
+Underfull \hbox (badness 10000) in paragraph at lines 1614--1686
+\TU/texgyrepagella(0)/m/n/12 ——————————————–|———————————————————| |
+ []
 
-] [63]
+
+Underfull \hbox (badness 10000) in paragraph at lines 1614--1686
+\TU/texgyrepagella(0)/m/n/12 |———————————————————–|———————————————
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1614--1686
+\TU/texgyrepagella(0)/m/n/12 ————————————————|———————————————————|
+ []
+
+[59
+
+]
 File: figures/questionnaire/metalworking.pdf Graphic file (type pdf)
 <use figures/questionnaire/metalworking.pdf>
 
-LaTeX Warning: Float too large for page by 24.52449pt on input line 1733.
+LaTeX Warning: Float too large for page by 24.52449pt on input line 1691.
 
 File: figures/questionnaire/plumbing.pdf Graphic file (type pdf)
 <use figures/questionnaire/plumbing.pdf>
@@ -1456,21 +1474,21 @@ File: figures/questionnaire/carpentry.pdf Graphic file (type pdf)
 File: figures/questionnaire/masonry.pdf Graphic file (type pdf)
 <use figures/questionnaire/masonry.pdf>
 
-LaTeX Warning: Float too large for page by 24.5115pt on input line 1745.
+LaTeX Warning: Float too large for page by 24.5115pt on input line 1703.
 
 File: figures/questionnaire/electricians.pdf Graphic file (type pdf)
 <use figures/questionnaire/electricians.pdf>
 
-LaTeX Warning: Float too large for page by 2.29791pt on input line 1749.
+LaTeX Warning: Float too large for page by 2.29791pt on input line 1707.
 
-[64] [65] [66] [67] [68] [69] (./cqp.aux) ) 
+[60] [61] [62] [63] [64] [65] (./cqp.aux) ) 
 Here is how much of TeX's memory you used:
- 24292 strings out of 476179
- 457225 string characters out of 5809544
- 972070 words of memory out of 5000000
- 44567 multiletter control sequences out of 15000+600000
+ 24289 strings out of 476179
+ 457206 string characters out of 5809544
+ 962958 words of memory out of 5000000
+ 44564 multiletter control sequences out of 15000+600000
  481536 words of font info for 158 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 74i,21n,123p,2258b,555s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 74i,21n,123p,2259b,582s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on cqp.pdf (69 pages).
+Output written on cqp.pdf (65 pages).
