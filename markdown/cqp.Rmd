@@ -13,13 +13,15 @@ thanks: |
   Thanks to Dario for the Markdown template.
 keywords: [Informal labor markets, Dual training, Apprenticeship]
 jel: [I26]
+classoption: a4paper, 12pt
+geometry: left=3cm, right=3cm
 bibliography: cqp.bib
 csl: 'apa-no-ampersand.csl'
 output: 
   bookdown::pdf_document2:
     latex_engine: xelatex
     template: template.tex
-    extra_dependencies: ["flafter", "placeins"]
+    extra_dependencies: ["flafter", "placeins", "changepage", "multirow", "array", "adjustbox", "longtable", "pifont", "fancyhdr", "pdflscape", "fancyhdr"]
     fig_caption: yes
 ---
 
