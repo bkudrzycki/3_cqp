@@ -26,7 +26,7 @@ output:
 ---
 
 ```{r cqp_setup, include=FALSE}
-packages <- c("tinytex", "lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "kableExtra", "stargazer", "tidyverse")
+packages <- c("tinytex", "lfe", "lme4", "plm", "bookdown", "gtsummary", "labelled", "grid", "gridExtra", "rstatix", "flextable", "kableExtra", "stargazer", "tidyverse")
 
 options(repos = c(CRAN = "http://cran.rstudio.com"))
 
@@ -61,12 +61,16 @@ knitr::read_chunk('../code/figures.R')
 ggplot2::theme_set(ggplot2::theme_bw())
 options(scipen=2, digits=2)
 
-# set knitr options
+# set knitr and flextable options
+set_flextable_defaults(font.family = 'Palatino',
+                       theme_fun = "theme_apa")
+
 knitr::opts_chunk$set(message=FALSE,
                       warning=FALSE,
                       echo = FALSE,
                       cache = TRUE,
-                      fig.path='figures/',
+                      fig.path= 'figures/',
+                      fig.pos = 'H',
                       out.extra = "",
                       floatfoot.envs = c("figure", "table", "longtabu"))
 ```
@@ -125,7 +129,7 @@ The paper proceeds as follows. Informal apprenticeship in Bénin, the CQP progra
 
 Despite the relative stability of its democratic government and strategic importance as a transportation hub for West Africa, Bénin (population approx. 12.1 million) performs poorly on many development indicators, ranking 158th out of 189 countries on the 2020 Human Development Index. Youth employment is a particularly pressing issue, with youth labor force participation decreasing from 53.9 percent in 2003 to 32.8 in 2018\footnote{According to the National Household Survey, Enquête de Suivi de l'Enquête Modulaire et Intégrée sur les Conditions de Vie des Ménages (HIES). The labor force is the sum of all persons in a given age range who are employed and those who are unemployed. The youth labor force participation rate is the total size of the labor force aged 15-24, as a percent of the population in the same age range.}. As in other parts of SSA, secondary and tertiary school enrollment has seen a steady increase in the past two decades, coinciding with a sharp decrease in the youth employment rate: according to the most recent labor force surveys, the youth employment-to-population ratio decreased by 20 percent, from 40 to 31.5 percent, between 2010 and 2018, compared to an 13 percent decrease for adults age 25 or older over the same time period\footnote{The employment-to-population ratio is the proportion of a country's population in a given age range that is employed. Youth are defined to be aged 15-24.}. Meanwhile, the share of youth neither in employment, education or training (NEET) increased from 17 percent in 2011 to 35 percent in 2018 (see Figure \@ref(fig:fig-enrollment)) --- one the highest rates in West Africa, and the world [@ilo2022].
 
-```{r fig-enrollment, fig.cap="Rates of youth enrollment and inactivity: Bénin and SSA", fig.height=4, fig.width=8, , fig.pos='H'}
+```{r fig-enrollment, fig.cap="Rates of youth enrollment and inactivity: Bénin and SSA", fig.height=4, fig.width=8}
 ```
 
 As enrollment in formal education has not translated to increasing rates of youth employment, interest in promoting alternative pathways to the labor force has grown. In Bénin, entry into formal technical and vocational education and training (TVET) begins after the completion of the second year of secondary school, or nine years of education. Yet across the country, the median number of years spent in the education system is just four; only five percent of youth of secondary school age are enrolled in TVET [@ilo2021], in line with the six percent of young workers estimated to participate in formal TVET across SSA [@hofmann2022]. Thus, rather than formal TVET, it is informal apprenticeship that is the primary conduit into the labor market for early school leavers in Bénin, with as many as 300,000 young men and women estimated to be in training [@ilo2021]. Recent examples of investment in Bénin's apprenticeship system include \$6.3 million from the World Bank's for the Benin Youth Employment Project (PEJ), completed in 2019, and a planned \$16.4 million dollar investment in strengthening the TVET system starting in 2020 [@worldbank2020c].
@@ -463,7 +467,7 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 ```{r, tbl-attritionfirmsreg, results = 'asis', fig.align = 'center'}
 ```
 
-``` {r, fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions", fig.pos='H'}
+``` {r, fig-firmsize, fig.width=7,fig.height=4, fig.cap = "Firm size distributions"}
 ```
 
 ```{r, tbl-compexp2}
@@ -484,10 +488,10 @@ Finally, how do these numbers compare to evidence from high-income countries? Du
 ```
 \end{doublespacing}
 
-``` {r fig-costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice", fig.pos='H'}
+``` {r fig-costspie, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per apprentice"}
 ```
 
-``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm", fig.pos='H'}
+``` {r fig-costspie2, fig.width=7,fig.height=4, fig.cap = "Breakdown of mean annual training costs per firm"}
 ```
 
 \begin{singlespacing}

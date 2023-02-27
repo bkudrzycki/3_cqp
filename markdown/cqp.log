@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.9.15)  26 FEB 2023 02:38
+This is XeTeX, Version 3.141592653-2.6-0.999994 (TeX Live 2022) (preloaded format=xelatex 2022.9.15)  26 FEB 2023 23:31
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1425,18 +1425,16 @@ File: figures/fig-costspie2-1.pdf Graphic file (type pdf)
 [49]
 File: figures/fig-apphist-1.pdf Graphic file (type pdf)
 <use figures/fig-apphist-1.pdf>
+[50]
+Overfull \vbox (224.90977pt too high) has occurred while \output is active []
 
-LaTeX Warning: Float too large for page by 24.5241pt on input line 1296.
-
+[51]
 File: figures/fig-firmhist-1.pdf Graphic file (type pdf)
 <use figures/fig-firmhist-1.pdf>
 
-LaTeX Warning: Float too large for page by 24.53235pt on input line 1300.
+Overfull \vbox (24.53235pt too high) has occurred while \output is active []
 
-[50] [51] [52]
-Overfull \vbox (2.45187pt too high) has occurred while \output is active []
-
-[53] [54] [55
+[52] [53] [54] [55
 
 ] [56
 
@@ -1464,28 +1462,31 @@ Underfull \hbox (badness 10000) in paragraph at lines 1614--1686
 ]
 File: figures/questionnaire/metalworking.pdf Graphic file (type pdf)
 <use figures/questionnaire/metalworking.pdf>
+[60]
+Overfull \vbox (24.52449pt too high) has occurred while \output is active []
 
-LaTeX Warning: Float too large for page by 24.52449pt on input line 1691.
-
+[61]
 File: figures/questionnaire/plumbing.pdf Graphic file (type pdf)
 <use figures/questionnaire/plumbing.pdf>
 File: figures/questionnaire/carpentry.pdf Graphic file (type pdf)
 <use figures/questionnaire/carpentry.pdf>
+[62]
 File: figures/questionnaire/masonry.pdf Graphic file (type pdf)
 <use figures/questionnaire/masonry.pdf>
+[63]
+Overfull \vbox (24.5115pt too high) has occurred while \output is active []
 
-LaTeX Warning: Float too large for page by 24.5115pt on input line 1703.
-
+[64]
 File: figures/questionnaire/electricians.pdf Graphic file (type pdf)
 <use figures/questionnaire/electricians.pdf>
 
-LaTeX Warning: Float too large for page by 2.29791pt on input line 1707.
+Overfull \vbox (2.29791pt too high) has occurred while \output is active []
 
-[60] [61] [62] [63] [64] [65] (./cqp.aux) ) 
+[65] (./cqp.aux) ) 
 Here is how much of TeX's memory you used:
  24289 strings out of 476179
  457206 string characters out of 5809544
- 962958 words of memory out of 5000000
+ 964958 words of memory out of 5000000
  44564 multiletter control sequences out of 15000+600000
  481536 words of font info for 158 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
