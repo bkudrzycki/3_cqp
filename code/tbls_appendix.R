@@ -151,11 +151,13 @@ y %>% select(FS1.2, wave, baseline_apps, baseline_sel, baseline_notsel, baseline
                          indent = T,
                          bold = F) %>% 
   kable_styling(font_size = 10) %>% 
-  kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD); n (%)",
+  kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD); n (\\\\%)",
+                       escape = F,
                        general_title = "")
 
 ## ---- attritionfirmsreg --------
 
+baseline <- df %>% filter(wave == 0)
 attr <- distinct(df, across(c(FS1.2, wave))) %>% filter(wave == 1) %>% select(FS1.2) %>% mutate(attr = 0)
 
 baseline_firms <- baseline %>% select(FS1.2, FS1.11, profits, FS4.1, FS5.4, selected, not_selected, did_not_apply, firm_size_sans_app) %>% 
@@ -642,7 +644,8 @@ df %>% select(contains("FS5.2"), wave, FS1.2) %>%
   modify_footnote(update = everything() ~ NA) %>% 
   as_kable_extra(caption = "Monthly wages", 
                  booktabs = T,
-                 linesep = "") %>% 
+                 linesep = "",
+                 position = "H") %>% 
   kable_styling(font_size = 9) %>% 
   kableExtra::footnote(general = "\\\\textit{Notes:} Mean (SD). Monthly wages in \\\\$US.",
                        threeparttable = T,

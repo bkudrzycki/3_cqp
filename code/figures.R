@@ -1,10 +1,6 @@
 ## ---- fig-enrollment --------
 
-x <- read_csv("../data/API_SE.SEC.ENRR_DS2_en_csv_v2_4029558.csv", show_col_types = FALSE) %>% as.data.frame() %>% mutate(Indicator = "Enrolment ratio")
-
-y <- read_csv("../data/EIP_2EET_SEX_RT_A-filtered-2022-05-20.csv", show_col_types = FALSE) %>% as.data.frame() %>% select(Country = "ref_area.label", value = "obs_value", Year = time) %>% mutate(Indicator = "% of youth not in\n employment,\n education, or \n training (NEET)")
-
-z = rbind(x, y)
+z = rbind(enroll_ratio, neet)
 
 ggplot(z, aes(x=Year, y=value, color=Country, shape = Indicator)) +
   geom_line(aes(linetype = Indicator), size = .75) +
@@ -131,6 +127,9 @@ grid.arrange(p1, p2, p3, p4, p5, nrow = 5, top = textGrob("Percentile",gp=gpar(f
 
 
 ## ---- fig-firmhist --------
+
+firms <- df %>% select(FS1.2, wave, FS3.4, firm_size, FS6.1, contains("cb")) %>% group_by(FS1.2, wave) %>% summarise_all(mean, na.rm = T) %>% ungroup()
+
 firms_extrap <- firms %>% mutate(cb_I = FS6.1 * cb_I,
                                  cb_II = FS6.1 * cb_II,
                                  cb_III = FS6.1 * cb_III,
