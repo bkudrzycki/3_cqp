@@ -218,7 +218,7 @@ tbl_stack(list(comp, exp, skills), quiet = TRUE) %>%
 ## ---- tbl-appreg --------
 
 # interaction term
-df$did <- ifelse(df$SELECTED == 1, (as.numeric(df$SELECTED)-1)*df$wave, 0)
+df$did <- ifelse(df$SELECTED == 0, (as.numeric(df$SELECTED))*df$wave, 0)
 df$did2 <- ifelse(df$SELECTED == 3, (as.numeric(df$SELECTED)-2)*df$wave, 0)
 
 x <- df %>% mutate(total_apps = selected + not_selected + did_not_apply,
@@ -252,7 +252,7 @@ stargazer(m1, m3, m4, m5, m7, m8, m9, m11, m12, df = FALSE, omit = "FS1.11", fon
           covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
                                "CQP Did Not Apply",
                                "Endline",
-                               "CQP Not Selected x Endline (reference) \\\\ \\\\ CQP Selected x Endline",
+                               "\\hl{CCQP Selected x Endline (reference)} \\\\ \\\\ \\hl{CCQP Not Selected x Endline}",
                                "CQP Did Not Apply x Endline",
                                "Baseline years of training$^1$",
                                "Firm Size$^2$",
@@ -294,7 +294,7 @@ stargazer(m1, m3, m4, m5, m7, m8, df = FALSE, omit = "FS1.11", font.size= "scrip
           notes.append = F,
           covariate.labels = c("CQP Selected (reference) \\\\ \\\\ CQP Not Selected",
                                "Endline",
-                               "CQP Not Selected x Endline (reference) \\\\ \\\\ CQP Selected x Endline",
+                               "\\hl{CQP Selected x Endline (reference)} \\\\ \\\\ \\hl{CQP Not Selected x Endline}",
                                "Baseline years of training$^1$",
                                "Firm size$^2$",
                                "Total apprentices in firm"),
